@@ -1,34 +1,18 @@
 <Project>
-  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
-    <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);SolutionDir=$(MSBuildThisFileDirectory)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);copyright=$(Reqnroll_Copyright)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);author=$(Reqnroll_Authors)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);owner=$(Reqnroll_Owners)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);summary=$(Reqnroll_Summary)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);branch=$(GitBranch)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);commit=$(GitCommitSha)</NuspecProperties>
-      
-      <NuspecProperties>$(NuspecProperties);Reqnroll_FullFramework_Tools_TFM=$(Reqnroll_FullFramework_Tools_TFM)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);Reqnroll_Core_Tools_TFM=$(Reqnroll_Core_Tools_TFM)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
 
-  <Target Name="CleanupNupkgs" BeforeTargets="Build" >
-    <ItemGroup>
-      <Nupkgs2Delete Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
-    </ItemGroup>
-    <Delete Files="@(Nupkgs2Delete)" />
-  </Target>
+  <PropertyGroup>
+    <ReqnrollCompatibilityVersionRange>[$(PackageVersion),$(CompatibilityVersionUpperRange))</ReqnrollCompatibilityVersionRange>
+    <PackagesOutputPath>$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)</PackagesOutputPath>
+  </PropertyGroup>
 
-  <Target Name="CopyNupkgToFolder" AfterTargets="Pack">
+  <!-- Copies generated NuGet packages and symbol packages to the output packages path -->
+  <Target
+    Name="CopyPackageToPackagesOutputPath"
+    AfterTargets="Pack">
     <ItemGroup>
-      <GeneratedNupkgs Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
+      <GeneratedPackages Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
     </ItemGroup>
-    <Copy SourceFiles="@(GeneratedNupkgs)" DestinationFolder="$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)" />
+    <Copy SourceFiles="@(GeneratedPackages)" DestinationFolder="$(PackagesOutputPath)" />
   </Target>
 
   <UsingTask
@@ -97,4 +81,79 @@ if (Directory.Exists(TmpDirectory))
     <!--Implementation based on https://www.nyckel.com/blog/nuget-packages/.-->
     <ReqnrollClearNuGetCache NuGetCacheDirectory="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)" EnsureNugetCacheCleared="$(REQNROLL_ENSURE_NUGET_CACHE_CLEARED)"/>
   </Target>
+
+  <!-- Get the list of project reference outputs that should be packed as part of this package. -->
+  <Target
+    Name="_GetProjectReferenceCopyLocalPathsForPackAsComponent"
+    DependsOnTargets="ResolveReferences"
+    Returns="_ProjectReferenceCopyLocalPathsForPackAsComponent">
+
+    <ItemGroup>
+      <_ReferenceCopyLocalProjects
+        Include="@(ReferenceCopyLocalPaths -> '%(ProjectReferenceOriginalItemSpec)')"
+        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(ReferenceCopyLocalPaths.PackAsComponent)' == 'true'">
+        <Asset>%(Identity)</Asset>
+      </_ReferenceCopyLocalProjects>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ProjectReferenceCopyLocalPathsForPackAsComponent
+        Include="@(_ReferenceCopyLocalProjects->'%(Asset)')"
+        Condition="'%(ProjectReference.PackAsComponent)' == 'true'"/>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>
+      $(TargetsForTfmSpecificContentInPackage);
+      CollectProjectReferenceOutputsForPack
+    </TargetsForTfmSpecificContentInPackage>
+    
+    <CollectProjectReferenceOutputsForPackDependsOn>
+      $(CollectProjectReferenceOutputsForPackDependsOn);
+      _GetProjectReferenceCopyLocalPathsForPackAsComponent
+    </CollectProjectReferenceOutputsForPackDependsOn>
+  </PropertyGroup>
+
+  <!-- Include referenced project assembly as part of this package directly. -->
+  <Target Name="CollectProjectReferenceOutputsForPack" DependsOnTargets="$(CollectProjectReferenceOutputsForPackDependsOn)">
+    <ItemGroup>
+      <TfmSpecificPackageFile
+        Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent)"
+        PackagePath="lib/$(TargetFramework)/"
+        Condition="'%(Extension)' != '.pdb'"/>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificDebugSymbolsInPackage>
+      $(TargetsForTfmSpecificDebugSymbolsInPackage);
+      CollectProjectReferenceDebugSymbolsForPack
+    </TargetsForTfmSpecificDebugSymbolsInPackage>
+
+    <CollectProjectReferenceDebugSymbolsForPackDependsOn>
+      $(CollectProjectReferenceDebugSymbolsForPackDependsOn);
+      _GetProjectReferenceCopyLocalPathsForPackAsComponent
+    </CollectProjectReferenceDebugSymbolsForPackDependsOn>
+  </PropertyGroup>
+
+  <!-- Included referenced project PDBs as part of the symbols package. -->
+  <Target Name="CollectProjectReferenceDebugSymbolsForPack" DependsOnTargets="$(CollectProjectReferenceDebugSymbolsForPackDependsOn)">
+    <ItemGroup>
+      <TfmSpecificDebugSymbolsFile
+        Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent)"
+        Condition="'%(Extension)' == '.pdb'"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_TfmSpecificDebugSymbolsCandidate
+        Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent->'%(RootDir)%(Directory)%(Filename).pdb')"
+        Condition="'%(Extension)' != '.pdb'"/>
+      <TfmSpecificDebugSymbolsFile
+        Include="@(_TfmSpecificDebugSymbolsCandidate)"
+        TargetFramework="$(TargetFramework)"
+        Condition="Exists('%(FullPath)')" />
+    </ItemGroup>
+  </Target>
+  
 </Project>

@@ -1,0 +1,42 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+
+    <_ReqnrollSpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_ReqnrollSpecFlowCompatibilityGeneratorPlugin>
+    <_ReqnrollSpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_ReqnrollSpecFlowCompatibilityGeneratorPlugin>
+    <_ReqnrollSpecFlowCompatibilityGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_ReqnrollSpecFlowCompatibilityGeneratorPlugin)\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.dll</_ReqnrollSpecFlowCompatibilityGeneratorPluginPath>
+
+    <_ReqnrollSpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_ReqnrollSpecFlowCompatibilityRuntimePlugin>
+    <_ReqnrollSpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">netstandard2.0</_ReqnrollSpecFlowCompatibilityRuntimePlugin>
+    <_ReqnrollSpecFlowCompatibilityRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_ReqnrollSpecFlowCompatibilityRuntimePlugin)\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll</_ReqnrollSpecFlowCompatibilityRuntimePluginPath>
+
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BuildDependsOn>
+      CopySpecFlowJsonToOutput;
+      $(BuildDependsOn)
+    </BuildDependsOn>
+    <CleanDependsOn>
+      $(CleanDependsOn)
+    </CleanDependsOn>
+    <RebuildDependsOn>
+      CopySpecFlowJsonToOutput;
+      $(RebuildDependsOn)
+    </RebuildDependsOn>
+  </PropertyGroup>
+
+  <Target Name="CopySpecFlowJsonToOutput" >
+
+    <PropertyGroup>
+      <SpecFlowJson>specflow.json</SpecFlowJson>
+    </PropertyGroup>
+
+    <ItemGroup Condition="Exists($(SpecFlowJson))">
+      <None Include="$(SpecFlowJson)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+  </Target>
+
+
+</Project>

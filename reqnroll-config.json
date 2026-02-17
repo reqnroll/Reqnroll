@@ -5,6 +5,12 @@
 
   Changelog:
 
+  3.2
+  - Added 'AsyncCucumberExpressionAttribute' and 'AsyncRegexAttribute' to the trace/stepDefinitionSkeletonStyle values.
+
+  3.1
+  - Added generator/disableFriendlyTestNames
+
   3.0
   - Added formatters
  
@@ -58,6 +64,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "disableFriendlyTestNames": {
+          "description": "By default, Reqnroll generates friendly DisplayNames in test case attributes for supported frameworks. Disable this behavior by setting this option to \"true\".",
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -94,7 +105,7 @@
           "description": "Specifies the default step definition style.",
           "type": "string",
           "default": "CucumberExpressionAttribute",
-          "enum": [ "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
+          "enum": [ "AsyncCucumberExpressionAttribute", "AsyncRegexAttribute", "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
         },
         "coloredOutput": {
           "description": "Determine whether Reqnroll should color the test result output.",

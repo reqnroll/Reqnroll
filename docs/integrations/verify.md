@@ -49,4 +49,42 @@ internal class StepDefinitions
 
 ```
 
-**Note:** in a single-threaded environment, the plugin will work without the injected VerifySettings instance. However, in a multithreaded environment, the VerifySettings instance must be injected into the step definition class for a deterministic outcome.
+## Legacy global VerifySettings support
+
+For Verify versions prior to 29.0.0, the plugin also supported a legacy mode that uses a global `VerifySettings` instance (i.e. calling `Verifier.Verify()` without specifying the settings). This mode is not thread-safe and should only be used in single-threaded test execution.
+
+From plugin version v3.1 this legacy support has been removed. It is recommended to always inject the `VerifySettings` instance into the step definition class like in the example above.
+
+If this is not possible, the following workaround can be used to still support the legacy mode. The workaround works only in single-threaded test execution.
+
+```csharp
+namespace Reqnroll.Verify.ReqnrollPlugin;
+
+[Binding]
+public class VerifyHooks
+{
+    [BeforeTestRun]
+    public static void EnableGlobalVerifySettingsForCompatibility()
+    {
+        Verifier.DerivePathInfo(
+            (_, projectDirectory, _, _) =>
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                var scenarioContext = Reqnroll.ScenarioContext.Current;
+                var featureContext = Reqnroll.FeatureContext.Current;
+#pragma warning restore CS0618 // Type or member is obsolete
+                string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
+
+                foreach (System.Collections.DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
+                {
+                    scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
+                }
+
+                return new PathInfo(
+                    Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
+                    featureContext.FeatureInfo.Title,
+                    scenarioInfoTitle);
+            });
+    }
+}
+```

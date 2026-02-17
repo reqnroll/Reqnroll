@@ -1,6 +1,9 @@
+#nullable enable
+using Gherkin;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.Configuration;
+using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Parser;
@@ -8,106 +11,101 @@ using Reqnroll.Tracing;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Reqnroll.Generator;
 
-public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
+public class TestGenerator(
+    ReqnrollConfiguration reqnrollConfiguration,
+    ProjectSettings projectSettings,
+    IFeatureGeneratorRegistry featureGeneratorRegistry,
+    CodeDomHelper codeDomHelper,
+    IGherkinParserFactory gherkinParserFactory,
+    GeneratorInfo generatorInfo)
+    : ITestGenerator
 {
-    protected readonly ReqnrollConfiguration ReqnrollConfiguration;
-    protected readonly ProjectSettings ProjectSettings;
-    protected readonly ITestHeaderWriter TestHeaderWriter;
-    protected readonly ITestUpToDateChecker TestUpToDateChecker;
-    protected readonly CodeDomHelper CodeDomHelper;
+    protected readonly ReqnrollConfiguration ReqnrollConfiguration = reqnrollConfiguration ?? throw new ArgumentNullException(nameof(reqnrollConfiguration));
+    protected readonly ProjectSettings ProjectSettings = projectSettings ?? throw new ArgumentNullException(nameof(projectSettings));
+    protected readonly CodeDomHelper CodeDomHelper = codeDomHelper ?? throw new ArgumentNullException(nameof(codeDomHelper));
 
-    private readonly IFeatureGeneratorRegistry _featureGeneratorRegistry;
-    private readonly IGherkinParserFactory _gherkinParserFactory;
-    private readonly GeneratorInfo _generatorInfo;
+    private readonly IFeatureGeneratorRegistry _featureGeneratorRegistry = featureGeneratorRegistry ?? throw new ArgumentNullException(nameof(featureGeneratorRegistry));
+    private readonly IGherkinParserFactory _gherkinParserFactory = gherkinParserFactory ?? throw new ArgumentNullException(nameof(gherkinParserFactory));
+    private readonly GeneratorInfo _generatorInfo = generatorInfo ?? throw new ArgumentNullException(nameof(generatorInfo));
 
-    public TestGenerator(ReqnrollConfiguration reqnrollConfiguration,
+    [Obsolete("This constructor is obsolete. Use the constructor without ITestHeaderWriter and ITestUpToDateChecker parameters.")]
+    public TestGenerator(
+        ReqnrollConfiguration reqnrollConfiguration,
         ProjectSettings projectSettings,
+        // ReSharper disable once UnusedParameter.Local
         ITestHeaderWriter testHeaderWriter,
+        // ReSharper disable once UnusedParameter.Local
         ITestUpToDateChecker testUpToDateChecker,
         IFeatureGeneratorRegistry featureGeneratorRegistry,
         CodeDomHelper codeDomHelper,
         IGherkinParserFactory gherkinParserFactory,
-        GeneratorInfo generatorInfo)
+        GeneratorInfo generatorInfo) : this(reqnrollConfiguration, projectSettings, featureGeneratorRegistry, codeDomHelper, gherkinParserFactory, generatorInfo)
     {
-        ReqnrollConfiguration = reqnrollConfiguration ?? throw new ArgumentNullException(nameof(reqnrollConfiguration));
-        TestUpToDateChecker = testUpToDateChecker ?? throw new ArgumentNullException(nameof(testUpToDateChecker));
-        _featureGeneratorRegistry = featureGeneratorRegistry ?? throw new ArgumentNullException(nameof(featureGeneratorRegistry));
-        CodeDomHelper = codeDomHelper ?? throw new ArgumentNullException(nameof(codeDomHelper));
-        TestHeaderWriter = testHeaderWriter ?? throw new ArgumentNullException(nameof(testHeaderWriter));
-        ProjectSettings = projectSettings ?? throw new ArgumentNullException(nameof(projectSettings));
-        _gherkinParserFactory = gherkinParserFactory ?? throw new ArgumentNullException(nameof(gherkinParserFactory));
-        _generatorInfo = generatorInfo ?? throw new ArgumentNullException(nameof(generatorInfo));
     }
 
-    protected override TestGeneratorResult GenerateTestFileWithExceptions(FeatureFileInput featureFileInput, GenerationSettings settings)
+    public TestGeneratorResult GenerateTestFile(FeatureFileInput featureFileInput, GenerationSettings settings)
     {
         if (featureFileInput == null) throw new ArgumentNullException(nameof(featureFileInput));
         if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-        var generatedTestFullPath = GetTestFullPath(featureFileInput);
-        bool? preliminaryUpToDateCheckResult = null;
-        if (settings.CheckUpToDate)
+        try
         {
-            preliminaryUpToDateCheckResult = TestUpToDateChecker.IsUpToDatePreliminary(featureFileInput, generatedTestFullPath, settings.UpToDateCheckingMethod);
-            if (preliminaryUpToDateCheckResult == true)
-                return new TestGeneratorResult(null, true, null, null);
+            return GenerateTestFileWithExceptions(featureFileInput, settings);
         }
-
-        string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings, out var featureMessages);
-        if(string.IsNullOrEmpty(generatedTestCode))
-            return new TestGeneratorResult(null, true, generatedWarnings, null);
-
-        if (settings.CheckUpToDate && preliminaryUpToDateCheckResult != false)
+        catch (ParserException parserException)
         {
-            var isUpToDate = TestUpToDateChecker.IsUpToDate(featureFileInput, generatedTestFullPath, generatedTestCode, settings.UpToDateCheckingMethod);
-            if (isUpToDate)
-                return new TestGeneratorResult(null, true, generatedWarnings, null);
+            return TestGeneratorResult.FromErrors(
+                parserException
+                    .GetParserExceptions()
+                    .Select(ex => new TestGenerationError(ex.Location?.Line ?? 0, ex.Location?.Column ?? 0, ex.Message)));
         }
-
-        if (settings.WriteResultToFile)
+        catch (Exception exception)
         {
-            File.WriteAllText(generatedTestFullPath, generatedTestCode, Encoding.UTF8);
+            return TestGeneratorResult.FromErrors([new TestGenerationError(exception)]);
         }
-
-        return new TestGeneratorResult(generatedTestCode, false, generatedWarnings, featureMessages);
     }
 
-    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureMessages)
+    protected virtual TestGeneratorResult GenerateTestFileWithExceptions(FeatureFileInput featureFileInput, GenerationSettings settings)
     {
-        generationWarnings = Array.Empty<string>();
-        featureMessages = null;
+        GenerationTargetLanguage.AssertSupported(ProjectSettings.ProjectPlatformSettings.Language);
+        var generationResult = GenerateCodeNamespace(featureFileInput);
+        return GenerateCodeFromCodeNamespace(generationResult);
+    }
 
-        using (var outputWriter = new IndentProcessingWriter(new StringWriter()))
+    private TestGeneratorResult GenerateCodeFromCodeNamespace(UnitTestFeatureGenerationResult? generationResult)
+    {
+        if (generationResult == null)
         {
-            var codeProvider = CodeDomHelper.CreateCodeDomProvider();
-            var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings, out featureMessages);
-            if (codeNamespace == null) return "";
+            // in case of empty feature file, generatedTestCode is empty and featureMessages is null
+            return new TestGeneratorResult("", [], null, null);
+        }
 
-            var options = new CodeGeneratorOptions
+        var codeProvider = CodeDomHelper.CreateCodeDomProvider();
+        using var outputWriter = new IndentProcessingWriter(new StringWriter());
+        AddReqnrollHeader(codeProvider, outputWriter);
+        AddFileWideUsingStatements(codeProvider, outputWriter);
+        codeProvider.GenerateCodeFromNamespace(
+            generationResult.CodeNamespace,
+            outputWriter,
+            new CodeGeneratorOptions
             {
                 BracingStyle = "C",
-            };
+            });
+        AddReqnrollFooter(codeProvider, outputWriter);
 
-            AddReqnrollHeader(codeProvider, outputWriter);
-            AddFileWideUsingStatements(codeProvider, outputWriter);
-            codeProvider.GenerateCodeFromNamespace(codeNamespace, outputWriter, options);
-            AddReqnrollFooter(codeProvider, outputWriter);
+        outputWriter.Flush();
+        var generatedTestCode = outputWriter.ToString();
+        if (CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
+            generatedTestCode = FixVb(generatedTestCode);
 
-            outputWriter.Flush();
-            var generatedTestCode = outputWriter.ToString();
-            if (CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
-                generatedTestCode = FixVb(generatedTestCode);
-            return generatedTestCode;
-        }
+        return new TestGeneratorResult(generatedTestCode, generationResult.GenerationWarnings, generationResult.FeatureMessages, generationResult.FeatureMessagesResourceName);
     }
 
     private string FixVb(string generatedTestCode)
@@ -139,27 +137,29 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return result;
     }
         
-    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureMessages)
+    private UnitTestFeatureGenerationResult? GenerateCodeNamespace(FeatureFileInput featureFileInput)
     {
-        generationWarnings = Array.Empty<string>();
-        featureMessages = null;
-        string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
-
-        var parser = _gherkinParserFactory.Create(ReqnrollConfiguration.FeatureLanguage);
-        ReqnrollDocument reqnrollDocument;
-        using (var contentReader = featureFileInput.GetFeatureFileContentReader(ProjectSettings))
-        {
-            reqnrollDocument = ParseContent(parser, contentReader, GetReqnrollDocumentLocation(featureFileInput));
-        }
-
+        var reqnrollDocument = ParseReqnrollDocument(featureFileInput);
         if (reqnrollDocument.ReqnrollFeature == null) return null;
 
         var featureGenerator = _featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (featureGenerator is UnitTestFeatureGenerator unitTestFeatureGenerator)
+            unitTestFeatureGenerator.FeatureFileInput = featureFileInput; // pass this to GenerateUnitTestFixture in v4
+#pragma warning restore CS0618 // Type or member is obsolete
+        string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
         var generationResult = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace);
-        var codeNamespace = generationResult.CodeNamespace;
-        featureMessages = generationResult.FeatureMessages;
-        generationWarnings = generationResult.GenerationWarnings;
-        return codeNamespace;
+        if (generationResult.CodeNamespace == null)
+            throw new ReqnrollException("No CodeNamespace has been generated"); // this should never happen
+
+        return generationResult;
+    }
+
+    private ReqnrollDocument ParseReqnrollDocument(FeatureFileInput featureFileInput)
+    {
+        var parser = _gherkinParserFactory.Create(ReqnrollConfiguration.FeatureLanguage);
+        using var contentReader = featureFileInput.GetFeatureFileContentReader(ProjectSettings);
+        return ParseContent(parser, contentReader, GetReqnrollDocumentLocation(featureFileInput));
     }
 
     private ReqnrollDocumentLocation GetReqnrollDocumentLocation(FeatureFileInput featureFileInput)
@@ -169,9 +169,9 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
             GetFeatureFolderPath(featureFileInput.ProjectRelativePath));
     }
 
-    private string GetFeatureFolderPath(string projectRelativeFilePath)
+    private string? GetFeatureFolderPath(string projectRelativeFilePath)
     {
-        string directoryName = Path.GetDirectoryName(projectRelativeFilePath);
+        var directoryName = Path.GetDirectoryName(projectRelativeFilePath);
         if (string.IsNullOrWhiteSpace(directoryName)) return null;
 
         return string.Join("/", directoryName.Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries));
@@ -182,32 +182,25 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return parser.Parse(contentReader, documentLocation);
     }
 
-    protected string GetTargetNamespace(FeatureFileInput featureFileInput)
+    protected string? GetTargetNamespace(FeatureFileInput featureFileInput)
     {
         if (!string.IsNullOrEmpty(featureFileInput.CustomNamespace))
             return featureFileInput.CustomNamespace;
 
-        string targetNamespace = ProjectSettings == null || string.IsNullOrEmpty(ProjectSettings.DefaultNamespace)
+        var targetNamespace = string.IsNullOrEmpty(ProjectSettings.DefaultNamespace)
             ? null
             : ProjectSettings.DefaultNamespace;
 
-        var directoryName = Path.GetDirectoryName(featureFileInput.ProjectRelativePath);
-        string namespaceExtension = string.IsNullOrEmpty(directoryName) ? null :
+        // we calculate the namespace based on the link information (if available) otherwise from the project relative path
+        var relativePathToCalculateNamespaceFrom = !string.IsNullOrEmpty(featureFileInput.FeatureFileLink) ? featureFileInput.FeatureFileLink : featureFileInput.ProjectRelativePath;
+        var directoryName = Path.GetDirectoryName(relativePathToCalculateNamespaceFrom);
+        var namespaceExtension = string.IsNullOrEmpty(directoryName) ? null :
             string.Join(".", directoryName.TrimStart('\\', '/', '.').Split('\\', '/').Select(f => f.ToIdentifier()).ToArray());
         if (!string.IsNullOrEmpty(namespaceExtension))
             targetNamespace = targetNamespace == null
                 ? namespaceExtension
                 : targetNamespace + "." + namespaceExtension;
         return targetNamespace;
-    }
-
-    public string GetTestFullPath(FeatureFileInput featureFileInput)
-    {
-        var path = featureFileInput.GetGeneratedTestFullPath(ProjectSettings);
-        if (path != null)
-            return path;
-
-        return featureFileInput.GetFullPath(ProjectSettings) + GenerationTargetLanguage.GetExtension(ProjectSettings.ProjectPlatformSettings.Language);
     }
 
     protected void AddFileWideUsingStatements(CodeDomProvider codeProvider,TextWriter outputWriter)
@@ -219,29 +212,24 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
     }
 
     #region Header & Footer
-    protected override Version DetectGeneratedTestVersionWithExceptions(FeatureFileInput featureFileInput)
-    {
-        var generatedTestFullPath = GetTestFullPath(featureFileInput);
-        return TestHeaderWriter.DetectGeneratedTestVersion(featureFileInput.GetGeneratedTestContent(generatedTestFullPath));
-    }
-
     protected void AddReqnrollHeader(CodeDomProvider codeProvider, TextWriter outputWriter)
     {
-        const string reqnrollHeaderTemplate = @"------------------------------------------------------------------------------
- <auto-generated>
-     This code was generated by Reqnroll (https://www.reqnroll.net/).
-     Reqnroll Version:{0}
-     Reqnroll Generator Version:{1}
+        const string reqnrollHeaderTemplate =
+            """
+            ------------------------------------------------------------------------------
+             <auto-generated>
+                 This code was generated by Reqnroll (https://reqnroll.net/).
+                 Reqnroll Version:{0}
+                 Reqnroll Generator Version:{1}
 
-     Changes to this file may cause incorrect behavior and will be lost if
-     the code is regenerated.
- </auto-generated>
-------------------------------------------------------------------------------";
+                 Changes to this file may cause incorrect behavior and will be lost if
+                 the code is regenerated.
+             </auto-generated>
+            ------------------------------------------------------------------------------
+            """;
 
-        var headerReader = new StringReader(string.Format(reqnrollHeaderTemplate,
-                                                          GetCurrentReqnrollVersion(),
-                                                          _generatorInfo.GeneratorVersion
-                                            ));
+        var headerReader = new StringReader(
+            string.Format(reqnrollHeaderTemplate, GetCurrentReqnrollVersion(), _generatorInfo.GeneratorVersion));
 
         while (headerReader.ReadLine() is { } line)
         {

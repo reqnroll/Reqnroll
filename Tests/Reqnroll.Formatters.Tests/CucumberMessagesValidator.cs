@@ -1,13 +1,15 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.Versioning;
 
 namespace Reqnroll.Formatters.Tests;
 
-public class CucumberMessagesValidator
+public partial class CucumberMessagesValidator
 {
     private readonly IEnumerable<Envelope> _actualEnvelopes;
     private readonly IEnumerable<Envelope> _expectedEnvelopes;
@@ -20,6 +22,11 @@ public class CucumberMessagesValidator
     private readonly Dictionary<string, object> _actualElementsById = new();
     private readonly Dictionary<string, object> _expectedElementsById = new();
     private readonly FluentAssertionCucumberMessagePropertySelectionRule _customCucumberMessagesPropertySelector;
+
+    Dictionary<object, int> _actualPartitions;
+    Dictionary<object, int> _expectedPartitions;
+    private readonly int _numPartitions;
+
 
     // Envelope types - these are the top level types in CucumberMessages
     // Meta is excluded from the list as there is nothing there for us to compare
@@ -38,10 +45,27 @@ public class CucumberMessagesValidator
         _actualEnvelopes = actual;
         _expectedEnvelopes = expected;
 
-        SetupCrossReferences(actual, _actualIDsByType, _actualElementsByType, _actualElementsById);
+        SetupCrossReferences(_actualEnvelopes, _actualIDsByType, _actualElementsByType, _actualElementsById);
         SetupCrossReferences(expected, _expectedIDsByType, _expectedElementsByType, _expectedElementsById);
 
+        // assign a 'partition' number to each Envelope id so that envelopes can be split apart by Feature
+        // this will allow Envelope sequence comparisons to be isolated to each feature (ensuring that parallel feature execution won't interfere with comparisons)
+        _actualPartitions = Partition(actual);
+        _expectedPartitions = Partition(expected);
+        _numPartitions = _expectedPartitions.Values.Max();
+
         _customCucumberMessagesPropertySelector = new FluentAssertionCucumberMessagePropertySelectionRule(_expectedElementsByType.Keys.ToList());
+    }
+
+    private Dictionary<object, int> Partition(Envelope[] envelopes)
+    {
+        var partitioner = new EnvelopePartitioner();
+        var result = new Dictionary<object, int>();
+        foreach (var envelope in envelopes)
+        {
+            result.Add(envelope.Content(), partitioner.AssignPartition(envelope));
+        }
+        return result;
     }
 
     private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> idsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, object> elementsById)
@@ -93,20 +117,34 @@ public class CucumberMessagesValidator
             foreach (Type t in EnvelopeTypes)
             {
                 var genMethod = method!.MakeGenericMethod(t);
-                genMethod.Invoke(this, null);
+                for (int i = 0; i <= _numPartitions; i++)
+                {
+                    genMethod.Invoke(this, [i]);
+                }
             }
         }
     }
 
-    private void CompareMessageType<T>()
+    private int MapPartitionNumber(int partitionNumber)
+    {
+        if (partitionNumber == 0) return 0;
+
+        var gd = _expectedPartitions.First(kvp => kvp.Value == partitionNumber && kvp.Key is GherkinDocument).Key as GherkinDocument;
+        var featureName = gd!.Feature.Name;
+        return _actualPartitions.First(kvp => kvp.Key is GherkinDocument document && document.Feature.Name == featureName).Value;
+    }
+    // by partition
+    private void CompareMessageType<T>(int partitionNumber)
     {
         if (!_expectedElementsByType.ContainsKey(typeof(T)))
             return;
 
-        var actual = _actualElementsByType.TryGetValue(typeof(T), out HashSet<object>? actualElements) ? 
-            actualElements.OfType<T>().ToList() : new List<T>();
+        int actualsPartitionNumber = MapPartitionNumber(partitionNumber);
 
-        var expected = _expectedElementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList();
+        var actual = _actualElementsByType.TryGetValue(typeof(T), out HashSet<object>? actualElements) && actualElements.Count > 0 ?
+            actualElements.OfType<T>().Where(e => _actualPartitions[e!] == actualsPartitionNumber).ToList() : new List<T>();
+
+        var expected = _expectedElementsByType[typeof(T)].AsEnumerable().OfType<T>().Where(e => _expectedPartitions[e!] == partitionNumber).ToList();
 
         if (!(typeof(T) == typeof(TestStepFinished)))
         {
@@ -143,41 +181,48 @@ public class CucumberMessagesValidator
         }
     }
 
+
+    // by partition
     private void ActualTestExecutionMessagesShouldReferBackToTheSameStepTextAsExpected()
     {
         // IF the expected results contains no TestStepStarted messages, then there is nothing to check
         if (!_expectedElementsByType.Keys.Contains(typeof(TestStepStarted)))
             return;
+        for (int i = 0; i < _numPartitions; i++)
+        {
+            var partitionNumber = i + 1;
+            int actualsPartitionNumber = MapPartitionNumber(partitionNumber);
 
-        // For each TestStepStarted message, ensure that the pickle step referred to is the same in Actual and Expected for the corresponding testStepStarted message
-        var actualTestStepStartedTestStepIds = _actualElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Select(tss => tss.TestStepId).ToList();
-        var expectedTestStepStartedTestStepIds = _expectedElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Select(tss => tss.TestStepId).ToList();
+            // For each TestStepStarted message, ensure that the pickle step referred to is the same in Actual and Expected for the corresponding testStepStarted message
+            var actualTestStepStartedTestStepIds = _actualElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Where(e => _actualPartitions[e!] == actualsPartitionNumber).Select(tss => tss.TestStepId).ToList();
+            var expectedTestStepStartedTestStepIds = _expectedElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Where(e => _expectedPartitions[e!] == partitionNumber).Select(tss => tss.TestStepId).ToList();
 
-        // Making the assumption here that the order of TestStepStarted messages is the same in both Actual and Expected
-        // pair these up, and walk back to the pickle step text and compare
+            // Making the assumption here that the order of TestStepStarted messages is the same in both Actual and Expected within a Partition
+            // pair these up, and walk back to the pickle step text and compare
 
-        actualTestStepStartedTestStepIds
-            .Zip(expectedTestStepStartedTestStepIds, (a, e) => (a, e))
-            .ToList()
-            .ForEach(t =>
-            {
-                _actualElementsById[t.a].Should().BeAssignableTo<TestStep>();
-                var actualTestStep = _actualElementsById[t.a] as TestStep;
-                _expectedElementsById[t.e].Should().BeAssignableTo<TestStep>();
-                var expectedTestStep = _expectedElementsById[t.e] as TestStep;
-                if (actualTestStep!.PickleStepId != null && expectedTestStep!.PickleStepId != null)
+            actualTestStepStartedTestStepIds
+                .Zip(expectedTestStepStartedTestStepIds, (a, e) => (a, e))
+                .ToList()
+                .ForEach(t =>
                 {
-                    _actualElementsById[actualTestStep.PickleStepId].Should().BeAssignableTo<PickleStep>();
-                    var actualPickleStep = _actualElementsById[actualTestStep.PickleStepId] as PickleStep;
-                    _expectedElementsById[expectedTestStep.PickleStepId].Should().BeAssignableTo<PickleStep>();
-                    var expectedPickleStep = _expectedElementsById[expectedTestStep.PickleStepId] as PickleStep;
-                    actualPickleStep!.Text.Should().Be(expectedPickleStep!.Text, $"expecting the text of the pickle step {actualPickleStep.Id} to match that of {expectedPickleStep.Id}");
-                }
-                else
-                { // confirm that both are null or not null, if one is null, throw an exception
-                    actualTestStep.PickleStepId.Should().Be(expectedTestStep!.PickleStepId, "expecting both PickleStepIds to be null or not null");
-                }
-            });
+                    _actualElementsById[t.a].Should().BeAssignableTo<TestStep>();
+                    var actualTestStep = _actualElementsById[t.a] as TestStep;
+                    _expectedElementsById[t.e].Should().BeAssignableTo<TestStep>();
+                    var expectedTestStep = _expectedElementsById[t.e] as TestStep;
+                    if (actualTestStep!.PickleStepId != null && expectedTestStep!.PickleStepId != null)
+                    {
+                        _actualElementsById[actualTestStep.PickleStepId].Should().BeAssignableTo<PickleStep>();
+                        var actualPickleStep = _actualElementsById[actualTestStep.PickleStepId] as PickleStep;
+                        _expectedElementsById[expectedTestStep.PickleStepId].Should().BeAssignableTo<PickleStep>();
+                        var expectedPickleStep = _expectedElementsById[expectedTestStep.PickleStepId] as PickleStep;
+                        actualPickleStep!.Text.Should().Be(expectedPickleStep!.Text, $"expecting the text of the pickle step {actualPickleStep.Id} to match that of {expectedPickleStep.Id}");
+                    }
+                    else
+                    { // confirm that both are null or not null, if one is null, throw an exception
+                        actualTestStep.PickleStepId.Should().Be(expectedTestStep!.PickleStepId, "expecting both PickleStepIds to be null or not null");
+                    }
+                });
+        }
     }
 
     private void TestExecutionStepsShouldProperlyReferenceTestCases()
@@ -318,8 +363,6 @@ public class CucumberMessagesValidator
 
         using (new AssertionScope("Basic Structural Comparison Tests"))
         {
-            actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
-
             // This checks that each top level Envelope content type present in the actual is present in the expected in the same number (except for hooks)
             foreach (var messageType in EnvelopeExtensions.EnvelopeContentTypes)
             {
@@ -338,10 +381,24 @@ public class CucumberMessagesValidator
                 if (messageType == typeof(Hook) && _actualElementsByType.ContainsKey(messageType))
                     _actualElementsByType[messageType].Should().HaveCountGreaterThanOrEqualTo(_expectedElementsByType[messageType].Count());
             }
+
+            actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
         }
     }
 
-    EquivalencyAssertionOptions<T> ArrangeFluentAssertionOptions<T>(EquivalencyAssertionOptions<T> options)
+    private bool GroupListIsEmpty(List<Group> groups)
+    {
+        if (groups == null || groups.Count == 0) return true;
+        foreach (var group in groups)
+        {
+            if (!string.IsNullOrEmpty(group.Value) || group.Start.HasValue)
+                return false;
+            if (!GroupListIsEmpty(group.Children)) return false;
+        }
+        return true;
+    }
+
+    private EquivalencyAssertionOptions<T> ArrangeFluentAssertionOptions<T>(EquivalencyAssertionOptions<T> options)
     {
         // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal when comparing instances
         return options
@@ -396,18 +453,28 @@ public class CucumberMessagesValidator
                .ComparingByMembers<UndefinedParameterType>()
                .ComparingByMembers<TestRunHookStarted>()
                .ComparingByMembers<TestRunHookFinished>()
+               .ComparingByMembers<Suggestion>()
+               .ComparingByMembers<Snippet>()
 
                // Using a custom Property Selector so that we can ignore the properties that are not comparable
                .Using(_customCucumberMessagesPropertySelector)
-
                // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
-               .Using<string>(ctx =>
+               //.Using<string>(ctx =>
+               //{
+               //    var actual = ctx.Subject.Split("-")[0];
+               //    var expected = ctx.Expectation.Split("-")[0];
+               //    actual.Should().Be(expected);
+               //})
+
+               // Using special logic to assert that suggestions must contain at least one snippets among those specified in the Expected set
+               // We can't compare snippet content as the Language and Code properties won't match
+               .Using<Suggestion>(ctx =>
                {
-                   var actual = ctx.Subject.Split("-")[0];
-                   var expected = ctx.Expectation.Split("-")[0];
-                   actual.Should().Be(expected);
+                   var actualSnippets = ctx.Subject.Snippets ?? new List<Snippet>();
+                   var expectedSnippets = ctx.Expectation.Snippets ?? new List<Snippet>();
+                   actualSnippets.Should().HaveCountGreaterThanOrEqualTo(1).And.HaveCountLessThanOrEqualTo(expectedSnippets.Count);
                })
-               .When(info => info.Path.EndsWith("Language"))
+               .WhenTypeIs<Suggestion>()
 
                // Using special logic to compare regular expression strings (ignoring the differences of the regex anchor characters)
                .Using<List<string>>(ctx =>
@@ -459,7 +526,7 @@ public class CucumberMessagesValidator
                    expectation = expectation.Replace("\r\n", "\n");
                    subject.Should().Be(expectation);
                })
-               .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data"))
+               .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data") || info.Path.EndsWith("Content"))
 
                // The list of hooks should contain at least as many items as the list of expected hooks
                // Because Reqnroll does not support Tag Expressions, these are represented in RnR as multiple Hooks or multiple Tags on Hooks Binding methods
@@ -497,10 +564,25 @@ public class CucumberMessagesValidator
 
                // Groups are nested self-referential objects inside StepMatchArgument(s). Other Cucumber implementations support a more sophisticated
                // version of this structure in which multiple regex capture groups are conveyed inside a single StepMatchArgument
-               // For Reqnroll, we will only compare the outermost Group; the only property we care about is the Value.
+               // For Reqnroll, we will only compare the outermost Group of the actual.
                .Using<Group>((ctx) =>
                {
-                   ctx.Subject.Value.Should().Be(ctx.Expectation.Value);
+                   var actual = ctx.Subject;
+                   var expected = ctx.Expectation;
+                   if (expected != null
+                        && expected.Value.Length > 2
+                        && ((expected.Value.StartsWith("\"") && expected.Value.EndsWith("\""))
+                            || (expected.Value.StartsWith("'") && expected.Value.EndsWith("'")))
+                       && !GroupListIsEmpty(expected.Children))
+                   {
+                       actual.Value.Should().Be(expected.Children[0].Value);
+                       actual.Start.Should().Be(expected.Children[0].Start);
+                   }
+                   else
+                   {
+                       actual.Value.Should().Be(ctx.Expectation.Value);
+                       actual.Start.Should().Be(ctx.Expectation.Start);
+                   }
                })
                .WhenTypeIs<Group>()
 
@@ -508,6 +590,32 @@ public class CucumberMessagesValidator
                // We can't simply omit Timestamp from comparison because then TestRunStarted has nothing else to compare (which causes an error)
                .Using<Timestamp>(_ => 1.Should().Be(1))
                .WhenTypeIs<Timestamp>()
+
+               .Using<List<Group>>((ctx) =>
+               {
+                   var actual = ctx.Subject;
+                   var expected = ctx.Expectation;
+                   // The CCK cucumber implementation sometimes renders empty nested groups, which we will ignore
+                   if (GroupListIsEmpty(expected)) { 1.Should().Be(1); }
+                   actual.Should().BeEquivalentTo(expected);
+               })
+               .WhenTypeIs<List<Group>>()
+
+               // TestStepResult.Message contains Exception message string. If one is expected, then the result should have content
+               .Using<string>((ctx) =>
+               {
+                   var actual = ctx.Subject;
+                   var expected = ctx.Expectation;
+                   if (!string.IsNullOrEmpty(expected))
+                   {
+                       actual.Should().NotBeNullOrEmpty();
+                   }
+                   else
+                   {
+                       actual.Should().BeNullOrEmpty();
+                   }
+               })
+               .When(info => info.Path.EndsWith("Message"))
 
                .AllowingInfiniteRecursion()
                //.RespectingRuntimeTypes()

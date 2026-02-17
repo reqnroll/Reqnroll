@@ -1,25 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-
-    <PackageId>Reqnroll.Autofac</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Autofac.nuspec</NuspecFile>
-    
     <RootNamespace>Reqnroll.Autofac</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.Autofac</PackageId>
+    <PackageTags>reqnroll autofac di dependency injection</PackageTags>
+    <Title>Reqnroll Autofac integration plugin</Title>
+    <Description>Reqnroll plugin that enables to use Autofac for resolving test dependencies.</Description>
+    <Authors>Gaspar Nagy, Spec Solutions, $(ReqnrollAuthors)</Authors>
+    <Copyright>Copyright © Gaspar Nagy, Spec Solutions, $(ReqnrollAuthors)</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
 
 </Project>

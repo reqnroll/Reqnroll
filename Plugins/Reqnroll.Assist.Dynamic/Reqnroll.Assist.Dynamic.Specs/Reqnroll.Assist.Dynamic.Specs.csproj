@@ -1,10 +1,18 @@
-﻿<Project>
-
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="..\..\..\Tests\Reqnroll.Specs\build/Reqnroll.Tools.MsBuild.Generation.OwnTests.props" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ReqnrollCoreToolsTfm)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ReqnrollFullFrameworkToolsTfm)</ReqnrollTestTFM>
+    <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../'))</_RepoRoot>
+    <ReqnrollGenerationProjectPath>$(_RepoRoot)Reqnroll.Tools.MsBuild.Generation/</ReqnrollGenerationProjectPath>
+    <ReqnrollGenerationTasksPath>$(ReqnrollGenerationProjectPath)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksPath>
+    <GenerateReqnrollAssemblyHooksFile>true</GenerateReqnrollAssemblyHooksFile>
+  </PropertyGroup>
+
+  <Import Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.props" />
+  
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>AssistDynamic.Specs</RootNamespace>
@@ -13,46 +21,34 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
-
-    <PackageReference Include="nunit" Version="4.2.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
-
+    <PackageReference Include="nunit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\Reqnroll.Assist.Dynamic\Reqnroll.Assist.Dynamic.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
-
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-
-  <Target Name="PreBuild">
-    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
-    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
-  </Target>
-
-  <ItemGroup>
-    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.NUnit.Generator.ReqnrollPlugin.dll" />
-  </ItemGroup>
-
-  <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
-  <!-- has to be before the PropertyGroup change-->
-  <PropertyGroup>
-    <BuildDependsOn>
-      PreBuild;
-      $(BuildDependsOn)
-    </BuildDependsOn>
-    <RebuildDependsOn>
-      PreBuild;
-      $(RebuildDependsOn)
-    </RebuildDependsOn>
-  </PropertyGroup>
 
   <ItemGroup>
     <None Update="reqnroll.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <ReqnrollGeneratorPlugins Include="$(_RepoRoot)Plugins/Reqnroll.NUnit.Generator.ReqnrollPlugin/bin/$(Configuration)/netstandard2.0/Reqnroll.NUnit.Generator.ReqnrollPlugin.dll" />
+    <ReqnrollAssemblyHooksTemplate Include="$(_RepoRoot)Plugins/Reqnroll.NUnit.ReqnrollPlugin/obj/$(Configuration)/netstandard2.0/NUnit.AssemblyHooks.$(PackageVersion).cs" />
+  </ItemGroup>
+
+  <Import Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.targets" />
+  <Import Project="$(_RepoRoot)Plugins/Reqnroll.TestFrameworkAdapter.targets" />
 
 </Project>

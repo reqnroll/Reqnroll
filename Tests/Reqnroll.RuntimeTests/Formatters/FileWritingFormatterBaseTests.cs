@@ -10,7 +10,6 @@ using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -104,6 +103,8 @@ public class FileWritingFormatterBaseTests
 
     public FileWritingFormatterBaseTests()
     {
+        _configMock.Setup(c => c.ResolveTemplatePlaceholders(It.IsAny<string>()))
+                   .Returns((string s) => s); // Default to identity function for tests
         _sut = new TestFileWritingFormatter(_configMock.Object, _loggerMock.Object, _fileSystemMock.Object);
     }
 

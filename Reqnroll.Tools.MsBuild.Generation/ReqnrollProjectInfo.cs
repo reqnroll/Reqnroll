@@ -1,57 +1,33 @@
 using System.Collections.Generic;
+using System.IO;
 using Reqnroll.Generator;
 using Reqnroll.Utils;
 
-namespace Reqnroll.Tools.MsBuild.Generation
+namespace Reqnroll.Tools.MsBuild.Generation;
+
+public class ReqnrollProjectInfo(
+    IReadOnlyCollection<GeneratorPluginInfo> generatorPlugins,
+    IReadOnlyCollection<ReqnrollFeatureFileInfo> featureFiles,
+    string projectPath,
+    string projectFolder,
+    string projectGuid,
+    string projectAssemblyName,
+    string outputPath,
+    string rootNamespace,
+    string targetFrameworks,
+    string currentTargetFramework)
 {
-    public class ReqnrollProjectInfo
-    {
-        public ReqnrollProjectInfo(
-            IReadOnlyCollection<GeneratorPluginInfo> generatorPlugins,
-            IReadOnlyCollection<string> featureFiles,
-            string projectPath,
-            string projectFolder,
-            string projectGuid,
-            string projectAssemblyName,
-            string outputPath,
-            string intermediateOutputPath,
-            string rootNamespace,
-            string targetFrameworks,
-            string currentTargetFramework)
-        {
-            GeneratorPlugins = generatorPlugins;
-            FeatureFiles = FileFilter.GetValidFiles(featureFiles);
-            ProjectFolder = projectFolder;
-            OutputPath = outputPath;
-            IntermediateOutputPath = intermediateOutputPath;
-            RootNamespace = rootNamespace;
-            TargetFrameworks = targetFrameworks;
-            CurrentTargetFramework = currentTargetFramework;
-            ProjectGuid = projectGuid;
-            ProjectAssemblyName = projectAssemblyName;
-            ProjectPath = projectPath;
-        }
+    public IReadOnlyCollection<GeneratorPluginInfo> GeneratorPlugins { get; } = generatorPlugins;
+    public IReadOnlyCollection<ReqnrollFeatureFileInfo> FeatureFiles { get; } = featureFiles ?? [];
+    public string ProjectPath { get; } = projectPath;
+    public string ProjectFolder { get; } = projectFolder;
+    public string ProjectGuid { get; } = projectGuid;
+    public string ProjectAssemblyName { get; } = projectAssemblyName;
+    public string OutputPath { get; } = outputPath;
+    public string RootNamespace { get; } = rootNamespace;
+    public string TargetFrameworks { get; } = targetFrameworks;
+    public string CurrentTargetFramework { get; } = currentTargetFramework;
 
-        public IReadOnlyCollection<GeneratorPluginInfo> GeneratorPlugins { get; }
-
-        public IReadOnlyCollection<string> FeatureFiles { get; }
-
-        public string ProjectPath { get; }
-
-        public string ProjectFolder { get; }
-
-        public string ProjectGuid { get; }
-
-        public string ProjectAssemblyName { get; }
-
-        public string OutputPath { get; }
-        public string IntermediateOutputPath { get; }
-
-        public string RootNamespace { get; }
-
-        public string TargetFrameworks { get; }
-
-        public string CurrentTargetFramework { get; }
-
-    }
+    public string GetFullPathAndNormalize(string projectRelativePath) => 
+        FileSystemHelper.NormalizeDirectorySeparators(Path.GetFullPath(Path.Combine(ProjectFolder, projectRelativePath)));
 }

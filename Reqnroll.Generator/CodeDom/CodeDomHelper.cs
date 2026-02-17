@@ -108,7 +108,7 @@ namespace Reqnroll.Generator.CodeDom
                 case CodeDomProviderLanguage.CSharp:
                     return new CodeSnippetStatement("#pragma warning disable");
                 case CodeDomProviderLanguage.VB:
-                    return new CodeSnippetStatement("#Disable Warning BC42356"); //in VB warning codes must be listed explicitly
+                    return new CodeSnippetStatement("#Disable Warning BC42356,BC42358"); //in VB warning codes must be listed explicitly
             }
             return new CodeCommentStatement("#pragma warning disable");
         }

@@ -14,15 +14,16 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit3PackageName = "NUnit";
         public const string NUnit3PackageVersion = "3.13.1";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
-        public const string NUnit3TestAdapterPackageVersion = "3.17.0";
+        public const string NUnit3TestAdapterPackageVersion = "5.2.0";
         public const string NUnit4PackageName = "NUnit";
-        public const string NUnit4PackageVersion = "4.2.2";
+        public const string NUnit4PackageVersion = "4.4.0";
         public const string NUnit4TestAdapterPackageName = "NUnit3TestAdapter";
-        public const string NUnit4TestAdapterPackageVersion = "4.6.0";
+        public const string NUnit4TestAdapterPackageVersion = "5.2.0";
         public const string TUnitPackageName = "TUnit";
-        public const string TUnitPackageVersion = "0.55.23";
+        public const string TUnitPackageVersion = "1.3.25";
         private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.10";
+        private const string MSTest4PackageVersion = "4.0.0";
         private const string XUnit3PackageVersion = "2.0.0";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
@@ -66,8 +67,14 @@ namespace Reqnroll.TestProjectGenerator
         public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Json;
 
         public bool IsReqnrollFeatureProject { get; set; } = true;
+        /// <summary>
+        /// Whether to add an explicit reference to `Reqnroll` package in addition to the unit test specific packages, like `Reqnroll.MsTest`.
+        /// </summary>
+        public bool ForceAddingExplicitReferenceToReqnrollPackage { get; set; } = false;
 
         public bool? IsTreatWarningsAsErrors { get; set; }
+
+        public bool? UseIntermediateOutputPathForCodeBehind { get; set; }
 
         public ProjectType ProjectType { get; set; } = ProjectType.Library;
 
@@ -232,7 +239,8 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddNuGetPackage("System.Runtime.CompilerServices.Unsafe", "6.0.0", new NuGetPackageAssembly("System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "netstandard2.0\\System.Runtime.CompilerServices.Unsafe.dll"));
                 }
 
-                _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
+                if (!IsReqnrollFeatureProject || ForceAddingExplicitReferenceToReqnrollPackage)
+                    _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(_testProjectFolders.LogFilePath));
@@ -253,6 +261,9 @@ namespace Reqnroll.TestProjectGenerator
                     case UnitTestProvider.MSTest:
                         ConfigureMSTest();
                         break;
+                    case UnitTestProvider.MSTest4:
+                        ConfigureMSTest4();
+                        break;
                     case UnitTestProvider.xUnit:
                         ConfigureXUnit();
                         break;
@@ -272,6 +283,9 @@ namespace Reqnroll.TestProjectGenerator
                         throw new InvalidOperationException(@"Invalid unit test provider.");
                 }
             }
+
+            if (UseIntermediateOutputPathForCodeBehind != null)
+                ConfigureUseIntermediateOutputPathForCodeBehind(UseIntermediateOutputPathForCodeBehind.Value);
 
             AddAdditionalStuff();
         }
@@ -372,22 +386,52 @@ namespace Reqnroll.TestProjectGenerator
             }
         }
 
+        private void ConfigureMSTest4()
+        {
+            _project.AddNuGetPackage("MSTest.TestAdapter", MSTest4PackageVersion);
+            _project.AddNuGetPackage("MSTest.TestFramework", MSTest4PackageVersion);
+
+            if (IsReqnrollFeatureProject)
+            {
+                _project.AddNuGetPackage("Reqnroll.MSTest", _currentVersionDriver.ReqnrollNuGetVersion,
+                                         new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.MSTest.ReqnrollPlugin.dll"), "net462\\Reqnroll.MSTest.ReqnrollPlugin.dll"));
+                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.MSTest", ReqnrollPluginType.Runtime));
+            }
+        }
+
         private void ConfigureTUnit()
         {
             _project.AddNuGetPackage(
                 TUnitPackageName,
                 TUnitPackageVersion,
                 new NuGetPackageAssembly(
-                    "TUnit, Version=0.55.23, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
+                    "TUnit, Version=1.3.25, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
                     "netstandard2.0\\TUnit.dll")
                 );
             _project.AddNuGetPackage(
                 "Microsoft.Testing.Extensions.TrxReport",
-                "1.8.2.0",
+                "2.0.2",
                 new NuGetPackageAssembly(
-                    "Microsoft.Testing.Extensions.TrxReport, Version=1.8.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+                    "Microsoft.Testing.Extensions.TrxReport, Version=2.0.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
                     "netstandard2.0\\Microsoft.Testing.Extensions.TrxReport.dll")
                 );
+            
+            if (TargetFramework is TargetFramework.Net481 or TargetFramework.Net472 or TargetFramework.Net462)
+            {
+                // Polyfill from TUnit doesn't work correctly for .NET Framework projects (see https://github.com/thomhurst/TUnit/issues/2734) 
+                _project.AddNuGetPackage("Polyfill", "9.3.1");
+                _project.AddAdditionalPropertyGroupEntry("EnableTUnitPolyfills", "false");
+                _project.AddAdditionalPropertyGroupEntry("LangVersion", "latest"); // LangVersion=latest is needed for Polyfill
+                // Exe is needed explicitly to ensure we don't get errors when running the tests from cli (see https://tunit.dev/docs/faq/#my-test-project-wont-execute--i-get-errors-about-runtime-identifiers)
+                _project.AddAdditionalPropertyGroupEntry("OutputType", "Exe");
+            }
+
+            if (TargetFramework >= TargetFramework.Net100)
+            {
+                // TUnit uses Microsoft.Testing.Platform which dropped VSTest support in .NET 10 SDK.
+                // Enable the new dotnet test experience.
+                _project.AddAdditionalPropertyGroupEntry("TestingPlatformDotnetTestSupport", "true");
+            }
 
             if (IsReqnrollFeatureProject)
             {
@@ -395,6 +439,11 @@ namespace Reqnroll.TestProjectGenerator
                                          new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.TUnit.ReqnrollPlugin.dll"), "netstandard2.0\\Reqnroll.TUnit.ReqnrollPlugin.dll"));
                 Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.TUnit", ReqnrollPluginType.Runtime));
             }
+        }
+
+        private void ConfigureUseIntermediateOutputPathForCodeBehind(bool useIntermediateOutputPathForCodeBehind)
+        {
+            _project.AddAdditionalPropertyGroupEntry("ReqnrollUseIntermediateOutputPathForCodeBehind", useIntermediateOutputPathForCodeBehind.ToString().ToLowerInvariant());
         }
 
         protected virtual void AddAdditionalStuff()
@@ -418,10 +467,12 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.All)]"));
                     break;
                 case UnitTestProvider.MSTest when _parallelTestExecution:
+                case UnitTestProvider.MSTest4 when _parallelTestExecution:
                     _project.AddFile(
                         new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.MethodLevel)]"));
                     break;
                 case UnitTestProvider.MSTest when !_parallelTestExecution:
+                case UnitTestProvider.MSTest4 when !_parallelTestExecution:
                     _project.AddFile(new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: DoNotParallelize]"));
                     break;
                 case UnitTestProvider.TUnit when !_parallelTestExecution:

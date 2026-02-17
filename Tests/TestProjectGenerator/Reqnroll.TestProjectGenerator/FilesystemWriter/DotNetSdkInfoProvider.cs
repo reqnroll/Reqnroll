@@ -11,9 +11,10 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
         /// <remarks>
         /// The default SDK should be the latest supported .NET LTS version.
         /// </remarks>
-        private static readonly DotNetSdkInfo DefaultSdk = Net80;
+        private static readonly DotNetSdkInfo DefaultSdk = Net100;
         private static readonly DotNetSdkInfo Net80 = new("8.0.100");
         private static readonly DotNetSdkInfo Net90 = new("9.0.100");
+        private static readonly DotNetSdkInfo Net100 = new("10.0.100");
 
         private readonly IReadOnlyDictionary<TargetFramework, DotNetSdkInfo> _sdkMappings = new Dictionary<TargetFramework, DotNetSdkInfo>
         {
@@ -25,6 +26,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             [TargetFramework.Net481] = DefaultSdk,
             [TargetFramework.Net80] = Net80,
             [TargetFramework.Net90] = Net90,
+            [TargetFramework.Net100] = Net100,
             [TargetFramework.NetStandard20] = DefaultSdk
         };
 

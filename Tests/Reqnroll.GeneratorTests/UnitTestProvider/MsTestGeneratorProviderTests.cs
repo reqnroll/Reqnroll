@@ -245,21 +245,54 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             attributes.Should().NotContain(a => a.Name == "Microsoft.VisualStudio.TestTools.UnitTesting.DoNotParallelizeAttribute");
         }
 
-        // Test for GH#588 - Generator Provider adds Friendly Name as an argument to the TestMethodAttribute on a non-paramterized test
         [Fact]
-        public void MsTestGeneratorProvider_SimpleScenario_ShouldProvideFriendlyNameForTestMethodAttribute()
+        public void MsTestGeneratorProvider_WithScenarioTagOnly_ShouldNotAddDoNotParallelizeAttribute()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            @nonparallelizable
+            Scenario: Isolated scenario
+                Given there is something");
+
+            var provider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new[] { "nonparallelizable" });
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
+
+            // ASSERT
+            code.Class().CustomAttributes().Should().NotContain(a => a.Name == "Microsoft.VisualStudio.TestTools.UnitTesting.DoNotParallelizeAttribute");
+            var method = code.Class().Members().Single(m => m.Name == "IsolatedScenario");
+            method.CustomAttributes().Should().NotContain(a => a.Name == "Microsoft.VisualStudio.TestTools.UnitTesting.DoNotParallelizeAttribute");
+        }
+
+        // Test for GH#588 - Generator Provider adds Friendly Name as an argument to the TestMethodAttribute on a non-paramterized test
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MsTestGeneratorProvider_SimpleScenario_ShouldProvideFriendlyNameForTestMethodAttribute(bool disableFriendlyTestNames)
         {
             // ARRANGE
             var document = ParseDocumentFromString(SampleFeatureFile);
             var sampleTestGeneratorProvider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
-            var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
+            var converter = sampleTestGeneratorProvider.CreateUnitTestConverter(disableFriendlyTestNames: disableFriendlyTestNames);
 
             // ACT
             var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethodAttributeForFirstScenario = code.Class().Members().Single(m => m.Name == "SimpleScenario").CustomAttributes().Single(a => a.Name == TestMethodAttributeName);
-            testMethodAttributeForFirstScenario.ArgumentValues().First().Should().Be("Simple scenario");
+            if (disableFriendlyTestNames)
+            {
+                testMethodAttributeForFirstScenario.ArgumentValues().Should().BeEmpty();
+            }
+            else
+            {
+                testMethodAttributeForFirstScenario.ArgumentValues().Should().HaveCount(1);
+                testMethodAttributeForFirstScenario.ArgumentValues().First().Should().Be("Simple scenario");
+            }
         }
 
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)

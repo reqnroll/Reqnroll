@@ -1,76 +1,98 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_FullFramework_Tools_TFM);$(Reqnroll_Core_Tools_TFM)</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Tools.MsBuild.Generation.nuspec</NuspecFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <TargetFrameworks>$(ReqnrollFullFrameworkToolsTfm);$(ReqnrollCoreToolsTfm)</TargetFrameworks>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
     
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeSymbols>false</IncludeSymbols>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
-  </PropertyGroup>
 
+    <!-- NuGet configuration -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- NuGet package metadata -->
+    <Description>Package to enable the code-behind file generation during build time https://go.reqnroll.net/doc-config-build</Description>
+    <DefaultLanguage>en-US</DefaultLanguage>
+  </PropertyGroup>
+  
+  <!-- Includes the build files. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Composition" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" />
-    <PackageReference Include="System.Collections.Immutable" />
+    <None Include="build/**/*" Pack="true" PackagePath="build/" />
+    <None Include="buildMultiTargeting/**/*" Pack="true" PackagePath="buildMultiTargeting/" />
   </ItemGroup>
 
-  <ItemDefinitionGroup>
-    <PackageReference>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-  </ItemDefinitionGroup>
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);ResolveRequiredReferences</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <!-- Filters the list of referenced assemblies to exclude ones that should be provided by the MSBuild host process. -->
+  <Target Name="ResolveRequiredReferences">
+
+    <ItemGroup>
+      <!-- Remove system assemblies. -->
+      <ReferenceCopyLocalPaths
+        Remove="@(ReferenceCopyLocalPaths)"
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
+      
+      <!-- Remove Visual Studio assemblies. -->
+      <ReferenceCopyLocalPaths
+        Remove="@(ReferenceCopyLocalPaths)"
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
+      
+      <!-- Remove netstandard -->
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'netstandard'" />
+      
+    </ItemGroup>
+    
+  </Target>
+
+  <!-- Include runtime assemblies in the package. -->
+  <Target
+    Name="CollectRedistributableAssemblies"
+    AfterTargets="CoreCompile"
+    DependsOnTargets="ResolveRequiredReferences">
+    
+    <ItemGroup>
+      <BuildOutputInPackage 
+        Include="@(ReferenceCopyLocalPaths)"
+        TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)"/>
+
+      <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
+      <BuildOutputInPackage
+        Include="$(ProjectDepsFilePath)"
+        TargetPath="$(ProjectDepsFileName)"
+        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'"/>
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+    <ProjectReference Include="../Reqnroll.Generator/Reqnroll.Generator.csproj" />
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.11.4" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" />
-    <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
-    <PackageReference Update="Microsoft.VisualStudio.Composition" Version="17.11.13" />
-    <PackageReference Update="Microsoft.VisualStudio.Threading" Version="17.11.20" />
-    <PackageReference Update="System.Collections.Immutable" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.11.48" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.48" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Composition" Version="17.11.13" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Only" Version="17.13.61" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.61" PrivateAssets="all" />
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework">
-      <HintPath>Microsoft.Build.Framework</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Build.Utilities.Core">
-      <HintPath>Microsoft.Build.Utilities.Core</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="build\CPS\Buildsystem\Rules\FeatureFileType.xaml">
+    <None Update="build/CPS/Buildsystem/Rules/FeatureFileType.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
-    <None Update="build\CPS\Buildsystem\Rules\ProjectItemsSchema.xaml">
+    <None Update="build/CPS/Buildsystem/Rules/ProjectItemsSchema.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <!-- We create a 'tasks' folder in the output folder with only those files 
-         that are needed for the task to run, according to Reqnroll.Tools.MsBuild.Generation.nuspec.
-         This is needed only for the Reqnroll projects within the solution (Specs, *.IntegrationTest),
-         and not used for producing the NuGet package.
-    -->
-    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Tools_TFM)'">
-      <TaskFiles Include="$(OutDir)\*.dll" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_Core_Tools_TFM)'">
-      <TaskFiles Include="$(OutDir)\*.dll;$(OutDir)\*.deps.json" Exclude="$(OutDir)\System.*;$(OutDir)\Microsoft.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(TaskFiles)" DestinationFolder="$(OutDir)\tasks" />
-  </Target>
+  <Import Project="SingleTfm.targets" Condition="'$(TargetFramework)' == ''" />
 
 </Project>

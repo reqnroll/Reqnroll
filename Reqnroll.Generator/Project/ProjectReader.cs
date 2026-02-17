@@ -10,10 +10,10 @@ namespace Reqnroll.Generator.Project
 {
     public class ProjectReader : IReqnrollProjectReader
     {
-        private readonly IGeneratorConfigurationProvider _configurationLoader;
+        private readonly IConfigurationLoader _configurationLoader;
         private readonly ProjectLanguageReader _languageReader;
 
-        public ProjectReader(IGeneratorConfigurationProvider configurationLoader, ProjectLanguageReader languageReader)
+        public ProjectReader(IConfigurationLoader configurationLoader, ProjectLanguageReader languageReader)
         {
             _configurationLoader = configurationLoader;
             _languageReader = languageReader;
@@ -36,7 +36,7 @@ namespace Reqnroll.Generator.Project
 
                 if (reqnrollProject.ProjectSettings.ConfigurationHolder != null)
                 {
-                    reqnrollProject.Configuration = _configurationLoader.LoadConfiguration(reqnrollProject.ProjectSettings.ConfigurationHolder);
+                    reqnrollProject.Configuration = _configurationLoader.Load(reqnrollProject.ProjectSettings.ConfigurationHolder);
                 }
 
                 return reqnrollProject;

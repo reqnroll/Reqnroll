@@ -1,5 +1,7 @@
 using System;
 using System.Globalization;
+using System.Linq;
+using Reqnroll.Bindings;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Configuration;
 using Reqnroll.ErrorHandling;
@@ -23,13 +25,24 @@ namespace Reqnroll.Infrastructure
         {
             string skeleton = _stepDefinitionSkeletonProvider.GetBindingClassSkeleton(
                 featureContext.FeatureInfo.GenerationTargetLanguage,
-                scenarioContext.MissingSteps.ToArray(),
+                scenarioContext.MissingSteps.Keys.ToArray(),
                 "MyNamespace",
                 "StepDefinitions",
                 _reqnrollConfiguration.StepDefinitionSkeletonStyle,
                 featureContext.BindingCulture ?? CultureInfo.CurrentCulture);
 
             return $"{_errorProvider.GetMissingStepDefinitionError().Message}{Environment.NewLine}{skeleton}";
+        }
+
+        public string BuildStepMessageFromContext(StepInstance step,  FeatureContext featureContext)
+        {
+            string skeleton = _stepDefinitionSkeletonProvider.GetStepDefinitionSkeleton(
+                featureContext.FeatureInfo.GenerationTargetLanguage,
+                step,
+                _reqnrollConfiguration.StepDefinitionSkeletonStyle,
+                featureContext.BindingCulture ?? CultureInfo.CurrentCulture);
+
+            return skeleton;
         }
     }
 }

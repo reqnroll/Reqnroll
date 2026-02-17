@@ -1,13 +1,12 @@
 ﻿using Io.Cucumber.Messages.Types;
 using System.Collections.Generic;
 
-namespace Reqnroll.Formatters.RuntimeSupport
+namespace Reqnroll.Formatters.RuntimeSupport;
+
+public interface IFeatureLevelCucumberMessages
 {
-    public interface IFeatureLevelCucumberMessages
-    {
-        GherkinDocument GherkinDocument { get; }
-        bool HasMessages { get; }
-        IEnumerable<Pickle> Pickles { get; }
-        Source Source { get; }
-    }
+    bool HasMessages { get; }
+    GherkinDocument GherkinDocument { get; }
+    IEnumerable<Pickle> Pickles { get; }
+    Source Source { get; }
 }

@@ -1,32 +1,24 @@
 using System;
 using System.IO;
 
-namespace Reqnroll.Tools.MsBuild.Generation
+namespace Reqnroll.Tools.MsBuild.Generation;
+
+public class ExceptionTaskLogger(IReqnrollTaskLoggingHelper log) : IExceptionTaskLogger
 {
-    public class ExceptionTaskLogger : IExceptionTaskLogger
+    public void LogException(Exception exception)
     {
-        private readonly ITaskLoggingWrapper _taskLoggingWrapper;
-
-        public ExceptionTaskLogger(ITaskLoggingWrapper taskLoggingWrapper)
+        if (exception.InnerException is FileLoadException fileLoadException)
         {
-            _taskLoggingWrapper = taskLoggingWrapper;
+            log.LogTaskError($"FileLoadException Filename: {fileLoadException.FileName}");
+            log.LogTaskError($"FileLoadException FusionLog: {fileLoadException.FusionLog}");
+            log.LogTaskError($"FileLoadException Message: {fileLoadException.Message}");
         }
 
-        public void LogException(Exception exception)
+        if (exception.InnerException is { } innerException)
         {
-            if (exception.InnerException is FileLoadException fileLoadException)
-            {
-                _taskLoggingWrapper.LogError($"FileLoadException Filename: {fileLoadException.FileName}");
-                _taskLoggingWrapper.LogError($"FileLoadException FusionLog: {fileLoadException.FusionLog}");
-                _taskLoggingWrapper.LogError($"FileLoadException Message: {fileLoadException.Message}");
-            }
-
-            if (exception.InnerException is Exception innerException)
-            {
-                _taskLoggingWrapper.LogError(innerException.ToString());
-            }
-
-            _taskLoggingWrapper.LogError(exception.ToString());
+            log.LogTaskError(innerException.ToString());
         }
+
+        log.LogTaskError(exception.ToString());
     }
 }

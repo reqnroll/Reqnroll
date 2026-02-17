@@ -44,6 +44,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             WriteNuGetPackages(project, projectElement);
             WriteFileReferences(project, projectElement);
             WriteSatelliteResourceLanguages(project, projectElement);
+            WriteAdditionalPropertyGroupEntries(project, projectElement);
 
             SetTreatWarningsAsErrors(project, projectElement);
 
@@ -109,7 +110,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                     }
                 }
 
-                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && (f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy || f.AdditionalMsBuildProperties.Any())))
+                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || (f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy || f.AdditionalMsBuildProperties.Any())))
                 {
                     WriteFileReference(xw, file);
                     created = true;
@@ -131,6 +132,17 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             var satelliteResourceLanguagesElement = new XElement("SatelliteResourceLanguages");
             satelliteResourceLanguagesElement.SetValue("en");
             propertyGroupElement.Add(satelliteResourceLanguagesElement);
+        }
+
+        private void WriteAdditionalPropertyGroupEntries(Project project, XElement projectElement)
+        {
+            var propertyGroupElement = projectElement.Element("PropertyGroup") ?? throw new ProjectCreationNotPossibleException();
+            foreach (var additionalPropertyGroupEntry in project.AdditionalPropertyGroupEntries)
+            {
+                var entryXml = propertyGroupElement.Element(additionalPropertyGroupEntry.Key) ?? new XElement(additionalPropertyGroupEntry.Key);
+                entryXml.SetValue(additionalPropertyGroupEntry.Value);
+                propertyGroupElement.Add(entryXml);
+            }
         }
 
         private void WriteFileReference(XmlWriter xw, ProjectFile projectFile)

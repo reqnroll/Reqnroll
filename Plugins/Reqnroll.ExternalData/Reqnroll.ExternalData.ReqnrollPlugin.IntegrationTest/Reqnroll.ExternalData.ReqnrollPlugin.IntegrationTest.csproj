@@ -1,10 +1,20 @@
 ﻿<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="..\..\..\Tests\Reqnroll.Specs\build/Reqnroll.Tools.MsBuild.Generation.OwnTests.props" />
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ReqnrollCoreToolsTfm)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ReqnrollFullFrameworkToolsTfm)</ReqnrollTestTFM>
+    <ReqnrollGenerationProjectPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectPath>
+    <ReqnrollGenerationTasksPath>$(ReqnrollGenerationProjectPath)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksPath>
+  </PropertyGroup>
+
+  <Import
+    Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.props"
+    Condition="'$(ReqnrollGenerationPropsImported)' != 'true'"/>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- we have to set the root namespace to avoid generation error -->
     <RootNamespace>XReqnroll.ExternalData.ReqnrollPlugin.IntegrationTest</RootNamespace>
   </PropertyGroup>
@@ -12,36 +22,26 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
 
-    <PackageReference Include="nunit" Version="4.2.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="nunit" Version="4.4.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" />
+
+    <ProjectReference Include="..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
+      <Private>false</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
-
-  <Target Name="PreBuild">
-    <MSBuild Projects="..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
-    <MSBuild Projects="..\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
-  </Target>
 
   <ItemGroup>
     <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\Reqnroll.ExternalData.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.ExternalData.ReqnrollPlugin.dll" />
   </ItemGroup>
 
-  <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
-  <!-- has to be before the PropertyGroup change-->
-  <PropertyGroup>
-    <BuildDependsOn>
-      PreBuild;
-      $(BuildDependsOn)
-    </BuildDependsOn>
-    <RebuildDependsOn>
-      PreBuild;
-      $(RebuildDependsOn)
-    </RebuildDependsOn>
-  </PropertyGroup>
+  <Import Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.targets" />
 </Project>

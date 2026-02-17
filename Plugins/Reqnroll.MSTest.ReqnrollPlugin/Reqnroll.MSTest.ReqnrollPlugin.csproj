@@ -1,19 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.MSTest</PackageId>
+    <Description>Package to use Reqnroll for use with MsTest v2.</Description>
+    <PackageTags>reqnroll mstest</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
+    <!-- PrivateAssets="none" ensures that MSTest build assets are included even if the user does not explicitly add a reference to the 'MSTest.TestFramework' package -->
+    <!-- We can consider removing PrivateAssets="none" in v4 and declaring that the users must add reference to 'MSTest.TestFramework' explicitly. -->
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" PrivateAssets="none" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference
+      Include="..\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj"
+      PrivateAssets="all"
+      PackAsReqnrollGeneratorPlugin="true" />
   </ItemGroup>
 
 </Project>

@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
+
+    <!-- This is required to ensure dependencies are made available for packing -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.SpecFlowCompatibility</PackageId>
+    <Description>Enables SpecFlow compatibility mode for Reqnroll</Description>
+    <PackageTags>reqnroll specflow</PackageTags>
+
+    <!-- Suppress packing warnings: we intentionally add assemblies to /build and have repeated copies of assemblies. -->
+    <NoWarn>$(NoWarn);NU5100;NU5118;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference Include="..\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.csproj" PrivateAssets="all" PackAsReqnrollGeneratorPlugin="true" />
+    <ProjectReference Include="..\Reqnroll.SpecFlowCompatibility\Reqnroll.SpecFlowCompatibility.csproj" PrivateAssets="all" PackAsComponent="true" />
   </ItemGroup>
 
 </Project>

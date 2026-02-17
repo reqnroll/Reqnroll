@@ -6,6 +6,7 @@ using Reqnroll.Bindings.Reflection;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
@@ -27,6 +28,7 @@ public partial class TestExecutionEngineTests
 {
     private readonly ScenarioContext _scenarioContext;
     private readonly ReqnrollConfiguration _reqnrollConfiguration;
+    private readonly Mock<IEnvironmentOptions> _environmentOptions;
     private readonly Mock<IBindingRegistry> _bindingRegistryStub;
     private readonly Mock<IErrorProvider> _errorProviderStub;
     private readonly Mock<IContextManager> _contextManagerStub;
@@ -83,6 +85,8 @@ public partial class TestExecutionEngineTests
     {
         _reqnrollConfiguration = ConfigurationLoader.GetDefault();
 
+        _environmentOptions = new Mock<IEnvironmentOptions>();
+
         _globalContainer = new ObjectContainer();
         _testThreadContainer = new ObjectContainer(_globalContainer);
         _featureContainer = new ObjectContainer(_testThreadContainer);
@@ -135,7 +139,6 @@ public partial class TestExecutionEngineTests
         _bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(_stepTransformations);
         _bindingRegistryStub.Setup(br => br.IsValid).Returns(true);
 
-        _reqnrollConfiguration = ConfigurationLoader.GetDefault();
         _errorProviderStub = new Mock<IErrorProvider>();
         _testTracerStub = new Mock<ITestTracer>();
         _stepDefinitionMatcherStub = new Mock<IStepDefinitionMatchService>();
@@ -166,6 +169,7 @@ public partial class TestExecutionEngineTests
             _errorProviderStub.Object,
             _stepArgumentTypeConverterMock.Object,
             _reqnrollConfiguration,
+            _environmentOptions.Object,
             _bindingRegistryStub.Object,
             _unitTestRuntimeProviderStub.Object,
             _contextManagerStub.Object,
@@ -328,7 +332,7 @@ public partial class TestExecutionEngineTests
         SkippedBecauseOfPreviousError,
         UndefinedStep,
         PendingStepDefinition,
-        DynamicallyPendingStepDefinition, // e.g. throws a not implemented exception
+        DynamicallyNotImplementedError, // e.g. throws a not implemented exception
         DynamicallySkippedStepDefinition, // e.g. Assert.Ignore called
         ObsoleteStepDefinitionAsError,
         ObsoleteStepDefinitionAsPending,
@@ -349,7 +353,7 @@ public partial class TestExecutionEngineTests
     [InlineData(StepExecutionUseCase.SkippedBecauseOfPreviousError,     false, ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.Skipped, false, true,  true,  false)]
     [InlineData(StepExecutionUseCase.UndefinedStep,                     false, ScenarioExecutionStatus.UndefinedStep,         null,                                null,                            false, true,  false, false)]
     [InlineData(StepExecutionUseCase.PendingStepDefinition,             false, ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.DynamicallyPendingStepDefinition,  false, ScenarioExecutionStatus.StepDefinitionPending, typeof(NotImplementedException),     null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.DynamicallyNotImplementedError,    false, ScenarioExecutionStatus.TestError,             typeof(NotImplementedException),     null,                            true,  true,  false, false)]
     [InlineData(StepExecutionUseCase.DynamicallySkippedStepDefinition,  false, ScenarioExecutionStatus.Skipped,               typeof(OperationCanceledException),  null,                            true,  true,  false, false)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsError,     false, ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsPending,   false, ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            false, true,  false, false)]
@@ -367,7 +371,7 @@ public partial class TestExecutionEngineTests
     [InlineData(StepExecutionUseCase.SkippedBecauseOfPreviousError,     true,  ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.Skipped, false, true,  true,  false)]
     [InlineData(StepExecutionUseCase.UndefinedStep,                     true,  ScenarioExecutionStatus.UndefinedStep,         null,                                null,                            false, true,  false, false)]
     [InlineData(StepExecutionUseCase.PendingStepDefinition,             true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            true,  true,  false, true)]
-    [InlineData(StepExecutionUseCase.DynamicallyPendingStepDefinition,  true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(NotImplementedException),     null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.DynamicallyNotImplementedError,    true,  ScenarioExecutionStatus.TestError,             typeof(NotImplementedException),     null,                            true,  true,  false, true)]
     [InlineData(StepExecutionUseCase.DynamicallySkippedStepDefinition,  true,  ScenarioExecutionStatus.Skipped,               typeof(OperationCanceledException),  null,                            true,  true,  false, true)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsError,     true,  ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, true)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsPending,   true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            false, true,  false, true)]
@@ -396,7 +400,7 @@ public partial class TestExecutionEngineTests
             case StepExecutionUseCase.PendingStepDefinition:
                 RegisterPendingStepDefinition();
                 break;
-            case StepExecutionUseCase.DynamicallyPendingStepDefinition:
+            case StepExecutionUseCase.DynamicallyNotImplementedError:
                 RegisterFailingStepDefinition(exceptionToThrow: new NotImplementedException("simulated"));
                 break;
             case StepExecutionUseCase.DynamicallySkippedStepDefinition:
@@ -524,6 +528,41 @@ public partial class TestExecutionEngineTests
         var hookMock = CreateHookMock(_afterStepEvents);
 
         await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
+
+        _methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+    }
+
+    [Fact]
+    public async Task Should_execute_after_scenario()
+    {
+        var testExecutionEngine = CreateTestExecutionEngine();
+        RegisterStepDefinition();
+
+        var hookMock = CreateHookMock(_afterScenarioEvents);
+
+        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioStartAsync();
+        await testExecutionEngine.OnScenarioEndAsync();
+
+        _methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+    }
+
+    [Fact]
+    public async Task Should_execute_after_scenario_even_when_test_is_dynamically_ignored()
+    {
+        var testExecutionEngine = CreateTestExecutionEngine();
+        RegisterStepDefinition();
+
+        var hookMock = CreateHookMock(_afterScenarioEvents);
+
+        _unitTestRuntimeProviderStub.Setup(utp => utp.DetectExecutionStatus(It.Is<Exception>(e => e is OperationCanceledException)))
+                                    .Returns(ScenarioExecutionStatus.Skipped);
+        RegisterFailingStepDefinition(exceptionToThrow: new OperationCanceledException("simulated"));
+
+        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioStartAsync();
+        await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
+        await testExecutionEngine.OnScenarioEndAsync();
 
         _methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
     }
@@ -720,6 +759,8 @@ public partial class TestExecutionEngineTests
         await act.Should().ThrowAsync<Exception>().WithMessage("simulated error");
         _contextManagerStub.Verify(cm => cm.CleanupScenarioContext(), Times.Once);
     }
+
+    
 
     [Fact]
     public async Task Should_resolve_FeatureContext_hook_parameter()

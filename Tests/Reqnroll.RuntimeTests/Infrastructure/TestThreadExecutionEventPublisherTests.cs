@@ -1,13 +1,14 @@
+using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
@@ -21,11 +22,11 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var testExecutionEngine = CreateTestExecutionEngine();
 
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
-            
+
             _testThreadExecutionEventPublisher.Verify(te =>
                     te.PublishEventAsync(It.Is<StepStartedEvent>(e => e.ScenarioContext.Equals(_scenarioContext) &&
                                                                  e.FeatureContext.Equals(_featureContainer.Resolve<FeatureContext>()) &&
-                                                                 e.StepContext.Equals(_contextManagerStub.Object.StepContext))), 
+                                                                 e.StepContext.Equals(_contextManagerStub.Object.StepContext))),
                                                       Times.Once);
         }
 
@@ -93,13 +94,33 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             _testThreadExecutionEventPublisher.Verify(te =>
                                                           te.PublishEventAsync(It.IsAny<StepSkippedEvent>()), Times.Once);
         }
-        
-        [Fact]
-        public async Task Should_publish_hook_binding_events()
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_publish_hook_binding_events(bool isDryRun)
         {
+            _testObjectResolverMock.Reset();
+            if (isDryRun)
+            {
+                _environmentOptions.Setup(e => e.IsDryRun).Returns(true);
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()))
+                                       .Throws(new Exception("ResolveBindingInstance should not be called in dry-run mode"));
+            }
+            else
+            {
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(typeof(string), It.IsAny<IObjectContainer>()))
+                                       .Returns(string.Empty);
+            }
+
             var hookType = HookType.AfterScenario;
             TimeSpan expectedDuration = TimeSpan.FromSeconds(5);
-            var expectedHookBinding = new HookBinding(new Mock<IBindingMethod>().Object, hookType, null, 1);
+            var bindingMethod = new Mock<IBindingMethod>();
+            var bindingParameter = new Mock<IBindingParameter>();
+            bindingParameter.SetupGet(p => p.Type).Returns(new RuntimeBindingType(typeof(string)));
+            bindingMethod.SetupGet(m => m.Parameters).Returns([bindingParameter.Object]);
+
+            var expectedHookBinding = new HookBinding(bindingMethod.Object, hookType, null, 1);
             _methodBindingInvokerMock
                 .Setup(i => i.InvokeBindingAsync(expectedHookBinding, _contextManagerStub.Object, It.IsAny<object[]>(), _testTracerStub.Object, It.IsAny<DurationHolder>()))
                 .Callback((IBinding _, IContextManager _, object[] arguments, ITestTracer _, DurationHolder durationHolder) => durationHolder.Duration = expectedDuration)
@@ -117,15 +138,38 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                                                     e.HookBinding.Equals(expectedHookBinding) &&
                                                                     e.Duration.Equals(expectedDuration))),
                                                       Times.Once);
+
+            var times = isDryRun ? Times.Never() : Times.AtLeastOnce();
+            _testObjectResolverMock.Verify(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()), times);
         }
 
-        [Fact]
-        public async Task Should_publish_hook_binding_finished_event_with_OK_status_when_hook_succeeds()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_publish_hook_binding_finished_event_with_OK_status_when_hook_succeeds(bool isDryRun)
         {
             // Arrange
+            _testObjectResolverMock.Reset();
+            if (isDryRun)
+            {
+                _environmentOptions.Setup(e => e.IsDryRun).Returns(true);
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()))
+                                       .Throws(new Exception("ResolveBindingInstance should not be called in dry-run mode"));
+            }
+            else
+            {
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(typeof(string), It.IsAny<IObjectContainer>()))
+                                       .Returns(string.Empty);
+            }
+
             var hookType = HookType.AfterScenario;
             TimeSpan expectedDuration = TimeSpan.FromSeconds(5);
-            var expectedHookBinding = new HookBinding(new Mock<IBindingMethod>().Object, hookType, null, 1);
+            var bindingMethod = new Mock<IBindingMethod>();
+            var bindingParameter = new Mock<IBindingParameter>();
+            bindingParameter.SetupGet(p => p.Type).Returns(new RuntimeBindingType(typeof(string)));
+            bindingMethod.SetupGet(m => m.Parameters).Returns([bindingParameter.Object]);
+
+            var expectedHookBinding = new HookBinding(bindingMethod.Object, hookType, null, 1);
             _methodBindingInvokerMock
                 .Setup(i => i.InvokeBindingAsync(expectedHookBinding, _contextManagerStub.Object, It.IsAny<object[]>(), _testTracerStub.Object, It.IsAny<DurationHolder>()))
                 .Callback((IBinding _, IContextManager _, object[] arguments, ITestTracer _, DurationHolder durationHolder) => durationHolder.Duration = expectedDuration)
@@ -143,15 +187,38 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                                                     e.HookStatus == ScenarioExecutionStatus.OK &&
                                                                     e.HookException == null)),
                                                       Times.Once);
+
+            var times = isDryRun ? Times.Never() : Times.AtLeastOnce();
+            _testObjectResolverMock.Verify(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()), times);
         }
 
-        [Fact]
-        public async Task Should_publish_hook_binding_finished_event_with_unit_test_provider_detected_status()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_publish_hook_binding_finished_event_with_unit_test_provider_detected_status(bool isDryRun)
         {
             // Arrange
+            _testObjectResolverMock.Reset();
+            if (isDryRun)
+            {
+                _environmentOptions.Setup(e => e.IsDryRun).Returns(true);
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()))
+                                       .Throws(new Exception("ResolveBindingInstance should not be called in dry-run mode"));
+            }
+            else
+            {
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(typeof(string), It.IsAny<IObjectContainer>()))
+                                       .Returns(string.Empty);
+            }
+
             var hookType = HookType.AfterScenario;
             TimeSpan expectedDuration = TimeSpan.FromSeconds(3);
-            var expectedHookBinding = new HookBinding(new Mock<IBindingMethod>().Object, hookType, null, 1);
+            var bindingMethod = new Mock<IBindingMethod>();
+            var bindingParameter = new Mock<IBindingParameter>();
+            bindingParameter.SetupGet(p => p.Type).Returns(new RuntimeBindingType(typeof(string)));
+            bindingMethod.SetupGet(m => m.Parameters).Returns([bindingParameter.Object]);
+
+            var expectedHookBinding = new HookBinding(bindingMethod.Object, hookType, null, 1);
             var expectedException = new Exception("Custom test framework exception");
 
             // Setup the unit test provider to return a specific status for this exception type
@@ -175,19 +242,55 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                                                     e.HookStatus == ScenarioExecutionStatus.Skipped &&
                                                                     e.HookException == expectedException)),
                                                       Times.Once);
+
+            var times = isDryRun ? Times.Never() : Times.AtLeastOnce();
+            _testObjectResolverMock.Verify(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()), times);
+        }
+
+        public static TheoryData<Type, ScenarioExecutionStatus, bool> Arguments__Should_publish_hook_binding_finished_event_with_correct_status_for_exception_types()
+        {
+            var data = new TheoryData<Type, ScenarioExecutionStatus, bool>();
+            (Type, ScenarioExecutionStatus)[] options = 
+                [
+                    (typeof(NotImplementedException), ScenarioExecutionStatus.TestError),
+                    (typeof(PendingScenarioException), ScenarioExecutionStatus.StepDefinitionPending),
+                    (typeof(InvalidOperationException), ScenarioExecutionStatus.TestError),
+                    (typeof(ArgumentException), ScenarioExecutionStatus.TestError)
+                ];
+            foreach (var option in options)
+            {
+                data.Add(option.Item1, option.Item2, true);
+                data.Add(option.Item1, option.Item2, false);
+            }
+
+            return data;
         }
 
         [Theory]
-        [InlineData(typeof(NotImplementedException), ScenarioExecutionStatus.StepDefinitionPending)]
-        [InlineData(typeof(PendingScenarioException), ScenarioExecutionStatus.StepDefinitionPending)]
-        [InlineData(typeof(InvalidOperationException), ScenarioExecutionStatus.TestError)]
-        [InlineData(typeof(ArgumentException), ScenarioExecutionStatus.TestError)]
-        public async Task Should_publish_hook_binding_finished_event_with_correct_status_for_exception_types(Type exceptionType, ScenarioExecutionStatus expectedStatus)
+        [MemberData(nameof(Arguments__Should_publish_hook_binding_finished_event_with_correct_status_for_exception_types))]
+        public async Task Should_publish_hook_binding_finished_event_with_correct_status_for_exception_types(Type exceptionType, ScenarioExecutionStatus expectedStatus, bool isDryRun)
         {
             // Arrange
+            _testObjectResolverMock.Reset();
+            if (isDryRun)
+            {
+                _environmentOptions.Setup(e => e.IsDryRun).Returns(true);
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()))
+                                       .Throws(new Exception("ResolveBindingInstance should not be called in dry-run mode"));
+            }
+            else
+            {
+                _testObjectResolverMock.Setup(r => r.ResolveBindingInstance(typeof(string), It.IsAny<IObjectContainer>()))
+                                       .Returns(string.Empty);
+            }
+
             var hookType = HookType.BeforeStep;
             TimeSpan expectedDuration = TimeSpan.FromSeconds(1);
-            var expectedHookBinding = new HookBinding(new Mock<IBindingMethod>().Object, hookType, null, 1);
+            var bindingMethod = new Mock<IBindingMethod>();
+            var bindingParameter = new Mock<IBindingParameter>();
+            bindingParameter.SetupGet(p => p.Type).Returns(new RuntimeBindingType(typeof(string)));
+            bindingMethod.SetupGet(m => m.Parameters).Returns([bindingParameter.Object]);
+            var expectedHookBinding = new HookBinding(bindingMethod.Object, hookType, null, 1);
             var expectedException = (Exception)Activator.CreateInstance(exceptionType, "Test exception");
 
             _methodBindingInvokerMock
@@ -207,6 +310,9 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                                                     e.HookStatus == expectedStatus &&
                                                                     e.HookException == expectedException)),
                                                       Times.Once);
+
+            var times = isDryRun ? Times.Never() : Times.AtLeastOnce();
+            _testObjectResolverMock.Verify(r => r.ResolveBindingInstance(It.IsAny<Type>(), It.IsAny<IObjectContainer>()), times);
         }
 
         [Fact]

@@ -1,25 +1,34 @@
 <Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
 
   <PropertyGroup>
-    <Reqnroll_CpsExtensionDesignTimeTargetsPath Condition="'$(Reqnroll_CpsExtensionDesignTimeTargetsPath)' == ''">$(MSBuildThisFileDirectory)CPS\Buildsystem\CpsExtension.DesignTime.targets</Reqnroll_CpsExtensionDesignTimeTargetsPath>
+    <ReqnrollGenerationPropsImported>true</ReqnrollGenerationPropsImported>
+    <ReqnrollCpsExtensionDesignTimeTargetsPath Condition="'$(ReqnrollCpsExtensionDesignTimeTargetsPath)' == ''">$(MSBuildThisFileDirectory)CPS\Buildsystem\CpsExtension.DesignTime.targets</ReqnrollCpsExtensionDesignTimeTargetsPath>
   </PropertyGroup>
 
-  <Import Project="$(Reqnroll_CpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
-
+  <Import Project="$(ReqnrollCpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
 
   <PropertyGroup>
-    <Reqnroll_UseHostCompilerIfAvailable Condition="'$(Reqnroll_UseHostCompilerIfAvailable)'==''">false</Reqnroll_UseHostCompilerIfAvailable>
-    <UseHostCompilerIfAvailable>$(Reqnroll_UseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
+    <ReqnrollGenerationTasksPath Condition="'$(ReqnrollGenerationTasksPath)' == '' And '$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)netstandard2.0/</ReqnrollGenerationTasksPath>
+    <ReqnrollGenerationTasksPath Condition="'$(ReqnrollGenerationTasksPath)' == ''">$(MSBuildThisFileDirectory)net462/</ReqnrollGenerationTasksPath>
+    <ReqnrollGenerationTasksAssemblyFilename Condition=" '$(ReqnrollGenerationTasksAssemblyFilename)' == '' ">Reqnroll.Tools.MsBuild.Generation.dll</ReqnrollGenerationTasksAssemblyFilename>
+    <ReqnrollGenerationTasksAssemblyPath Condition=" '$(ReqnrollGenerationTasksAssemblyPath)' == '' ">$(ReqnrollGenerationTasksPath)$(ReqnrollGenerationTasksAssemblyFilename)</ReqnrollGenerationTasksAssemblyPath>
+
+    <!-- Using `TaskHostFactory` ensures that the task assembly will not be locked by Visual Studio on Windows. See: https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-configure-targets-and-tasks?view=vs-2022#task-factories -->
+    <!-- Note: `TaskHostFactory` is not compatible with some macOS versions. https://github.com/reqnroll/Reqnroll/issues/152 -->
+    <ReqnrollGenerationTaskFactory Condition="'$(ReqnrollGenerationTaskFactory)' == '' And $([MSBuild]::IsOsPlatform('Windows'))">TaskHostFactory</ReqnrollGenerationTaskFactory>
+    <ReqnrollGenerationTaskFactory Condition="'$(ReqnrollGenerationTaskFactory)' == ''">AssemblyTaskFactory</ReqnrollGenerationTaskFactory>
   </PropertyGroup>
 
-
   <PropertyGroup>
-    <OverwriteReadOnlyFiles Condition="'$(OverwriteReadOnlyFiles)'==''">false</OverwriteReadOnlyFiles>
-    <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
+    <ReqnrollUseHostCompilerIfAvailable Condition="'$(ReqnrollUseHostCompilerIfAvailable)'==''">false</ReqnrollUseHostCompilerIfAvailable>
+    <UseHostCompilerIfAvailable>$(ReqnrollUseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
+  </PropertyGroup>
 
-    <Reqnroll_DebugMSBuildTask Condition="'$(Reqnroll_DebugMSBuildTask)' == ''">false</Reqnroll_DebugMSBuildTask>
-
-    <_ReqnrollPropsImported Condition="'$(_ReqnrollPropsImported)'==''">true</_ReqnrollPropsImported>
+  <!--
+    property group for internal or debug settings
+  -->
+  <PropertyGroup>
+    <ReqnrollDebugMSBuildTask Condition="'$(ReqnrollDebugMSBuildTask)' == ''">false</ReqnrollDebugMSBuildTask>
   </PropertyGroup>
 
   <!--
@@ -28,59 +37,45 @@
   <PropertyGroup>
 
     <!--
-      feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
+      feature flag to enable use of intermediate output path for generated code-behind files; this is optional, Reqnroll does not need it
+      this is false by default for backward compatibility, but will be changed to true in v4 hopefully
     -->
-    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)'==''">false</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollUseIntermediateOutputPathForCodeBehind Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'==''">false</ReqnrollUseIntermediateOutputPathForCodeBehind>
 
     <!--
-      net.sdk support: feature flag to enable experimental support for net.sdk project system
+      feature flag to enable embedding of feature files as resources in the assembly; this is optional, Reqnroll does not need it
     -->
-    <Reqnroll_EnableDefaultCompileItems Condition="'$(Reqnroll_EnableDefaultCompileItems)'==''">true</Reqnroll_EnableDefaultCompileItems>
-    <Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(Reqnroll_EnableDefaultCompileItems)</Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
+    <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
 
-    <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
+    <!--
+      feature flag to enable warning for obsolete feature code-behind files without corresponding feature file
+    -->
+    <ReqnrollWarnForObsoleteCodeBehindFiles Condition="'$(ReqnrollWarnForObsoleteCodeBehindFiles)'==''">true</ReqnrollWarnForObsoleteCodeBehindFiles>
+
+    <!--
+      feature flag to enable deletion of obsolete feature code-behind files on 'Clean' and 'Rebuild' operation
+    -->
+    <ReqnrollDeleteObsoleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteObsoleteCodeBehindFilesOnClean>
   </PropertyGroup>
 
   <ItemGroup>
 
-    <!-- Registration of custom item type for ReSharper Build -->
-    <!-- https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
-    <AvailableItemName Include="ReqnrollFeatureFiles"/>
+    <!-- The items group 'ReqnrollFeatureFile' has to be made visible with the 'AvailableItemName' group for multiple reasons: -->
+    <!-- * Visual Studio Fast-Up-To-Date-Check (FUTDC) requires it, otherwise if only a feature file is changed, the build will be skipped.  -->
+    <!-- * ReSharper Build requires it to be treated as compile item https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
+    <AvailableItemName Include="ReqnrollFeatureFile"/>
     
-    <ReqnrollFeatureFiles Include="**\*.feature" >
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    <ReqnrollFeatureFile Include="**\*.feature" >
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
-    </ReqnrollFeatureFiles>
-
-    <!-- obsolete codebehind files, scenarios:
-         - after rename operation
-         - after deletion of a feature file
-         - after pulling latest changes from version control with above changes
-     -->
-    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
-
-    <!-- Support for Visual Studio Incremental Build
-        https://github.com/reqnroll/Reqnroll/issues/1319
-     -->
-    <UpToDateCheckInput Include="@(ReqnrollFeatureFiles)" />
-    <UpToDateCheckBuild Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" Original="@(ReqnrollFeatureFiles)" />
-    <CustomAdditionalCompileInputs Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
-
+    </ReqnrollFeatureFile>
   </ItemGroup>
 
-
   <PropertyGroup>
-    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_Reqnroll_TaskFolder)' == ''">netstandard2.0</_Reqnroll_TaskFolder>
-    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_Reqnroll_TaskFolder)' == ''">net462</_Reqnroll_TaskFolder>
-    <_Reqnroll_TaskAssembly Condition=" '$(_Reqnroll_TaskAssembly)' == '' ">..\tasks\$(_Reqnroll_TaskFolder)\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
-
-    <!-- Using `TaskHostFactory` ensures that the task assembly will not be locked by Visual Studio on Windows. See: https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-configure-targets-and-tasks?view=vs-2022#task-factories -->
-    <!-- Note: `TaskHostFactory` is not compatible with some macOS versions. https://github.com/reqnroll/Reqnroll/issues/152 -->
-    <_Reqnroll_TaskFactory Condition="'$(_Reqnroll_TaskFactory)' == '' And $([MSBuild]::IsOsPlatform('Windows'))">TaskHostFactory</_Reqnroll_TaskFactory>
-    <_Reqnroll_TaskFactory Condition="'$(_Reqnroll_TaskFactory)' == '' And !($([MSBuild]::IsOsPlatform('Windows')))">AssemblyTaskFactory</_Reqnroll_TaskFactory>
+    <ReqnrollConfigFile Condition="Exists('reqnroll.json')">reqnroll.json</ReqnrollConfigFile>
   </PropertyGroup>
-
-  <Import Project="Reqnroll.Tools.MsBuild.Generation.tasks" Condition="'$(_ReqnrollTasksImported)' =='' " />
+  <ItemGroup>
+    <!-- Build should be triggered in Visual Studio even if only the config file was changed -->
+    <UpToDateCheckInput Include="$(ReqnrollConfigFile)" Condition ="'$(ReqnrollConfigFile)' != ''" />
+  </ItemGroup>
 
 </Project>

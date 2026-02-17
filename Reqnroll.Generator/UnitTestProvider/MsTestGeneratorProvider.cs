@@ -40,7 +40,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper = codeDomHelper;
         }
 
-        private void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
+        protected void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
         {
             CodeDomHelper.AddAttribute(codeTypeMember, PROPERTY_ATTR, name, value);
         }
@@ -102,6 +102,11 @@ namespace Reqnroll.Generator.UnitTestProvider
             //Not Supported            
         }
 
+        public virtual void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+        {
+            // Not Supported
+        }
+
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
@@ -112,7 +117,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClassInitializeMethod, TESTFIXTURESETUP_ATTR);
         }
 
-        public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
+        public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
             // [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior.EndOfClass)]
@@ -133,12 +138,24 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
         {
-            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, friendlyTestName);
+            AddTestMethodAttribute(generationContext, testMethod, friendlyTestName);
             CodeDomHelper.AddAttribute(testMethod, DESCRIPTION_ATTR, friendlyTestName);
 
             //as in mstest, you cannot mark classes with the description attribute, we
             //just apply it for each test method as a property
             SetProperty(testMethod, FEATURE_TITILE_PROPERTY_NAME, generationContext.Feature.Name);
+        }
+
+        public virtual void AddTestMethodAttribute(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
+        {
+            if (generationContext.DisableFriendlyTestNames)
+            {
+                CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+            }
+            else
+            {
+                CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, friendlyTestName);
+            }
         }
 
         public virtual void SetTestMethodCategories(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> scenarioCategories)

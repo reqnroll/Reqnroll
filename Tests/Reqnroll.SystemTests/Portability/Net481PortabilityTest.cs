@@ -14,6 +14,5 @@ public class Net481PortabilityTest : PortabilityTestBase
         base.TestInitialize();
         _testRunConfiguration.TargetFramework = TargetFramework.Net481;
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.CSharp73;
-        SkipTUnit = true; // TUnit is not supported on .NET Framework 4.8.1
     }
 }

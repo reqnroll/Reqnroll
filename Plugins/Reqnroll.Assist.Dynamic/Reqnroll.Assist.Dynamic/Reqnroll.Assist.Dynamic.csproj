@@ -1,25 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-    
-    <PackageId>Reqnroll.Assist.Dynamic</PackageId>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Assist.Dynamic.nuspec</NuspecFile>
 
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>10</LangVersion>
+
+    <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+
+    <!-- Assembly signing -->
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+    
+    <!-- NuGet configuration -->
+    <PackageId>Reqnroll.Assist.Dynamic</PackageId>
+    <Description>Adds support for dynamic instances and sets from Reqnroll tables.
+
+    See documentation at https://github.com/reqnroll/Reqnroll/tree/main/Plugins/Reqnroll.Assist.Dynamic
+     </Description>
+    <Authors>Oleg Koshmeliuk,Marcus Hammarberg, $(ReqnrollAuthors)</Authors>
+    <Copyright>Copyright © Oleg Koshmeliuk, Marcus Hammarberg, $(ReqnrollAuthors)</Copyright>
+    <PackageTags>reqnroll dynamic</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Dynamitey" Version="3.0.3" />
 	</ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Reqnroll\Reqnroll.csproj" />
-  </ItemGroup>
 </Project>
