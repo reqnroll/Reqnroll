@@ -1,6 +1,6 @@
 ﻿Reqnroll.Microsoft.Extensions.DependencyInjection provides [Microsoft.Extensions.DependencyInjection](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-usage) integration for Reqnroll.
 
-This package enables Reqnroll to use the standard .NET dependency injection container for resolving step definitions, hooks, and other dependencies in your BDD tests.
+This package enables Reqnroll to use the dependency injection container from the Microsoft.Extensions.DependencyInjection package for resolving step definitions, hooks, and other dependencies in your BDD tests.
 
 ## Documentation
 
