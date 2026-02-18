@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Updated Cucumber dependencies to: Gherkin v38.0.0, Cucumber.Messages v32.0.1 and Cucumber.HtmlFormatter v23.0.0. (#984)
 
 ## Bug fixes:
 
