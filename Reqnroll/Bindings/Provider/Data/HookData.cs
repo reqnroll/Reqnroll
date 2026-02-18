@@ -6,4 +6,5 @@ public class HookData
     public BindingScopeData Scope { get; set; }
     public string Type { get; set; }
     public int HookOrder { get; set; }
+    public string Error { get; set; }
 }
