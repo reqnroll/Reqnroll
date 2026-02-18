@@ -1,31 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.MSTest.nuspec</NuspecFile>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-    <PackageId>Reqnroll.MsTest</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="build\**\*" />
-    <None Include="build\**\*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-    <ProjectReference Include="..\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
-  </ItemGroup>
-
-
-  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.cs" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.template.vb" OutputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.vb" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-  </Target>
-  
 </Project>

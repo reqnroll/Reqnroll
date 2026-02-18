@@ -25,13 +25,10 @@ public class EnvironmentWrapperStub : IEnvironmentWrapper
             ? Result<string>.Success(value)
             : Result<string>.Failure($"Environment variable '{name}' not set in stub");
 
-    public IDictionary<string, string> GetEnvironmentVariables(string prefix) => throw new NotSupportedException();
+    public IDictionary<string, string> GetEnvironmentVariables(string prefix, bool trimPrefix = true) => throw new NotSupportedException();
 
     public bool IsEnvironmentVariableSet(string name)
         => EnvironmentVariables.ContainsKey(name);
-
-    public IResult<string> ResolveEnvironmentVariables(string source)
-        => Result<string>.Success(source);
 
     public void SetEnvironmentVariable(string name, string value)
         => EnvironmentVariables[name] = value;

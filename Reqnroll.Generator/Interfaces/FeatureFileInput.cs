@@ -1,17 +1,17 @@
 using System;
-using System.IO;
 
 namespace Reqnroll.Generator.Interfaces;
 
 /// <summary>
 /// Represents the information related to a feature file as an input of the generation
 /// </summary>
-public class FeatureFileInput
+public class FeatureFileInput(string projectRelativePath)
 {
     /// <summary>
     /// The project relative path of the feature file. Must be specified.
     /// </summary>
-    public string ProjectRelativePath { get; private set; }
+    public string ProjectRelativePath { get; private set; } = projectRelativePath ?? throw new ArgumentNullException(nameof(projectRelativePath));
+
     /// <summary>
     /// The content of the feature file. Optional. If not specified, the content is read from <see cref="ProjectRelativePath"/>.
     /// </summary>
@@ -22,20 +22,18 @@ public class FeatureFileInput
     public string CustomNamespace { get; set; }
 
     /// <summary>
-    /// The project relative path of the generated test class file. Optional, used for up-to-date checking. 
+    /// The resource name to use for the embedded messages resource.
     /// </summary>
-    public string GeneratedTestProjectRelativePath { get; set; }
+    public string MessagesResourceName { get; set; }
+
     /// <summary>
-    /// The content of the existing test class file. Optional, used for up-to-date checking. 
+    /// Absolute path of the code behind file to be generated.
     /// </summary>
-    public string GeneratedTestFileContent { get; set; }
+    public string CodeBehindFilePath { get; set; }
 
-    public FeatureFileInput(string projectRelativePath)
-    {
-        if (projectRelativePath == null) throw new ArgumentNullException(nameof(projectRelativePath));
-        if (string.IsNullOrEmpty(Path.GetFileName(projectRelativePath))) 
-            throw new ArgumentException("The feature file path must denote a file and not a directory", nameof(projectRelativePath));
-
-        ProjectRelativePath = projectRelativePath;
-    }
+    /// <summary>
+    /// Optional link information for feature files imported from outside the project folder. Relative "virtual" path in the project.
+    /// If the link is provided (not null), the feature file should be handled (e.g. for generated namespace) as a linked file in the project.
+    /// </summary>
+    public string FeatureFileLink { get; set; }
 }

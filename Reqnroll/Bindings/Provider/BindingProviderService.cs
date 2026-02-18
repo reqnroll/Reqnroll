@@ -22,7 +22,10 @@ public interface IBindingProviderService
     void OnBindingRegistryBuildingCompleted();
 }
 
-public class BindingProviderService(IBindingRegistry bindingRegistry, ITestAssemblyProvider testAssemblyProvider, IEnvironmentWrapper environmentWrapper) : IBindingProviderService
+public class BindingProviderService(
+    IBindingRegistry bindingRegistry, 
+    ITestAssemblyProvider testAssemblyProvider, 
+    IEnvironmentOptions environmentOptions) : IBindingProviderService
 {
     /// <summary>
     /// Invoked by the Visual Studio extension connectors. Do not remove or change the signature.
@@ -37,8 +40,6 @@ public class BindingProviderService(IBindingRegistry bindingRegistry, ITestAssem
         return GetDiscoveredBindingsFromRegistry(bindingRegistry, testAssembly);
     }
 
-    private const string REQNROLL_BINDING_OUTPUT_ENVIRONMENT_VARIABLE = "REQNROLL_BINDING_OUTPUT";
-
     public void OnBindingRegistryBuildingCompleted()
     {
         // Experimental feature: This code allows the Visual Studio extension to instruct saving the discovered bindings to a file
@@ -46,11 +47,13 @@ public class BindingProviderService(IBindingRegistry bindingRegistry, ITestAssem
         // This might be used as an alternative to invoking the `DiscoverBindings` method, because that needs the test assembly to be
         // fully loaded and this is sometimes problematic.
 
-        if (environmentWrapper.GetEnvironmentVariable(REQNROLL_BINDING_OUTPUT_ENVIRONMENT_VARIABLE) is ISuccess<string> environmentVariable &&
-            !string.IsNullOrWhiteSpace(environmentVariable.Result))
+        string bindingsOutputFilepath = environmentOptions.BindingsOutputFilepath;
+        if (!string.IsNullOrWhiteSpace(bindingsOutputFilepath))
         {
-            var outputFilePath = environmentVariable.Result.Equals("true", StringComparison.OrdinalIgnoreCase) ? "reqnroll_bindings.json" :
-                environmentVariable.Result.Trim();
+            bindingsOutputFilepath = bindingsOutputFilepath.Trim();
+            string outputFilePath = bindingsOutputFilepath.Equals("true", StringComparison.OrdinalIgnoreCase) 
+                ? "reqnroll_bindings.json" 
+                : bindingsOutputFilepath;
 
             outputFilePath = Path.GetFullPath(outputFilePath);
             TrySaveBindings(outputFilePath);

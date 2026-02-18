@@ -9,6 +9,125 @@
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @chekkan
 
+# v3.3.3 - 2026-01-27
+
+## Improvements:
+
+* Improve binding discovery so that the discovery can continue even if the attributes of a type fail to load (#1006)
+
+## Bug fixes:
+* Fix: xUnit VB.NET generates code with async warning (#1009)
+* Fix: disableFriendlyTestNames doesn't work in Reqnroll 3.3.2 (#1013)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi
+
+# v3.3.2 - 2026-01-14
+
+## Bug fixes:
+
+* Fix: Partially defined CI Environment variables (missing relevant environment variables) cause missing Meta envelope in Cucumber Messages report and Javascript errors in HTML report. (#990)
+* Fix: Visual Studio Test Explorer does not navigate to the correct source line for MsTest v4 tests when 'ReqnrollUseIntermediateOutputPathForCodeBehind' is enabled. (#997)
+* Fix: Visual Studio Test Explorer does not navigate to the correct source line for TUnit tests. (#997)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy
+
+# v3.3.1 - 2026-01-08
+
+## Bug fixes:
+
+* Fix: Upgrading to 3.3.0 causes build error with SpecFlowCompatibility (NuGet package Reqnroll.SpecFlowCompatibility issue) (#970)
+* Fix: IGeneratorPlugin interface could not be found after upgrading to the Reqnroll 3.3.0 (NuGet package Reqnroll.CustomPlugin issue) (#972)
+* Fix: Authors field of Reqnroll.Autofac package is incorrect (#979)
+* Fix: Referencing step definitions from other assembly/project not working because `reqnroll.json` config file is not copied to the output folder (#985)
+
+*Contributors of this release (in alphabetical order):* @304NotModified, @Code-Grump, @gasparnagy
+
+# v3.3.0 - 2025-12-17
+
+## Improvements:
+
+* NUnit dependencies are updated to v4.4.0 in templates. This does not impact Reqnroll compatibility. (#846)
+* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. See https://docs.reqnroll.net/latest/installation/formatter-configuration.html#available-substitution-variables for details. (#930)
+* Improved packaging of Reqnroll NuGet packages (#914)
+* Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
+* Support for storing the code-behind files in the intermediate output folder (obj folder) by setting the `ReqnrollUseIntermediateOutputPathForCodeBehind` MSBuild property to `true`. (#947)
+* Support for linked feature files (files used from outside of the project folder). To use this feature, the `ReqnrollUseIntermediateOutputPathForCodeBehind` flag must be enabled (see above). (#948)
+* Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
+* Updated Cucumber.HtmlFormatter to version 22 to support HTML reports on non-https URLs (#962)
+* Updated Cucumber.Messages to version 30 (#962)
+* NotImplementedException thrown by the tests is no longer treated as a "pending" outcome (reverting to v2 behavior). (#954)
+
+## Bug fixes:
+
+* Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
+* Fix: The configuration setting `generator/addNonParallelizableMarkerForTags` does not work for xUnit 3 (#917)
+* Fix: Improve error handling in OnTestRunEnd when test runners are still executing (#957)
+
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @copilot, @gasparnagy, @markk-df, @obligaron
+
+# v3.2.1 - 2025-11-07
+
+## Bug fixes:
+
+* Fix: AfterScenario hook is not called when a scenario end in inconclusive or skipped status (#883, #900)
+* Fix: Feature-level tags are not generating MSTest TestCategory attributes for scenarios (#910)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi, @PaysPlat
+
+# v3.2.0 - 2025-10-21
+
+## Improvements:
+
+* Step definition snippets (aka, skeletons) can be generated as async methods by setting `treace/stepDefinitionSkeletonStyle` to `AsyncCucumberExpressionAttribute` or `AsyncRegexAttribute`. (#876)
+* Added Support for MsTest v4 (#703, #889, #894, #896)
+
+## Bug fixes:
+
+* Address [Microsoft Security Advisory CVE-2025-55247 | .NET Denial of Service Vulnerability](https://github.com/advisories/GHSA-w3q9-fxm7-j8fq) (#893)
+
+*Contributors of this release (in alphabetical order):*  @clrudolphi, @Code-Grump, @gasparnagy, @kant2002
+
+# v3.1.2 - 2025-10-07
+
+## Bug fixes:
+
+* Fix: MsTest: Friendly names are generated for scenario outline examples, even if `generator/disableFriendlyTestNames` is set to true, causing a Reqnroll v2 compatiblility issue (#867)
+* Fix: Performance issue caused by the fix #862 in v3.1.0 (#874)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi, @konarx
+
+# v3.1.1 - 2025-09-29
+
+## Bug fixes:
+
+* Fix: Mismatch in Cucumber.HtmlFormatter version between package and project causing build warnings (#868)
+
+*Contributors of this release (in alphabetical order):* @jdb0123
+
+# v3.1.0 - 2025-09-26
+
+## New features:
+
+* Added xUnit 3 support. In order to use Reqnroll with xUnit v3, you need to use the `Reqnroll.xunit.v3` package. (#405, #538)
+* Disabling parallel execution with the `addNonParallelizableMarkerForTags` efature now also applies to scenario-level tags for frameworks supporting method-level isolation (NUnit, MsTest V2, TUnit). (#826)
+* Generating "friendly names" for generated test methods by default can be disabled by the `generator/disableFriendlyTestNames` setting in `reqnroll.json`. This can help to avoid compatiblity issues with tools like VsTest retry. For MsTest this setting restores the behavior of Reqnroll v2. (#854)
+
+## Improvements:
+
+* Reqnroll.Verify: Support for Verify v29+ (Verify.Xunit v29.0.0 or later). For earlier versions use 3.0.3 version of the plugin that is compatible with Reqnroll v3.*. The support for custom snapshot files with global VerifySettings has been removed, see [plugin documentation](https://docs.reqnroll.net/latest/integrations/verify.html) for details and workarounds. (#572)
+* Dependencies: Updated to Cucumber Gherkin v35, Cucumber Messages v29 and Cucumber CompatibilityKit v23 (#841)
+* Improved `Reqnroll.Tools.MsBuild.Generation` NuGet package: reduced size by optimizing included dependencies, consolidated MsBuild assets (#812)
+
+## Bug fixes:
+
+* Fix: Formatters: Test execution fails when formatters were disabled due to a generation error (#861)
+* Fix: Exceptions from before scenario plugin hook events (RuntimePluginTestExecutionLifecycleEvents.BeforeScenario) are not shown (#856)
+* Fix: Before scenario hooks are not raised immediately when `runtime/stopAtFirstError` is true, but handled delayed (#857)
+* Fix: Dry Run mode doesn't work properly if the project contains hooks that register & inject custom dependencies (#862)
+
+*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @DrEsteban, @gasparnagy, @konarx
+>>>>>>> b9f0963d1222796b757ea5a28544cd24fd3f2110
+
 # v3.0.3 - 2025-09-17
 
 ## Improvements:

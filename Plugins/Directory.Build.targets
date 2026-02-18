@@ -1,0 +1,107 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.targets"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.RuntimePlugin.targets"
+    Condition="'$(IsReqnrollRuntimePlugin)' == 'true'"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.GeneratorPlugin.targets"
+    Condition="'$(IsReqnrollGeneratorPlugin)' == 'true'"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.TestFrameworkAdapter.targets"
+    Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
+  
+  <PropertyGroup>
+    <UseCompatibilityRangeForReqnrollDependency Condition="'$(UseCompatibilityRangeForReqnrollDependency)' == ''">true</UseCompatibilityRangeForReqnrollDependency>
+  </PropertyGroup>
+
+  <!-- Updates project reference versions to use the explicit override for packing -->
+  <Target
+    Name="_SetReqnrollProjectReferenceVersionForPack"
+    BeforeTargets="GenerateNuspec"
+    Condition="'$(UseCompatibilityRangeForReqnrollDependency)' == 'true'">
+
+    <ItemGroup>
+      <_ProjectReferencesWithVersions
+        Update="@(_ProjectReferencesWithVersions)"
+        BaseVersion="%(ProjectVersion)"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <_ProjectReferencesWithVersions
+        Update="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj"
+        ProjectVersion="[%(_ProjectReferencesWithVersions.BaseVersion),$(CompatibilityVersionUpperRange))"/>
+      <_ProjectReferencesWithVersions
+        Update="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj"
+        ProjectVersion="[%(_ProjectReferencesWithVersions.BaseVersion),$(CompatibilityVersionUpperRange))"/>
+    </ItemGroup>
+  </Target>
+
+  <!-- Get the list of project reference outputs that should be packed as a generator plugin. -->
+  <Target
+    Name="_GetProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin"
+    DependsOnTargets="ResolveReferences"
+    Returns="_ProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin">
+
+    <ItemGroup>
+      <_ReferenceCopyLocalProjects
+        Include="@(ReferenceCopyLocalPaths -> '%(ProjectReferenceOriginalItemSpec)')"
+        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true'">
+        <Asset>%(Identity)</Asset>
+      </_ReferenceCopyLocalProjects>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin
+        Include="@(_ReferenceCopyLocalProjects->'%(Asset)')"
+        Condition="'%(ProjectReference.PackAsReqnrollGeneratorPlugin)' == 'true'"/>
+    </ItemGroup>
+  </Target>
+
+  <!--
+  ============================================================
+  
+      GetReqnrollGeneratorPluginProjectReferencePackageFiles
+      
+      Gets the list of redistributable assets a project publishes as a Reqnroll Generator Plugin and includes them
+      in the package content.
+      
+      [IN]
+      @(ProjectReference) - The list of project references to be processed. Only ones marked as 
+                            PackAsReqnrollGeneratorPlugin="true" are processed by this target.
+                            
+      [OUT]
+      @(None) - Items are added which are the package files for each generator plugin.
+  
+  ============================================================
+  -->
+  <PropertyGroup>
+    <GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn>$(GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn);_GetReqnrollGeneratorPluginProjectReferences</GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn>
+  </PropertyGroup>
+  
+  <Target 
+    Name="GetReqnrollGeneratorPluginProjectReferencePackageFiles"
+    BeforeTargets="_GetPackageFiles"
+    DependsOnTargets="$(GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn)">
+    
+    <MSBuild 
+      Projects="@(_ReqnrollGeneratorPluginProjectReference)"
+      Targets="GetReqnrollGeneratorPluginPackageFiles"
+      Properties="IsReqnrollGeneratorPlugin=true"
+      Condition="'@(_ReqnrollGeneratorPluginProjectReference)' != ''">
+      <Output TaskParameter="TargetOutputs" ItemName="_ReqnrollGeneratorPluginProjectReferencePackageFiles" />
+    </MSBuild>
+    
+    <ItemGroup>
+      <None Include="@(_ReqnrollGeneratorPluginProjectReferencePackageFiles)" Pack="true" />
+    </ItemGroup>
+  </Target>
+  
+  <!-- Gets the project refrences to be packed as Reqnroll Generator Plugins -->
+  <Target Name="_GetReqnrollGeneratorPluginProjectReferences">
+    <ItemGroup>
+      <_ReqnrollGeneratorPluginProjectReference
+        Include="@(ProjectReference)"
+        Condition="'%(ProjectReference.PackAsReqnrollGeneratorPlugin)' == 'true'"/>
+    </ItemGroup>
+  </Target>
+</Project>

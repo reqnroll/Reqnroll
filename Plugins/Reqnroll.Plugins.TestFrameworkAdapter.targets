@@ -1,0 +1,132 @@
+<Project>
+  <!--
+  REQNROLL TEST FRAMEWORK ADAPTER SDK
+  
+  This file defines properties and extensions to MSBuild which ensure a runtime and generator plugin can be built and
+  and packed correctly.
+  
+  Runtime plugins are loaded into Reqnroll at runtime, where generator plugins are loaded into the MSBuild process and picked
+  up by the Reqnroll generator. To deliver a test framework adapter, both kinds of plugin are packed as separate assemblies.
+  The SDK expects the runtime plugin to be a project that also references a generator plugin project. The runtime plugin 
+  project imports this SDK to create the publishable NuGet package and the generator plugin project is packed into the /build 
+  folder of the NuGet package.
+  
+  NuGet package layout:
+  /assets
+    /icon.png <- The package icon
+  /build      <- Contains a copy of all files from the project's /build folder plus SDK-defined files
+    /<tfm>    <- Contains the generator plugin assembly compiled for that Target Framework
+    /Reqnroll.TestFrameworkAdapter.props   <- Prop file added by the SDK
+    /Reqnroll.TestFrameworkAdapter.targets <- Targets file added by the SDK
+  /lib
+    /<tfm>    <- Contains the runtime plugin assembly compiled for that Target Framework
+      
+  -->
+  <PropertyGroup>
+    <!-- Assembly signing -->
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+
+    <!-- NuGet configuration -->
+    <GeneratePackageOnBuild Condition="'$(GeneratePackageOnBuild)' == ''">true</GeneratePackageOnBuild>
+    <ContentTargetFolders>build</ContentTargetFolders>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <!-- We don't use compatibility ranges for test framework adapters -->
+    <UseCompatibilityRangeForReqnrollDependency>false</UseCompatibilityRangeForReqnrollDependency>
+  </PropertyGroup>
+
+  <!-- The adapter props and targets and the SDK files themselves should be part of the up-to-date check -->
+  <ItemGroup>
+    <UpToDateCheckInput Include="$(MSBuildThisFileFullPath)" />
+    <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).targets"/>
+
+    <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.props"/>
+    <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.targets"/>
+  </ItemGroup>
+
+  <!-- All adapters should reference the Reqnroll generator and runtime -->
+  <ItemGroup>
+    <ProjectReference
+      Include="$(MSBuildThisFileDirectory)..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
+      PrivateAssets="none" />
+    <!-- PrivateAssets="none" ensures that the consumers of this package get everything from Reqnroll package, 
+         like they would have referenced the Reqnroll package directly. This is necessary to ensure that build and later analyzer assets are also used.
+         This is important here, because these are the "entry" packages that users reference directly. -->
+    <ProjectReference 
+      Include="$(MSBuildThisFileDirectory)..\Reqnroll\Reqnroll.csproj"
+      PrivateAssets="none" />
+  </ItemGroup>
+
+  <!-- Assembly hooks templates are not compiled and instead are used to produce source for the package. -->
+  <ItemGroup>
+    <Compile Remove="AssemblyHooksTemplates/**" />
+    <None Include="AssemblyHooksTemplates/**" />
+    <AssemblyHooksTemplate Include="AssemblyHooksTemplates/**" />
+    <UpToDateCheckInput Include="@(AssemblyHooksTemplate)" />
+    <UpToDateCheckOutput Include="@(AssemblyHooksTemplate -> '$(IntermediateOutputPath)%(Filename).$(PackageVersion)%(Extension)')" />
+  </ItemGroup>
+
+  <!-- Build assets are included in the package. -->
+  <ItemGroup>
+    <None Include="build/**" Pack="true" PackagePath="build" />
+    <UpToDateCheckInput Include="build/**" />
+  </ItemGroup>
+
+  <!-- Common build assets are included in the package. -->
+  <ItemGroup>
+    <None
+      Include="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.props"
+      Link="build/%(Filename)%(Extension)"
+      Pack="true"
+      PackagePath="build" />
+    <None
+      Include="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.targets"
+      Link="build/%(Filename)%(Extension)"
+      Pack="true"
+      PackagePath="build" />
+  </ItemGroup>
+  
+  <Target
+    Name="GenerateAssemblyHookTemplates"
+    BeforeTargets="Build"
+    Returns="@(GeneratedAssemblyHookTemplates)"
+    Inputs="@(AssemblyHooksTemplate)"
+    Outputs="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)">
+
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(AssemblyHooksTemplate.Identity)">
+      <Output TaskParameter="Lines" ItemName="_AssemblyHooksTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the version token replaced. -->
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)"
+      Lines="@(_AssemblyHooksTemplateLine -> Replace(`REQNROLL_VERSION`, `$(PackageVersion)`))"
+      Overwrite="true"
+      Encoding="UTF-8" />
+
+    <!-- Clean up the read lines -->
+    <ItemGroup>
+      <_AssemblyHooksTemplateLine Remove="@(_AssemblyHooksTemplateLine)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <GeneratedAssemblyHookTemplates
+        Include="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)" />
+      
+      <!-- Include the file in the final build package -->
+      <None
+        Include="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)"
+        Pack="true"
+        PackagePath="build/%(AssemblyHooksTemplate.Filename)%(AssemblyHooksTemplate.Extension)"/>
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)" />
+    </ItemGroup>
+
+  </Target>
+  
+</Project>

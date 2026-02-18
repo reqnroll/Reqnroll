@@ -1,31 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.ExternalData.nuspec</NuspecFile>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
 
+    <!-- NuGet configuration -->
     <PackageId>Reqnroll.ExternalData</PackageId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Description>Package to use external data in Gherkin scenarios</Description>
+    <PackageTags>reqnroll externaldata json</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Utf8Json" Version="1.3.7" />
-
     <PackageReference Include="CsvHelper" Version="33.0.1" />
-
     <PackageReference Include="ExcelDataReader" Version="3.7.0" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
   </ItemGroup>
 </Project>

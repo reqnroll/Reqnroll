@@ -48,10 +48,19 @@ namespace Reqnroll.TestProjectGenerator.Driver
             {
                 envVariables.Add("REQNROLL_FORMATTERS_DISABLED", formattersEnable ? "false" : "true");
             }
+            else
+                envVariables.Add("REQNROLL_FORMATTERS_DISABLED", null); // Always override to avoid conflicts between local config and expected settings in the tests
 
             if (_testSuiteInitializationDriver.OverrideCucumberMessagesFormatters is string cucumberMessagesFormatters)
             {
                 envVariables.Add("REQNROLL_FORMATTERS", cucumberMessagesFormatters);
+            }
+            else
+                envVariables.Add("REQNROLL_FORMATTERS", null); // Always override to avoid conflicts between local config and expected settings in the tests
+
+            foreach (var envOverride in _testSuiteInitializationDriver.EnvironmentVariableOverrides)
+            {
+                envVariables.Add(envOverride.Key, envOverride.Value);
             }
 
             return envVariables;

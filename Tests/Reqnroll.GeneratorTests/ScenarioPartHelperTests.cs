@@ -68,7 +68,7 @@ namespace Reqnroll.GeneratorTests
             ReqnrollConfiguration _reqnrollConfiguration = ConfigurationLoader.GetDefault(); 
             _reqnrollConfiguration.AllowRowTests = true;
             _reqnrollConfiguration.AllowDebugGeneratedFiles = true;
-            TestClassGenerationContext _generationContext = new TestClassGenerationContext(null, _reqnrollDocument, null, null, null, null, null, null, null, null, null, null, null, null, true);
+            TestClassGenerationContext _generationContext = new TestClassGenerationContext(null, _reqnrollDocument, null, null, null, null, null, null, null, null, null, null, null, null, ConfigDefaults.AllowRowTests, ConfigDefaults.DisableFriendlyTestNames);
             List<CodeStatement> _statements = new List<CodeStatement>();
             
             // Creating the SUT

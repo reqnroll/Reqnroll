@@ -8,6 +8,7 @@ using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
 using Xunit;
@@ -103,6 +104,7 @@ namespace Reqnroll.RuntimeTests
             TestThreadContainer = new ObjectContainer();
             TestThreadContainer.RegisterInstanceAs(runtimeConfiguration);
             TestThreadContainer.RegisterInstanceAs(new Mock<ITestRunner>().Object);
+            TestThreadContainer.RegisterInstanceAs(new Mock<IEnvironmentOptions>().Object);
             TestThreadContainer.RegisterTypeAs<TestObjectResolver, ITestObjectResolver>();
             var containerBuilderMock = new Mock<IContainerBuilder>();
             containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>()))

@@ -2,7 +2,7 @@
 
 The Visual Studio extension includes a number of features that make it easier to edit Gherkin files and navigate to and from step definitions in Visual Studio. You can also generate code snippets for step definition methods from feature files.
 
-You can install the extension from the Visual Studio Gallery (Marketplace) or directly in Visual Studio. Detailed instructions can be found [here](../../installation/setup-ide.md#setup-visual-studio-2022).
+You can install the extension from the Visual Studio Gallery (Marketplace) or directly in Visual Studio. Detailed instructions can be found [here](../../installation/setup-ide.md#setup-visual-studio).
 
 The extension provides the following features:
 

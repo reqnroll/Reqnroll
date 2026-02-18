@@ -37,13 +37,14 @@ namespace Reqnroll.Configuration
         private static TimeSpan DefaultMinTracedDuration => ConfigDefaults.MinTracedDurationAsTimeSpan;
 
         private static StepDefinitionSkeletonStyle DefaultStepDefinitionSkeletonStyle => ConfigDefaults.StepDefinitionSkeletonStyle;
-
         private static List<string> DefaultAdditionalStepAssemblies => new List<string>();
         private static bool DefaultAllowDebugGeneratedFiles => ConfigDefaults.AllowDebugGeneratedFiles;
         private static bool DefaultAllowRowTests => ConfigDefaults.AllowRowTests;
         public static string DefaultGeneratorPath => ConfigDefaults.GeneratorPath;
 
         public static string[] DefaultAddNonParallelizableMarkerForTags => ConfigDefaults.AddNonParallelizableMarkerForTags;
+
+        public static bool DefaultDisableFriendlyTestNames => ConfigDefaults.DisableFriendlyTestNames;
 
         public static ObsoleteBehavior DefaultObsoleteBehavior => ConfigDefaults.ObsoleteBehavior;
 
@@ -129,6 +130,7 @@ namespace Reqnroll.Configuration
                 DefaultAllowDebugGeneratedFiles,
                 DefaultAllowRowTests,
                 DefaultAddNonParallelizableMarkerForTags,
+                DefaultDisableFriendlyTestNames,
                 DefaultObsoleteBehavior,
                 DefaultColoredOutput
                 );

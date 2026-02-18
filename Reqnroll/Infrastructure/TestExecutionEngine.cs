@@ -3,6 +3,7 @@ using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.PlatformCompatibility;
@@ -26,6 +27,7 @@ namespace Reqnroll.Infrastructure
         private readonly IErrorProvider _errorProvider;
         private readonly IObsoleteStepHandler _obsoleteStepHandler;
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
+        private readonly IEnvironmentOptions _environmentOptions;
         private readonly IStepArgumentTypeConverter _stepArgumentTypeConverter;
         private readonly IStepDefinitionMatchService _stepDefinitionMatchService;
         private readonly IStepFormatter _stepFormatter;
@@ -49,6 +51,7 @@ namespace Reqnroll.Infrastructure
             IErrorProvider errorProvider,
             IStepArgumentTypeConverter stepArgumentTypeConverter,
             ReqnrollConfiguration reqnrollConfiguration,
+            IEnvironmentOptions environmentOptions,
             IBindingRegistry bindingRegistry,
             IUnitTestRuntimeProvider unitTestRuntimeProvider,
             IContextManager contextManager,
@@ -69,6 +72,7 @@ namespace Reqnroll.Infrastructure
             _unitTestRuntimeProvider = unitTestRuntimeProvider;
             _bindingRegistry = bindingRegistry;
             _reqnrollConfiguration = reqnrollConfiguration;
+            _environmentOptions = environmentOptions;
             _testTracer = testTracer;
             _stepFormatter = stepFormatter;
             _stepArgumentTypeConverter = stepArgumentTypeConverter;
@@ -192,9 +196,9 @@ namespace Reqnroll.Infrastructure
             }
             catch (Exception)
             {
-                // Removed code that sets the ScenarioContext.TestError and ScenarioContext.ScenarioExecutionStatus, because
-                // FireEventsAsync called by FireScenarioEventsAsync sets *Context.TestError and ScenarioContext.ScenarioExecutionStatus.
-                // The fact that the exception is not rethrown here is suspicious, but it is the current behavior. We need to check it eventually.
+                // When StopAtFirstError is false (default), we do not rethrow the exception, because it will be handled in OnAfterLastStepAsync
+                if (_reqnrollConfiguration.StopAtFirstError)
+                    throw;
             }
         }
 
@@ -249,7 +253,11 @@ namespace Reqnroll.Infrastructure
 
             try
             {
-                if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
+                // IF the ScenarioExecutionStatus is something other than Skipped, then we should fire the AfterScenario Hooks
+                // IF the ScenarioExecutionStatus IS Skipped AND the TestError IS NULL, then this situation came about because the OnScenarioSkippedAsync() got called, therefore the Scenario wasn't started and we should NOT fire the AfterScenario hooks
+                // IF the ScenarioExecutionStatus IS Skipped AND the TestError has a value, then the result of executing the Scenario was the TestError; and we SHOULD fire the AfterScenario hooks
+                if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped || 
+                    (_contextManager.ScenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.Skipped && _contextManager.ScenarioContext.TestError != null))
                 {
                     await FireScenarioEventsAsync(HookType.AfterScenario);
                 }
@@ -352,8 +360,20 @@ namespace Reqnroll.Infrastructure
             }
 
             //Note: plugin-hooks are still executed even if a user-hook failed with an exception
-            //A plugin-hook should not throw an exception under normal circumstances, exceptions are not handled/caught here
-            await FireRuntimePluginTestExecutionLifecycleEventsAsync(hookType);
+            //A plugin-hook should not throw an exception under normal circumstances, still, we handle them like user-hooks
+            try
+            {
+                await FireRuntimePluginTestExecutionLifecycleEventsAsync(hookType);
+            }
+            catch (Exception hookExceptionCaught)
+            {
+                // we do not overwrite an existing exception as that might be the root cause of the failure
+                if (hookException == null)
+                {
+                    hookException = hookExceptionCaught;
+                    SetHookError(hookType, hookException);
+                }
+            }
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new HookFinishedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext, hookException));
 
@@ -431,10 +451,7 @@ namespace Reqnroll.Infrastructure
         }
 
         private ScenarioExecutionStatus GetStatusFromException(Exception exception)
-        {
-            // handle generic exception types
-            if (exception is NotImplementedException)
-                return ScenarioExecutionStatus.StepDefinitionPending;
+        {            
             if (exception is PendingScenarioException) // this exception should not be thrown by steps (for that we have PendingStepException), but in case it does, we detect it
                 return ScenarioExecutionStatus.StepDefinitionPending;
 
@@ -468,6 +485,11 @@ namespace Reqnroll.Infrastructure
 
             if (parameter.Type is RuntimeBindingType runtimeParameterType)
             {
+                if (_environmentOptions.IsDryRun)
+                {
+                    return null;
+                }
+
                 return _testObjectResolver.ResolveBindingInstance(runtimeParameterType.Type, container);
             }
 
@@ -535,9 +557,9 @@ namespace Reqnroll.Infrastructure
                     // GetStepMatch might throw
                     // - BindingException when the binding registry is invalid, e.g. because of an invalid regex
                     // - MissingStepDefinitionException when step is undefined
+                    contextManager.StepContext.StepInfo.StepInstance = stepInstance;
                     match = GetStepMatch(stepInstance, out candidatingMatches);
                     contextManager.StepContext.StepInfo.BindingMatch = match;
-                    contextManager.StepContext.StepInfo.StepInstance = stepInstance;
                     return Task.CompletedTask;
                 });
 
@@ -649,8 +671,9 @@ namespace Reqnroll.Infrastructure
                     _contextManager.ScenarioContext.PendingSteps.Add(_stepFormatter.GetMatchText(match, arguments));
                     return;
                 case ScenarioExecutionStatus.UndefinedStep:
+                    var msg = _testUndefinedMessageFactory.BuildStepMessageFromContext(stepInstance, FeatureContext);
                     _testTracer.TraceNoMatchingStepDefinition(stepInstance, FeatureContext.FeatureInfo.GenerationTargetLanguage, FeatureContext.BindingCulture, candidatingMatches);
-                    _contextManager.ScenarioContext.MissingSteps.Add(stepInstance);
+                    _contextManager.ScenarioContext.MissingSteps.Add(stepInstance, msg);
                     return;
                 case ScenarioExecutionStatus.BindingError:
                     _testTracer.TraceBindingError(exception);

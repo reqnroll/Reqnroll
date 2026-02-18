@@ -9,8 +9,6 @@ public class GeneratorInfoProviderTests : TestGeneratorTestsBase
     [Fact]
     public void GetGeneratorVersion_should_return_a_version()
     {
-        var sut = new GeneratorInfoProvider();
-
-        sut.GetGeneratorInfo().GeneratorVersion.Should().NotBeNull();
+        GeneratorInfoProvider.GetGeneratorInfo().GeneratorVersion.Should().NotBeNull();
     }
 }

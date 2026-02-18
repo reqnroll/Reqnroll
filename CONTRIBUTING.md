@@ -18,7 +18,7 @@ In order to run all system tests, you will need to have the following SDKs insta
 - .NET 8.0 SDK
 - .NET 9.0 SDK
 
-and of course **C# knowledge** if you are looking to contribute by coding.
+Additionally, of course, **C# knowledge** if you are looking to contribute by coding.
 
 ## Types of contributions 
 
@@ -64,7 +64,7 @@ Please adhere to the coding conventions in the project (indentation, accurate co
 
 ### Pull requests
 
-in order to craft an excellent pull request:
+In order to craft an excellent pull request:
 
 1. [Fork](https://docs.github.com/articles/fork-a-repo) the project, clone your fork, and configure the remotes. If you are already in the [contributors team](https://github.com/orgs/reqnroll/teams/contributors), you can just clone the project.
 
@@ -107,12 +107,35 @@ Some important notes to keep in mind:
 
 Visual Studio:
 
-- Open <Reqnroll.sln> with Visual Studio
+- Open <Reqnroll.slnx> with Visual Studio
 - Build\Build Solution
 
 CLI:
 
 - Execute `dotnet build` in a shell
+
+## Consuming local build
+
+If you want consume local changes on your project, run `dotnet build` and go to `GeneratedNuGetPackages\Debug` folder. There would be stored locally build packages. You should modify your nuget.config to use that folder as source for `Reqnroll.*` packages. For example:
+```
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="https://api.nuget.org/v3/index.json" value="https://api.nuget.org/v3/index.json" />
+    <add key="Reqnroll" value="<path-to-reqnroll>\GeneratedNuGetPackages\Debug" />
+  </packageSources>
+  <packageSourceMapping>
+    <packageSource key="https://api.nuget.org/v3/index.json">
+      <package pattern="*" />
+    </packageSource>
+    <packageSource key="Reqnroll">
+      <package pattern="Reqnroll.*" />
+			<package pattern="Reqnroll" />
+    </packageSource>
+  </packageSourceMapping>
+</configuration>
+```
 
 ## Running tests
 
@@ -122,7 +145,7 @@ We have three type of tests:
 
 ### Requirements tests using BDD
 
-There tests should contain illustrative scenarios that describe the behavior of the system. They are not suitable to provide full coverage for all cases (use unit tests for that).
+These tests should contain illustrative scenarios that describe the behavior of the system. They are not suitable to provide full coverage for all cases (use unit tests for that).
 
 Currently we have the following projects in this category:
 * Reqnroll.Specs - BDD tests for Reqnroll, currently under review and restructuring. Please ask for guidance before working on this project.
@@ -230,6 +253,14 @@ cd ./docs
 ```
 
 The documentation will be available at http://localhost:8000
+
+## Debugging MsBuild integration
+
+The MsBuild integration is implemented by the `Reqnroll.Tools.MsBuild.Generation` project that implements a custom MsBuild task. The following hints might help.
+
+* Observing normal log messages in build output: `dotnet build -v:n --tl:of  f` (Look for messages starting with `[Reqnroll]`)
+* Observing detailed log messages in build output: `dotnet build -v:d --tl:off | Select-String -Pattern "\[Reqnroll\]"` (this works with PowerShell)
+* Debugging the MsBuild task: `dotnet build -p:ReqnrollDebugMSBuildTask=True` (will popup to attach a debugger)
 
 ## Where can I go for help?
 

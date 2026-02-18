@@ -3,6 +3,7 @@ namespace Reqnroll.TestProjectGenerator;
 public enum UnitTestProvider
 {
     MSTest,
+    MSTest4,
     xUnit,
     xUnit3,
     NUnit4,

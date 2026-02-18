@@ -1,24 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-
+    <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+    
+    <!-- NuGet package metadata -->
     <PackageId>Reqnroll.Verify</PackageId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Verify.nuspec</NuspecFile>
-
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Description>Package to use Verify.Xunit with Reqnroll</Description>
+    <PackageTags>reqnroll verify xunit</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Verify.Xunit" Version="24.2.0"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Reqnroll\Reqnroll.csproj"/>
+    <PackageReference Include="Verify.Xunit" Version="29.0.0"/>
   </ItemGroup>
 </Project>

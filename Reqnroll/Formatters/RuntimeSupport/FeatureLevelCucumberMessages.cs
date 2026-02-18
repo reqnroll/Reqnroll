@@ -21,13 +21,13 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 
     internal int ExpectedEnvelopeCount { get; }
 
-    public FeatureLevelCucumberMessages(string resourceNameOfEmbeddedMessages, int envelopeCount)
+    public FeatureLevelCucumberMessages(string featureMessagesResourceName, int envelopeCount)
     {
-        if (string.IsNullOrEmpty(resourceNameOfEmbeddedMessages))
-            throw new ArgumentNullException(nameof(resourceNameOfEmbeddedMessages));
-
         var assembly = Assembly.GetCallingAssembly();
-        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromAssembly(assembly, resourceNameOfEmbeddedMessages));
+
+        var isEnabled = !string.IsNullOrEmpty(featureMessagesResourceName) && envelopeCount > 0;
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => 
+            isEnabled ? ReadEnvelopesFromAssembly(assembly, featureMessagesResourceName) : []);
         ExpectedEnvelopeCount = envelopeCount;
 
         InitializeLazyProperties();
@@ -36,7 +36,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     // Internal constructor for testing with direct stream access
     internal FeatureLevelCucumberMessages(Stream stream, string resourceNameOfEmbeddedMessages, int envelopeCount)
     {
-        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromStream(stream, resourceNameOfEmbeddedMessages));
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromStream(stream));
         ExpectedEnvelopeCount = envelopeCount;
 
         InitializeLazyProperties();
@@ -57,16 +57,14 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         _pickles = new Lazy<IEnumerable<Pickle>>(() => _embeddedEnvelopes.Value.Select(e => e.Pickle).Where(p => p != null));
     }
 
-    internal IReadOnlyCollection<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string resourceNameOfEmbeddedNdJson)
+    internal IReadOnlyCollection<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string featureMessagesResourceName)
     {
-        var targetResourceName = resourceNameOfEmbeddedNdJson.Replace("\\", "/") + ".ndjson";
-
         try
         {
-            using var stream = assembly.GetManifestResourceStream(targetResourceName);
+            using var stream = assembly.GetManifestResourceStream(featureMessagesResourceName);
             if (stream != null)
             {
-                return ReadEnvelopesFromStream(stream, resourceNameOfEmbeddedNdJson);
+                return ReadEnvelopesFromStream(stream);
             }
         }
         catch (System.Exception)
@@ -76,7 +74,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         return [];
     }
 
-    internal IReadOnlyCollection<Envelope> ReadEnvelopesFromStream(Stream stream, string resourceNameOfEmbeddedNdJson)
+    internal IReadOnlyCollection<Envelope> ReadEnvelopesFromStream(Stream stream)
     {
         try
         {

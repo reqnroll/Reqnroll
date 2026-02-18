@@ -43,6 +43,10 @@ permissions:
 env:
   SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
   REQNROLL_TEST_PIPELINEMODE: true
+  DOTNET_VERSIONS: |
+    8.0.x
+    9.0.x
+    10.0.x
 
 jobs:
   build:
@@ -159,7 +163,7 @@ jobs:
 
         # Calculate 'test_params'
         $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
-        $testParams = "--no-restore --verbosity minimal --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true RunConfiguration.TreatNoTestsAsError=true"
+        $testParams = "--verbosity minimal --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true RunConfiguration.TreatNoTestsAsError=true"
         Write-Output "test_params=$testParams" >> $env:GITHUB_OUTPUT
         Write-Output "Test Params: $testParams"
 
@@ -185,27 +189,36 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ steps.build_params.outputs.main_build_params }}
-    - name: Runtime Tests
-      run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/runtimetests-results.trx" ${{ steps.build_params.outputs.test_params }}
-    - name: Generator Tests
-      run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/generatortests-results.trx" ${{ steps.build_params.outputs.test_params }}
-    - name: Plugin Tests
-      run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/plugintests-results.trx" ${{ steps.build_params.outputs.test_params }}
-    - name: TestProjectGenerator Tests
-      run: dotnet test ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/testprjgentests-results.trx" ${{ steps.build_params.outputs.test_params }}
-    - name: Upload TRX files
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: build-trx-v${{ steps.versions.outputs.product_full_version }}
-        if-no-files-found: error
-        path: "TestResults/*.trx"
     - name: Upload packages
       uses: actions/upload-artifact@v4
       with:
         name: packages-v${{ steps.versions.outputs.product_full_version }}
         if-no-files-found: error
         path: "GeneratedNuGetPackages/${{ steps.versions.outputs.product_configuration }}/*.*nupkg"
+    - name: Upload RuntimeTests
+      uses: actions/upload-artifact@v4
+      with:
+        name: RuntimeTests
+        if-no-files-found: error
+        path: Tests/Reqnroll.RuntimeTests/bin/
+    - name: Upload GeneratorTests
+      uses: actions/upload-artifact@v4
+      with:
+        name: GeneratorTests
+        if-no-files-found: error
+        path: Tests/Reqnroll.GeneratorTests/bin/
+    - name: Upload PluginTests
+      uses: actions/upload-artifact@v4
+      with:
+        name: PluginTests
+        if-no-files-found: error
+        path: Tests/Reqnroll.PluginTests/bin/
+    - name: Upload TestProjectGenerator
+      uses: actions/upload-artifact@v4
+      with:
+        name: TestProjectGeneratorTests
+        if-no-files-found: error
+        path: Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/bin/
     - name: Upload SystemTests
       uses: actions/upload-artifact@v4
       with:
@@ -221,7 +234,7 @@ jobs:
     - name: Upload Formatters Tests
       uses: actions/upload-artifact@v4
       with:
-        name: Formatters
+        name: FormattersTests
         if-no-files-found: error
         path: Tests/Reqnroll.Formatters.Tests/bin/
 
@@ -289,6 +302,57 @@ jobs:
           Write-Output "✅ Validation completed for $totalPackages packages"
           exit 0
         }
+
+  component-tests:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download packages
+      uses: actions/download-artifact@v4
+      with:
+        name: packages-v${{ needs.build.outputs.product_full_version }}
+        path: GeneratedNuGetPackages/${{ needs.build.outputs.product_configuration }}/
+    - name: Download RuntimeTests
+      uses: actions/download-artifact@v4
+      with:
+        name: RuntimeTests
+        path: Tests/Reqnroll.RuntimeTests/bin/
+    - name: Download GeneratorTests
+      uses: actions/download-artifact@v4
+      with:
+        name: GeneratorTests
+        path: Tests/Reqnroll.GeneratorTests/bin/
+    - name: Download PluginTests
+      uses: actions/download-artifact@v4
+      with:
+        name: PluginTests
+        path: Tests/Reqnroll.PluginTests/bin/
+    - name: Download TestProjectGenerator
+      uses: actions/download-artifact@v4
+      with:
+        name: TestProjectGeneratorTests
+        path: Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/bin/
+    - name: Runtime Tests
+      shell: pwsh
+      run: dotnet test ./Tests/Reqnroll.RuntimeTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.RuntimeTests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/runtimetests-results.trx" ${{ needs.build.outputs.test_params }}
+    - name: Generator Tests
+      shell: pwsh
+      run: dotnet test ./Tests/Reqnroll.GeneratorTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.GeneratorTests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/generatortests-results.trx" ${{ needs.build.outputs.test_params }}  
+    - name: Plugin Tests
+      shell: pwsh
+      run: dotnet test ./Tests/Reqnroll.PluginTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.PluginTests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/plugintests-results.trx" ${{ needs.build.outputs.test_params }}    
+    - name: TestProjectGenerator Tests
+      shell: pwsh
+      run: dotnet test ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.TestProjectGenerator.Tests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/testprjgentests-results.trx" ${{ needs.build.outputs.test_params }}    
+    - name: Upload TRX files
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: component-tests-trx-v${{ steps.versions.outputs.product_full_version }}
+        if-no-files-found: error
+        path: "TestResults/*.trx"
 
   specs:
     runs-on: ubuntu-latest
@@ -370,19 +434,16 @@ jobs:
     - name: Download Formatters Tests
       uses: actions/download-artifact@v4
       with:
-        name: Formatters
+        name: FormattersTests
         path: Tests/Reqnroll.Formatters.Tests/bin/
     - name: Setup required .NET SDKs
       # It is faster to install all required .NET versions to D: drive than installing only the missing one to C: drive and use it from there.
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: | 
-          8.0.x
-          9.0.x
+        dotnet-version: ${{ env.DOTNET_VERSIONS }}
     - name: .NET Information
       run: |
-        dotnet --list-sdks
-        dotnet --list-runtimes
+        dotnet --info
     - name: System Tests
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }}
@@ -396,7 +457,6 @@ jobs:
         name: systemtests-windows-trx-v${{ needs.build.outputs.product_full_version }}
         if-no-files-found: error
         path: "TestResults/*.trx"
-
 
   system-tests-linux:
     runs-on: ubuntu-latest
@@ -434,19 +494,16 @@ jobs:
     - name: Download Formatters Tests
       uses: actions/download-artifact@v4
       with:
-        name: Formatters
+        name: FormattersTests
         path: Tests/Reqnroll.Formatters.Tests/bin/
     - name: Setup required .NET SDKs
       # The default image contains .NET 8 only, but reusing it would not provide much performance benefit
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: | 
-          8.0.x
-          9.0.x
+        dotnet-version: ${{ env.DOTNET_VERSIONS }}
     - name: .NET Information
       run: |
-        dotnet --list-sdks
-        dotnet --list-runtimes
+        dotnet --info
     - name: System Tests
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx" ${{ needs.build.outputs.test_params }}
@@ -483,7 +540,7 @@ jobs:
     
   release:
     runs-on: ubuntu-latest
-    needs: [build, validate-packages, specs, system-tests-windows, system-tests-linux]
+    needs: [build, validate-packages, component-tests, specs, system-tests-windows, system-tests-linux]
     environment: production_environment
     if: github.ref == 'refs/heads/main' && needs.build.outputs.deploy_packages == 'true'
     permissions:

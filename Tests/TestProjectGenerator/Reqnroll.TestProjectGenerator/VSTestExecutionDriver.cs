@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Driver;
 using Reqnroll.TestProjectGenerator.Helpers;
 
@@ -99,16 +100,62 @@ namespace Reqnroll.TestProjectGenerator
             var envVariables = _testSuiteEnvironmentVariableGenerator.GenerateEnvironmentVariables();
 
             var processHelper = new ProcessHelper();
-            string arguments = $"test {GenerateDotnetTestsArguments()}";
             ProcessResult processResult;
-            try
+
+            // TUnit uses Microsoft.Testing.Platform which dropped VSTest support in .NET 10 SDK.
+            // Run the test assembly directly instead of using dotnet test.
+            // This applies to ALL target frameworks when using .NET 10 SDK, not just net10.0 targets.
+            if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
             {
-                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, arguments, envVariables);
+                string testArguments = "--report-trx";
+                if (Filter.IsNotNullOrEmpty())
+                {
+                    testArguments += $" --filter \"{Filter}\"";
+                }
+
+                string executable;
+                string execArguments;
+                bool isNetFramework = _testRunConfiguration.TargetFramework is 
+                    TargetFramework.Net35 or TargetFramework.Net45 or TargetFramework.Net452 or
+                    TargetFramework.Net461 or TargetFramework.Net462 or
+                    TargetFramework.Net471 or TargetFramework.Net472 or 
+                    TargetFramework.Net48 or TargetFramework.Net481;
+                
+                if (isNetFramework)
+                {
+                    // .NET Framework: run the exe directly
+                    executable = Path.ChangeExtension(_testProjectFolders.CompiledAssemblyPath, ".exe");
+                    execArguments = testArguments;
+                }
+                else
+                {
+                    // .NET Core/.NET 5+: use dotnet exec (cross-platform)
+                    executable = DotnetTestPath;
+                    execArguments = $"exec \"{_testProjectFolders.CompiledAssemblyPath}\" {testArguments}";
+                }
+
+                try
+                {
+                    processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.ProjectBinOutputPath, executable, execArguments, envVariables);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine($"running {executable} failed - {execArguments}");
+                    throw;
+                }
             }
-            catch (Exception)
+            else
             {
-                Console.WriteLine($"running {DotnetTestPath} failed - {_testProjectFolders.CompiledAssemblyPath} {DotnetTestPath} {arguments}");
-                throw;
+                string arguments = $"test {GenerateDotnetTestsArguments()}";
+                try
+                {
+                    processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, arguments, envVariables);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine($"running {DotnetTestPath} failed - {_testProjectFolders.CompiledAssemblyPath} {DotnetTestPath} {arguments}");
+                    throw;
+                }
             }
 
             string output = processResult.CombinedOutput;
@@ -136,7 +183,10 @@ namespace Reqnroll.TestProjectGenerator
 
             TestExecutionResultFiles = trxFiles.ToDictionary(trxFile => trxFile.trxFilePath, trxFile => trxFile.trx);
 
-            LastTestExecutionResult = TestExecutionResultFiles.First(f => f.Key.Contains(_testProjectFolders.ProjectFolder)).Value;
+            // For TUnit direct execution, TRX files are generated in the bin output path,
+            // so the path might not contain the project folder name. Use first match or single result.
+            var matchingResult = TestExecutionResultFiles.FirstOrDefault(f => f.Key.Contains(_testProjectFolders.ProjectFolder));
+            LastTestExecutionResult = matchingResult.Value ?? TestExecutionResultFiles.First().Value;
 
             return LastTestExecutionResult;
         }

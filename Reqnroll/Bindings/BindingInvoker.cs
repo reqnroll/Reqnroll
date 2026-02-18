@@ -19,30 +19,21 @@ namespace Reqnroll.Bindings
 {
     public class BindingInvoker : IAsyncBindingInvoker
     {
-        internal const string DryRunEnvVarName = "REQNROLL_DRY_RUN";
-
         protected readonly ReqnrollConfiguration reqnrollConfiguration;
         protected readonly IErrorProvider errorProvider;
         protected readonly IBindingDelegateInvoker bindingDelegateInvoker;
-
-        private readonly Lazy<bool> isDryRunLazy;
+        protected readonly IEnvironmentOptions environmentOptions;
 
         public BindingInvoker(
             ReqnrollConfiguration reqnrollConfiguration,
             IErrorProvider errorProvider,
             IBindingDelegateInvoker bindingDelegateInvoker,
-            IObjectContainer objectContainer)
+            IEnvironmentOptions environmentOptions)
         {
             this.reqnrollConfiguration = reqnrollConfiguration;
             this.errorProvider = errorProvider;
             this.bindingDelegateInvoker = bindingDelegateInvoker;
-
-            // Don't want to evaluate too early in case the user overrides the EnvironmentWrapper, so use Lazy
-            isDryRunLazy = new Lazy<bool>(() =>
-                objectContainer.Resolve<IEnvironmentWrapper>()
-                    .GetEnvironmentVariable(DryRunEnvVarName) is ISuccess<string> dryRunEnvVar
-                       && bool.TryParse(dryRunEnvVar.Result, out bool isDryRun)
-                       && isDryRun);
+            this.environmentOptions = environmentOptions;
         }
 
         public virtual async Task<object> InvokeBindingAsync(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, DurationHolder durationHolder)
@@ -50,7 +41,7 @@ namespace Reqnroll.Bindings
             EnsureReflectionInfo(binding, out _, out var bindingAction);
 
             // Check for Dry Run mode
-            if (isDryRunLazy.Value)
+            if (environmentOptions.IsDryRun)
             {
                 durationHolder.Duration = TimeSpan.Zero;
                 return null; // Dry run, no actual invocation

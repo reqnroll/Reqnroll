@@ -1,19 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.NUnit</PackageId>
+    <Description>Package to use Reqnroll with NUnit 3.13 and later.</Description>
+    <PackageTags>reqnroll nunit</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.13.1" />
+    <!-- PrivateAssets="none" ensures that NUnit build assets are included even if the user does not explicitly add a reference to the 'NUnit' package -->
+    <!-- We can consider removing PrivateAssets="none" in v4 and declaring that the users must add reference to 'NUnit' explicitly. -->
+    <PackageReference Include="NUnit" Version="3.13.1" PrivateAssets="none" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference
+      Include="..\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj"
+      PrivateAssets="all"
+      PackAsReqnrollGeneratorPlugin="true" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,97 @@
+<Solution>
+  <Folder Name="/Licenses/">
+    <File Path="Licenses/BoDi-LICENSE-Apache2.txt" />
+    <File Path="Licenses/Gherkin-LICENSE-MIT.txt" />
+    <File Path="Licenses/Newtonsoft.Json-LICENSE-MIT.md" />
+    <File Path="Licenses/System.ValueTuple-LICENSE-MIT.txt" />
+  </Folder>
+  <Folder Name="/Plugins/">
+    <Project Path="Plugins/Reqnroll.Autofac.ReqnrollPlugin/Reqnroll.Autofac.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.CustomPlugin/Reqnroll.CustomPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin/Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.Windsor.ReqnrollPlugin/Reqnroll.Windsor.ReqnrollPlugin.csproj" />
+  </Folder>
+  <Folder Name="/Plugins/Assist.Dynamic/">
+    <Project Path="Plugins/Reqnroll.Assist.Dynamic/Reqnroll.Assist.Dynamic.Specs/Reqnroll.Assist.Dynamic.Specs.csproj" />
+    <Project Path="Plugins/Reqnroll.Assist.Dynamic/Reqnroll.Assist.Dynamic/Reqnroll.Assist.Dynamic.csproj" />
+  </Folder>
+  <Folder Name="/Plugins/build/">
+    <File Path="Plugins/Directory.Build.props" />
+    <File Path="Plugins/Directory.Build.targets" />
+    <File Path="Plugins/Reqnroll.Plugins.GeneratorPlugin.targets" />
+    <File Path="Plugins/Reqnroll.Plugins.RuntimePlugin.targets" />
+    <File Path="Plugins/Reqnroll.Plugins.TestFrameworkAdapter.targets" />
+    <File Path="Plugins/Reqnroll.TestFrameworkAdapter.props" />
+    <File Path="Plugins/Reqnroll.TestFrameworkAdapter.targets" />
+  </Folder>
+  <Folder Name="/Plugins/ExternalData/">
+    <Project Path="Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.IntegrationTest/Reqnroll.ExternalData.ReqnrollPlugin.IntegrationTest.csproj" />
+    <Project Path="Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin/Reqnroll.ExternalData.ReqnrollPlugin.csproj" />
+  </Folder>
+  <Folder Name="/Plugins/SpecFlowCompatibility/">
+    <Project Path="Plugins/Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin/Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.SpecFlowCompatibility.ReqnrollPlugin/Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.SpecFlowCompatibility/Reqnroll.SpecFlowCompatibility.csproj" />
+  </Folder>
+  <Folder Name="/Plugins/TestFrameworkAdapters/">
+    <Project Path="Plugins/Reqnroll.MSTest.Generator.ReqnrollPlugin/Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.MSTest.ReqnrollPlugin/Reqnroll.MSTest.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.NUnit.Generator.ReqnrollPlugin/Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.NUnit.ReqnrollPlugin/Reqnroll.NUnit.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.TUnit.Generator.ReqnrollPlugin/Reqnroll.TUnit.Generator.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.TUnit.ReqnrollPlugin/Reqnroll.TUnit.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.xUnit.Generator.ReqnrollPlugin/Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.xUnit.ReqnrollPlugin/Reqnroll.xUnit.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.xUnit3.Generator.ReqnrollPlugin/Reqnroll.xUnit3.Generator.ReqnrollPlugin.csproj" />
+    <Project Path="Plugins/Reqnroll.xUnit3.ReqnrollPlugin/Reqnroll.xUnit3.ReqnrollPlugin.csproj" />
+  </Folder>
+  <Folder Name="/Plugins/Verify/">
+    <Project Path="Plugins/Reqnroll.Verify/Reqnroll.Verify.ReqnrollPlugin/Reqnroll.Verify.ReqnrollPlugin.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="CHANGELOG.md" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="RELEASING.md" />
+  </Folder>
+  <Folder Name="/Solution Items/Build/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="nuget.config" />
+  </Folder>
+  <Folder Name="/Solution Items/GitHubWorkflows/">
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/publish_packages.ps1" />
+  </Folder>
+  <Folder Name="/Solution Items/Resources/">
+    <File Path="reqnroll-config.json" />
+    <File Path="reqnroll-icon.png" />
+    <File Path="reqnroll.ico" />
+  </Folder>
+  <Folder Name="/Templates/">
+    <Project Path="Templates/Reqnroll.Templates.DotNet/Reqnroll.Templates.DotNet.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Reqnroll.Formatters.Tests/Reqnroll.Formatters.Tests.csproj" />
+    <Project Path="Tests/Reqnroll.Specs/Reqnroll.Specs.csproj" />
+    <Project Path="Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj" />
+  </Folder>
+  <Folder Name="/Tests/TestProjectGenerator/">
+    <Project Path="Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Cli/Reqnroll.TestProjectGenerator.Cli.csproj" />
+    <Project Path="Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj" />
+    <Project Path="Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator/Reqnroll.TestProjectGenerator.csproj" />
+  </Folder>
+  <Folder Name="/Tests/UnitTests/">
+    <Project Path="Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj" />
+    <Project Path="Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj" />
+    <Project Path="Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj" />
+  </Folder>
+  <Project Path="Reqnroll.Generator/Reqnroll.Generator.csproj" />
+  <Project Path="Reqnroll.Parser/Reqnroll.Parser.csproj" />
+  <Project Path="Reqnroll.Tools.MsBuild.Generation/Reqnroll.Tools.MsBuild.Generation.csproj" />
+  <Project Path="Reqnroll.Utils/Reqnroll.Utils.csproj" />
+  <Project Path="Reqnroll/Reqnroll.csproj" />
+</Solution>

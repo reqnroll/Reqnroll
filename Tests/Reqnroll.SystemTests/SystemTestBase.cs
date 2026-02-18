@@ -29,11 +29,14 @@ public abstract class SystemTestBase
     protected TestRunConfiguration _testRunConfiguration = null!;
     protected CurrentVersionDriver _currentVersionDriver = null!;
     protected CompilationDriver _compilationDriver = null!;
+    protected CompilationResultDriver _compilationResultDriver = null!;
     protected BindingsDriver _bindingDriver = null!;
     protected TestProjectFolders _testProjectFolders = null!;
     protected JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver = null!;
 
     protected int _preparedTests = 0;
+
+    protected bool KeepPassingResults = false;
 
     public TestContext TestContext { get; set; } = null!;
 
@@ -92,6 +95,7 @@ public abstract class SystemTestBase
         _executionDriver = GetServiceSafe<ExecutionDriver>();
         _vsTestExecutionDriver = GetServiceSafe<VSTestExecutionDriver>();
         _compilationDriver = GetServiceSafe<CompilationDriver>();
+        _compilationResultDriver = GetServiceSafe<CompilationResultDriver>();
         _testProjectFolders = GetServiceSafe<TestProjectFolders>();
         _bindingDriver = GetServiceSafe<BindingsDriver>();
         _jsonConfigurationLoaderDriver = GetServiceSafe<JsonConfigurationLoaderDriver>();
@@ -108,7 +112,7 @@ public abstract class SystemTestBase
 
     protected virtual void TestCleanup()
     {
-        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed && !KeepPassingResults)
             _folderCleaner.CleanSolutionFolder();
     }
 

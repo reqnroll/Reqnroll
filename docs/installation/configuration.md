@@ -2,7 +2,7 @@
 
 Reqnroll can be [setup](setup-project) simply by adding a NuGet package to your project and in the most of the cases there is no additional configuration required.
 
-The default configuration can be altered by adding a `reqnroll.json` configuration file to your project. An empty configuration file can be added using the *Add / New Item...* command of Visual Studio 2022 or using the Reqnroll .NET item template. The following example downloads the Reqnroll templates and adds a configuration file to the project.
+The default configuration can be altered by adding a `reqnroll.json` configuration file to your project. An empty configuration file can be added using the *Add / New Item...* command of Visual Studio or using the Reqnroll .NET item template. The following example downloads the Reqnroll templates and adds a configuration file to the project.
 
 ```{code-block} pwsh
 :caption: .NET CLI
@@ -113,7 +113,10 @@ Use this section to define test generation options.
   - Determines whether "row tests" should be generated for [scenario outlines](../gherkin/gherkin-reference.md#scenario-outline). This setting is ignored if the [test execution framework](setup-project.md#choosing-your-test-execution-framework) does not support row based testing. <br/> *Default:* `true`
 * - addNonParallelizableMarkerForTags
   - List of tags
-  - Defines a set of tags, any of which specify that a feature should be excluded from running in parallel with any other feature. See [](../execution/parallel-execution).<br/> *Default:* empty
+  - Defines a set of tags that mark tests as exclusive (non-parallelizable). If the tag appears on a feature, the whole generated test class is marked non-parallelizable. If the tag appears only on a scenario (and not on the feature), the generated test method is marked non-parallelizable on frameworks that support scenario/method level isolation (currently NUnit, MsTest V2 and TUnit). See [](../execution/parallel-execution).<br/> *Default:* empty
+* - disableFriendlyTestNames
+  - `true`/`false`
+  - Option available in Reqnroll versions **greater than v3.0.3**. <br/> Determines whether generated tests will contain a `"DisplayName"` in their test attributes with the name of the Scenario. Friendly names are easier to read in test reports, but may cause issues with some test runners or CI systems. Friendly display names are currently only supported by MSTest and xUnit. <br/> *Default:* `false`
 ```
 
 ### `runtime`
@@ -148,7 +151,7 @@ Use this section to determine the Reqnroll trace output.
   - Value
   - Description
 * - stepDefinitionSkeletonStyle
-  - `CucumberExpressionAttribute` / `RegexAttribute`
+  - `CucumberExpressionAttribute` / `RegexAttribute` / `AsyncCucumberExpressionAttribute` / `AsyncRegexAttribute`
   - Specifies the default [step definition style](step-matching-styles-rules).<br/> *Default:* `CucumberExpressionAttribute`
 * - coloredOutput
   - `true`/`false`

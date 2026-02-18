@@ -55,7 +55,9 @@ googleanalytics_enabled = (os.getenv("READTHEDOCS", "False") == "True") # enable
 # See supported Callouts & Admonitions at https://mystmd.org/guide/admonitions
 
 myst_enable_extensions = [
-    "attrs_block"
+    "attrs_block",
+    "colon_fence",
+    "attrs_inline"
 ]
 
 myst_heading_anchors = 3
@@ -112,6 +114,10 @@ html_theme_options = {
 html_css_files = [
     'css/custom.css',
 ] 
+
+html_js_files = [
+    'tag-filtered-table.js',  # Enable tag-filtered-table functionality
+]
 
 # see https://pygments.org/styles/
 pygments_style = "solarized-light"

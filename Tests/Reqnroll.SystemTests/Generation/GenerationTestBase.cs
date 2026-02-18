@@ -27,11 +27,6 @@ public abstract class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void GeneratorAllIn_sample_can_be_handled_with_VisualBasic()
     {
-        if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
-        {
-            Assert.Inconclusive("Issues with current TUnit Version (https://github.com/thomhurst/TUnit/issues/2905 and https://github.com/thomhurst/TUnit/issues/2906). Check again and remove inconclusive if a fix is available.");
-        }
-
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.VB;
 
         PrepareGeneratorAllInSamples();
@@ -837,15 +832,42 @@ public abstract class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Tests_can_be_executed_parallel()
     {
-        _projectsDriver.EnableTestParallelExecution();
+        RunParallelTest(true);
+        var parallelTrueLogs = _bindingDriver.GetActualLogLines("parallel: true").ToList();
+        parallelTrueLogs.Should().NotBeEmpty("the scenarios should have run parallel");
+        AssertScenarioLevelParallelExecution();
+    }
 
-        var scenarioTemplate = 
+    [TestMethod]
+    public void Tests_respect_non_parallelizable_tag()
+    {
+        RunParallelTest(false);
+        // Check nothing run parallel
+        var parallelTrueLogs = _bindingDriver.GetActualLogLines("parallel: true").ToList();
+        parallelTrueLogs.Should().BeEmpty("the scenarios should not have run parallel");
+        var scenarioParallelTrueLogs = _bindingDriver.GetActualLogLines("scenario-parallel: true").ToList();
+        scenarioParallelTrueLogs.Should().BeEmpty("the scenarios should have not run parallel using scenario-level parallelization");
+        // Check that the tests run synchronously
+        var parallelFalseLogs = _bindingDriver.GetActualLogLines("parallel: false").ToList();
+        parallelFalseLogs.Should().NotBeEmpty("the scenarios should have run synchron");
+        var scenarioParallelFalseLogs = _bindingDriver.GetActualLogLines("scenario-parallel: false").ToList();
+        scenarioParallelFalseLogs.Should().NotBeEmpty("the scenarios should have run synchron");
+    }
+
+    void RunParallelTest(bool supportParallel)
+    {
+        const string NonParallelTag = "nonparallelizable";
+        _projectsDriver.EnableTestParallelExecution();
+        _configurationFileDriver.AddNonParallelizableMarkerForTag(NonParallelTag);
+        var prefix = supportParallel ? string.Empty : "@" + NonParallelTag + Environment.NewLine;
+
+        var scenarioTemplate =
             """
             Scenario: {0}
               When executing '{0}' in '{1}'
             """;
 
-        var scenarioOutlineTemplate = 
+        var scenarioOutlineTemplate =
             """
             Scenario Outline: {0}
               When executing '{0}' in '{1}'
@@ -863,7 +885,7 @@ public abstract class GenerationTestBase : SystemTestBase
 
         foreach (string feature in features)
         {
-            AddFeatureFile($"Feature: {feature}" + Environment.NewLine);
+            AddFeatureFile($"{prefix}Feature: {feature}" + Environment.NewLine);
             for (int i = 0; i < scenariosPerFile; i++)
                 AddScenario(string.Format(scenarioTemplate, $"S{++scenarioIdCounter}", feature));
             for (int i = 0; i < scenarioOutlinesPerFile; i++)
@@ -914,11 +936,9 @@ public abstract class GenerationTestBase : SystemTestBase
                         System.Threading.Thread.Sleep(10);
                         
                         var afterStartIndex = startIndex;
-                        if (afterStartIndex != currentStartIndex)
-                            Log.LogCustom("parallel", "true");
+                        Log.LogCustom("parallel", afterStartIndex != currentStartIndex ? "true" : "false");
                         var afterFeatureStartIndex = featureName == "A" ? featureAStartIndex : featureBStartIndex;
-                        if (afterFeatureStartIndex != currentFeatureStartIndex)
-                            Log.LogCustom("scenario-parallel", "true");
+                        Log.LogCustom("scenario-parallel", afterFeatureStartIndex != currentFeatureStartIndex ? "true" : "false");
                     }
                 }
             }
@@ -926,17 +946,12 @@ public abstract class GenerationTestBase : SystemTestBase
 
         ExecuteTests();
         ShouldAllScenariosPass();
-
-        var parallelLogs = _bindingDriver.GetActualLogLines("parallel").ToList();
-        parallelLogs.Should().NotBeEmpty("the scenarios should have run parallel");
-
-        AssertScenarioLevelParallelExecution();
     }
 
     protected virtual void AssertScenarioLevelParallelExecution()
     {
-        var scenarioParallelLogs = _bindingDriver.GetActualLogLines("scenario-parallel").ToList();
-        scenarioParallelLogs.Should().NotBeEmpty("the scenarios should have run parallel using scenario-level parallelization");
+        var scenarioParallelTrueLogs = _bindingDriver.GetActualLogLines("scenario-parallel: true").ToList();
+        scenarioParallelTrueLogs.Should().NotBeEmpty("the scenarios should have run parallel using scenario-level parallelization");
     }
 
     #endregion

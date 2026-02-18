@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <GenerateReqnrollAssemblyHooksFile Condition="'$(GenerateReqnrollAssemblyHooksFile)' == ''">true</GenerateReqnrollAssemblyHooksFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Language)' == 'C#'">
+    <ReqnrollAssemblyHooksTemplate Include="$(MSBuildThisFileDirectory)*.AssemblyHooks.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Language)' == 'VB'">
+    <ReqnrollAssemblyHooksTemplate Include="$(MSBuildThisFileDirectory)*.AssemblyHooks.vb" />
+  </ItemGroup>
+</Project>

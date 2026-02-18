@@ -1,0 +1,19 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.targets"/>
+
+  <Target Name="SetPluginParameters" BeforeTargets="CoreProcessReqnrollFeatureFilesInProject">
+    <PropertyGroup>
+      <!-- Detect the version of MSTest.TestFramework package and pass it to the plugin. -->
+      <!-- The property can be overridden for special cases in the project file. -->
+      <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(ReferencePath->WithMetadataValue('NuGetPackageId', 'MSTest.TestFramework')->'%(NuGetPackageVersion)')</_MsTestFrameworkVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ReqnrollGeneratorPlugins Update="$(_ReqnrollMsTestGeneratorPluginPath)">
+        <Parameter_TargetMsTestVersion>$(_MsTestFrameworkVersion)</Parameter_TargetMsTestVersion>
+      </ReqnrollGeneratorPlugins>
+    </ItemGroup>
+  </Target>
+
+</Project>
