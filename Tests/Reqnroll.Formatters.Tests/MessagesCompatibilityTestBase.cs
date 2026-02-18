@@ -337,6 +337,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                 TestStepFinished finished => finished.TestCaseStartedId,
                 TestCaseFinished tcFin => tcFin.TestCaseStartedId,
                 Attachment att => att.TestCaseStartedId,
+                ExternalAttachment extAtt => extAtt.TestCaseStartedId,
                 TestRunHookStarted => null,
                 TestRunHookFinished => null,
                 Suggestion suggestion => FindTestCaseStartedFromStepPickleId(suggestion.PickleStepId),

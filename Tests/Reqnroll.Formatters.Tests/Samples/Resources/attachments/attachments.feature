@@ -9,7 +9,7 @@ Feature: Attachments
   Attachments must have a body and a content type.
 
   Scenario: Strings can be attached with a media type
-    Beware that some formatters such as @cucumber/react use the media type
+    Beware that some formatters such as the html formatter use the media type
     to determine how to display an attachment.
 
     When the string "hello" is attached as "application/octet-stream"
@@ -34,3 +34,6 @@ Feature: Attachments
 
   Scenario: Attaching URIs
     When a link to "https://cucumber.io" is attached
+
+  Scenario: Attaching during a failed step
+    When the string "hello" is attached as "application/octet-stream" before a failure

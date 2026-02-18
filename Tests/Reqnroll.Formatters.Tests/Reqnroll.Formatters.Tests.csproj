@@ -45,8 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
       <PrivateAssets>all</PrivateAssets>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
@@ -61,6 +60,9 @@
 
   <ItemGroup>
     <None Update="reqnroll_withBothFormatters.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="reqnroll_withExternalAttachments.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="reqnroll_withHtmlOutput.json">

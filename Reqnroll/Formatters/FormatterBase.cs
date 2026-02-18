@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -34,6 +35,9 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
     private readonly string _pluginName;
 
     public string Name => _pluginName;
+    protected AttachmentHandlingOption _attachmentHandlingOption;
+    public AttachmentHandlingOption AttachmentHandlingOption => _attachmentHandlingOption;
+    public string ExternalAttachmentsStoragePath { get; set; } = string.Empty; 
 
     protected FormatterBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName)
     {
@@ -65,14 +69,32 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
             ReportInitialized(false);
             return;
         }
+        var options = GetAttachmentHandlingOptionValues(formatterConfiguration);
+        _attachmentHandlingOption = options.AttachmentHandlingOption;
+        ExternalAttachmentsStoragePath = _configurationProvider.ResolveTemplatePlaceholders(options.ExternalAttachmentsStoragePath);
+        _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} resolved ExternalAttachmentsStoragePath from: '{options.ExternalAttachmentsStoragePath}' to '{ExternalAttachmentsStoragePath}'.");
+        _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} configured with AttachmentHandlingOption: {_attachmentHandlingOption.ToString()} and ExternalAttachmentsStoragePath: '{ExternalAttachmentsStoragePath}'.");
+
         LaunchInner(formatterConfiguration, ReportInitialized);
         _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(_cancellationTokenSource.Token));
     }
 
-    // Method available to sinks to allow them to initialize.
-    public abstract void LaunchInner(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
+    public virtual AttachmentHandlingOptions GetAttachmentHandlingOptionValues(IDictionary<string, object> formatterConfiguration)
+    {
+        if (formatterConfiguration.TryGetValue(FormattersConfigurationResolverBase.ATTACHMENT_HANDLING_SECTION, out var options)
+            && options is AttachmentHandlingOptions attachmentHandlingOptions)
+        {
+            _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} setting AttachmentHandlingOption to {attachmentHandlingOptions.AttachmentHandlingOption.ToString()} from configuration.");
+            return attachmentHandlingOptions;
+        }
+        _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} setting AttachmentHandlingOption to default Embed.");
+        return new(AttachmentHandlingOption.Embed, string.Empty);
+    }
 
-    private void ReportInitialized(bool status)
+    // Method available to sinks to allow them to initialize.
+    public abstract void LaunchInner(IDictionary<string, object> formatterConfigString, Action<bool, AttachmentHandlingOption> onAfterInitialization);
+
+    private void ReportInitialized(bool status, AttachmentHandlingOption attachmentHandlingOption = AttachmentHandlingOption.Embed)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} reporting status as {status}.");
         Closed = !status;
@@ -80,7 +102,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         // Preemptively closing down the Channel to force error identification
         if (status == false)
             PostedMessages.Writer.Complete();
-        _broker?.FormatterInitialized(this, enabled: status);
+        _broker?.FormatterInitialized(this, enabled: status, attachmentHandlingOption: attachmentHandlingOption);
     }
 
     public async Task PublishAsync(Envelope message)
@@ -91,7 +113,8 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
             return;
         }
 
-        await PostedMessages.Writer.WriteAsync(message);
+        var messageToPublish = TransformMessage(message);
+        await PostedMessages.Writer.WriteAsync(messageToPublish);
 
         // If the _publisher sends the TestRunFinished message, then we can safely shut down.
         if (message.Content() is TestRunFinished)
@@ -99,6 +122,41 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
             _logger.WriteMessage($"DEBUG: Formatters.Plugin {Name} has received the TestRunFinished message and is calling CloseAsync");
             await CloseAsync();
         }
+    }
+
+    // This method is a seam which allows derived formatters to modify messages before they are queued for processing.
+    // The first such transformation is to 'cast' Attachment messages to either Attachment or ExternalAttachment based on the formatter's AttachmentHandlingOption.
+    protected virtual Envelope TransformMessage(Envelope message)
+    {
+        if (message.Attachment != null && AttachmentHandlingOption == AttachmentHandlingOption.Embed)
+        {
+            return Envelope.Create(message.Attachment);
+        }
+        else if (message.ExternalAttachment != null && AttachmentHandlingOption == AttachmentHandlingOption.External)
+        {
+            var attachment = message.ExternalAttachment;
+            var path = attachment.Url;
+            if (Path.IsPathRooted(path))
+            {
+                _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} transforming (rooted) absolute path '{path}' to external attachment storage path.");
+                path = Path.Combine(ExternalAttachmentsStoragePath, Path.GetFileName(path));
+            }
+            else
+            {
+                _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} transforming (relative) path '{path}' to external attachment storage path.");
+                path = Path.Combine(ExternalAttachmentsStoragePath, path);
+            }
+            var newExternalAttachment = new ExternalAttachment(
+                path,
+                attachment.MediaType,
+                attachment.TestStepId,
+                attachment.TestCaseStartedId,
+                attachment.TestRunHookStartedId,
+                attachment.Timestamp
+            );
+            return Envelope.Create(newExternalAttachment);
+        }
+        return message;
     }
 
     protected abstract Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken);

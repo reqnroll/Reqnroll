@@ -8,6 +8,7 @@ using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Events;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
@@ -45,6 +46,7 @@ public class FormatterPublisherTests
     {
         _objectContainerMock = new Mock<IObjectContainer>();
         _brokerMock = new Mock<ICucumberMessageBroker>();
+        _brokerMock.Setup(b => b.AggregateAttachmentHandlingOption).Returns(AttachmentHandlingOption.Embed);
         _bindingRegistryMock = new Mock<IBindingRegistry>();
         _idGeneratorMock = new Mock<IIdGenerator>();
         _clockMock = new Mock<IClock>();
@@ -53,6 +55,7 @@ public class FormatterPublisherTests
         _formatterLoggerMock = new Mock<IFormatterLog>();
         _metaMessageGeneratorMock = new Mock<IMetaMessageGenerator>();
         _publishMessageMock = new Mock<IMessagePublisher>();
+        _publishMessageMock.Setup(p => p.AggregateAttachmentHandlingOption).Returns(AttachmentHandlingOption.Embed);
         _featureTrackerFactory = new FeatureExecutionTrackerFactory(_idGeneratorMock.Object,
                                                                         new Mock<IPickleExecutionTrackerFactory>().Object, _publishMessageMock.Object);
 
