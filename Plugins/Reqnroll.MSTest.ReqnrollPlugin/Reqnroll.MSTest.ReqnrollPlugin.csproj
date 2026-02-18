@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
 
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.MSTest</PackageId>

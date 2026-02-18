@@ -3,5 +3,7 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
     <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 </Project>

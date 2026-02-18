@@ -6,6 +6,9 @@
 
     <!-- NuGet configuration -->
     <PackageId>Reqnroll.ExternalData</PackageId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Description>Package to use external data in Gherkin scenarios</Description>
     <PackageTags>reqnroll externaldata json</PackageTags>
   </PropertyGroup>

@@ -8,5 +8,12 @@
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
 </Project>

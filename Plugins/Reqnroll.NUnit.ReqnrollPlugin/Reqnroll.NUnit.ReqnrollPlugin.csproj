@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
 
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.NUnit</PackageId>
@@ -12,7 +14,7 @@
 
   <ItemGroup>
     <!-- PrivateAssets="none" ensures that NUnit build assets are included even if the user does not explicitly add a reference to the 'NUnit' package -->
-    <!-- We can consider removing PrivateAssets="none" in v4 and declaring that the users must add reference to 'MSTest.TestFramework' explicitly. -->
+    <!-- We can consider removing PrivateAssets="none" in v4 and declaring that the users must add reference to 'NUnit' explicitly. -->
     <PackageReference Include="NUnit" Version="3.13.1" PrivateAssets="none" />
   </ItemGroup>
 

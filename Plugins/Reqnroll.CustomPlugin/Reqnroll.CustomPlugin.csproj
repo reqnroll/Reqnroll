@@ -5,6 +5,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeMainProjectInDepsFile>false</IncludeMainProjectInDepsFile>
 
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+
     <!-- NuGet configuration -->
     <PackageId>Reqnroll.CustomPlugin</PackageId>
     <Description>Package for writing custom generator extensions for Reqnroll.</Description>

@@ -5,6 +5,9 @@
     
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.Verify</PackageId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Description>Package to use Verify.Xunit with Reqnroll</Description>
     <PackageTags>reqnroll verify xunit</PackageTags>
   </PropertyGroup>

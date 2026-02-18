@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <!-- This is required to ensure dependencies are made available for packing -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -12,7 +13,7 @@
     <PackageTags>reqnroll specflow</PackageTags>
 
     <!-- Suppress packing warnings: we intentionally add assemblies to /build and have repeated copies of assemblies. -->
-    <NoWarn>$(NoWarn);NU5100;NU5118</NoWarn>
+    <NoWarn>$(NoWarn);NU5100;NU5118;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

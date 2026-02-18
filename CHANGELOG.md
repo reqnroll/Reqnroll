@@ -2,9 +2,12 @@
 
 ## Improvements:
 
+* Add xUnit 3 support (#405, #538)
+* Add READMEs and XML documentation to all NuGet packages (#844)
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @304NotModified, @chekkan
 
 # v3.3.3 - 2026-01-27
 
@@ -123,6 +126,7 @@
 * Fix: Dry Run mode doesn't work properly if the project contains hooks that register & inject custom dependencies (#862)
 
 *Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @DrEsteban, @gasparnagy, @konarx
+>>>>>>> b9f0963d1222796b757ea5a28544cd24fd3f2110
 
 # v3.0.3 - 2025-09-17
 

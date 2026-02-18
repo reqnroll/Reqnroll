@@ -2,12 +2,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.TUnit</PackageId>
     <Description>Package to use Reqnroll with TUnit 1.3.25 and later.</Description>
     <PackageTags>reqnroll TUnit</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

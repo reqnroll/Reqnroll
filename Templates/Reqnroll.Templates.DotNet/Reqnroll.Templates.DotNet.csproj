@@ -15,6 +15,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeSymbols>false</IncludeSymbols>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludeSource>false</IncludeSource>
     <!-- Because templates trigger NU5128, because they need a targetframework, but don't have files in the lib folder for it-->
     <NoDefaultExcludes>true</NoDefaultExcludes>
@@ -25,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
     <MetaTemplate Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
     <None Include="$(SolutionDir)reqnroll-icon.png" Pack="true" PackagePath="images" />

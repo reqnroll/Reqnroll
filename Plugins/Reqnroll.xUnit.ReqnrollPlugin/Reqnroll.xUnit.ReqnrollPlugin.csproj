@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
 
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.xUnit</PackageId>
