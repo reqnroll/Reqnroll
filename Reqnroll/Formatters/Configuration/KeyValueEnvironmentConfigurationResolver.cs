@@ -9,9 +9,14 @@ internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentOptions envi
 {
     private readonly IEnvironmentOptions _environmentWrapper = environmentOptions ?? throw new ArgumentNullException(nameof(environmentOptions));
 
-    public IDictionary<string, IDictionary<string, object>> Resolve()
+    /// <summary>
+    /// KeyValue-based configuration merges with existing settings (only overrides specified values).
+    /// </summary>
+    public bool ShouldMergeSettings => true;
+
+    public IDictionary<string, FormatterConfiguration> Resolve()
     {
-        var result = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+        var result = new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
 
         var environmentVariables = _environmentWrapper.FormatterSettings;
         foreach (var formatterEnvironmentVariable in environmentVariables)
@@ -27,7 +32,7 @@ internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentOptions envi
 
             if (formatterConfiguration.Equals("true", StringComparison.InvariantCultureIgnoreCase))
             {
-                result[formatterName] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                result[formatterName] = new FormatterConfiguration();
                 continue;
             }
 
@@ -39,17 +44,27 @@ internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentOptions envi
 
             var settings = formatterConfiguration.Split(';');
 
-            var configValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var config = new FormatterConfiguration();
             foreach (string setting in settings)
             {
                 var keyValue = setting.Split(['='], 2);
                 if (keyValue.Length == 1)
                     throw new ReqnrollException($"Could not parse setting '{setting}' for formatter '{formatterName}' when processing the environment variable {formatterEnvironmentVariable.Key}. Please use semicolon separated list of 'key=value' settings or 'true'.");
 
-                configValues[keyValue[0].Trim()] = keyValue[1].Trim();
+                var key = keyValue[0].Trim();
+                var value = keyValue[1].Trim();
+
+                if (string.Equals(key, "outputFilePath", StringComparison.OrdinalIgnoreCase))
+                {
+                    config.OutputFilePath = value;
+                }
+                else
+                {
+                    config.AdditionalSettings[key] = value;
+                }
             }
 
-            result[formatterName] = configValues;
+            result[formatterName] = config;
         }
 
         return result;

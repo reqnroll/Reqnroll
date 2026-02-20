@@ -54,7 +54,7 @@ public class JsonEnvironmentConfigurationResolverTests
         var result = _sut.Resolve();
 
         // Assert
-        result["formatter1"]["configSetting1"].Should().Be("configValue1");
+        result["formatter1"].AdditionalSettings["configSetting1"].Should().Be("configValue1");
     }
 
 
@@ -78,7 +78,7 @@ public class JsonEnvironmentConfigurationResolverTests
         var result = _sut.Resolve();
 
         // Assert
-        result["formatter1"]["configSetting1"].Should().Be("configValue1");
+        result["formatter1"].AdditionalSettings["configSetting1"].Should().Be("configValue1");
     }
 
     [Fact]
@@ -103,8 +103,8 @@ public class JsonEnvironmentConfigurationResolverTests
         Assert.Equal(2, result.Count);
         var first = result["html"];
         var second = result["message"];
-        Assert.Equal("forHtml", first["outputFilePath"]);
-        Assert.Equal("forMessages", second["outputFilePath"]);
+        Assert.Equal("forHtml", first.OutputFilePath);
+        Assert.Equal("forMessages", second.OutputFilePath);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class JsonEnvironmentConfigurationResolverTests
 
         // Assert
         result.Should().ContainKey("message");
-        result["message"]["outputFilePath"].Should().Be("foo.ndjson");
+        result["message"].OutputFilePath.Should().Be("foo.ndjson");
         result.Should().HaveCount(1);
     }
 }

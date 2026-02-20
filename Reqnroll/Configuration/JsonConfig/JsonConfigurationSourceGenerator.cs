@@ -10,6 +10,8 @@ namespace Reqnroll.Configuration.JsonConfig;
     Converters = [typeof(CustomTimeSpanConverter)],
     ReadCommentHandling = JsonCommentHandling.Skip)] // the user can comment his used configuration value
 [JsonSerializable(typeof(JsonConfig))]
+[JsonSerializable(typeof(FormattersElement))]
+[JsonSerializable(typeof(FormatterOptionsElement))]
 internal partial class JsonConfigurationSourceGenerator : JsonSerializerContext
 {
 
