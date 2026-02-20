@@ -271,11 +271,20 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     public virtual Attachment ToAttachment(AttachmentTracker tracker)
     {
         var filePath = tracker.FilePath;
+        var mimeType = FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath));
+        bool isText = mimeType.StartsWith("text/")
+            || mimeType == "application/json"
+            || mimeType == "application/xml"
+            || mimeType == "application/javascript"
+            || mimeType == "application/xhtml+xml"
+            || mimeType == "application/x-www-form-urlencoded"
+            || mimeType == "application/rtf";
+
         return new Attachment(
-            Base64EncodeFile(filePath),
+            Base64EncodeFile(filePath, isText),
             AttachmentContentEncoding.BASE64,
             Path.GetFileName(filePath),
-            FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
+            mimeType,
             null, //Source
             tracker.TestCaseStartedId,
             tracker.TestCaseStepId,
@@ -435,9 +444,21 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     {
         return stepDefinition.Method != null ? string.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
     }
-    private static string Base64EncodeFile(string filePath)
+    private static string Base64EncodeFile(string filePath, bool isText)
     {
-        byte[] fileBytes = File.ReadAllBytes(filePath);
+        byte[] fileBytes;
+
+        if (isText)
+        {
+            // Read as UTF-8 text, encode to UTF-8 bytes, then Base64 encode
+            string textContent = File.ReadAllText(filePath, System.Text.Encoding.UTF8);
+            fileBytes = System.Text.Encoding.UTF8.GetBytes(textContent);
+        }
+        else
+        {
+            // Read as binary, then Base64 encode
+            fileBytes = File.ReadAllBytes(filePath);
+        }
         return Convert.ToBase64String(fileBytes);
     }
 
