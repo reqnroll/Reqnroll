@@ -1,0 +1,39 @@
+# Reqnroll1002: Step definition expression cannot be empty or whitespace
+
+## Cause
+A method is decorated with one of the Reqnroll step binding attributes and has specified an expression to bind to, but the string is empty or only contains whitespace characters.
+
+## Description
+When a method is decorated with a step attribute, the Reqnroll system adds it to the list of available step definitions. When binding steps in examples to step definitions, the expression specified in the binding attribute is used to match the step text. If the attribute specifies the expression as empty or whitespace, it will cause it to bind to no steps, such as in the following examples:
+
+```CSharp
+[Given("")]
+public void GivenThereAreTwoPlayers()
+{
+}
+
+[When("   ")]
+public void WhenMakerStartsAGame()
+{
+}
+
+[Then(string.Empty)]
+public void ThenTheGameStarts()
+{
+}
+```
+
+## How to fix
+Either add some text to the expression, or remove the expression argument entirely. The following example shows possible solutions for correctly declaring step definition methods.
+
+```CSharp
+[When("maker starts a game")]
+public void WhenMakerStartsAGame()
+{
+}
+
+[Then] // Uses method-name based matching to match "Then the game starts"
+public void ThenTheGameStarts()
+{
+}
+```

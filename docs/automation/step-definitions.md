@@ -88,7 +88,7 @@ public void GivenStuffIsDone()
 * Can be either a static or an instance method. If it is an instance method, the containing class will be instantiated once for every scenario.
 * Cannot have `out` or `ref` parameters.
 * Cannot have optional parameters.
-* Should return `void` or `Task`. Note `async` methods must return `Task`
+* Should return `void`, `Task` or `ValueTask`. Note `async` methods must return `Task` or `ValueTask`.
 
 (step-matching-styles-rules)=
 ## Step Definition Styles
