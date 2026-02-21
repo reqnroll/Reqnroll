@@ -1,7 +1,8 @@
 # [vNext]
 
 ## Improvements:
-
+* Formatters: Made shutdown an explicit part of the interfaces for the Broker and Formatters. 
+* 
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments.
 

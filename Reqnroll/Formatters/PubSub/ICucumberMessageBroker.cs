@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.Formatters.PubSub;
+﻿using System.Threading.Tasks;
+
+namespace Reqnroll.Formatters.PubSub;
 
 public interface ICucumberMessageBroker : IMessagePublisher
 {
@@ -6,4 +8,5 @@ public interface ICucumberMessageBroker : IMessagePublisher
 
     void Initialize();
     void FormatterInitialized(ICucumberMessageFormatter formatterSink, bool enabled);
+    Task CompleteAsync();
 }

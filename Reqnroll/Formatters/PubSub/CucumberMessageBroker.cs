@@ -104,4 +104,21 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         }
     }
 
+    public async Task CompleteAsync()
+    {
+        _logger.WriteMessage("DEBUG: Formatters - Broker: CompleteAsync called. Closing all active formatters.");
+        foreach (var formatter in _activeFormatters.Values)
+        {
+            try
+            {
+                await formatter.CloseAsync();
+            }
+            catch (System.Exception e)
+            {
+                _logger.WriteMessage($"Formatters Broker: Exception closing Formatter Plugin {formatter.Name}: {e.Message}");
+            }
+        }
+        _logger.WriteMessage("DEBUG: Formatters - Broker: CompleteAsync finished.");
+    }
+
 }
