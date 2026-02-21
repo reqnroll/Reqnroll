@@ -29,14 +29,9 @@ namespace Reqnroll.Bindings.Discovery
             return true;
         }
 
-        private static bool IsPotentialBindingClass(IEnumerable<string> attributeTypeNames)
-        {
-            return attributeTypeNames.Any(attr => attr.EndsWith($".{nameof(BindingAttribute)}", StringComparison.InvariantCulture));
-        }
-
         public bool PreFilterType(IEnumerable<string> attributeTypeNames)
         {
-            return IsPotentialBindingClass(attributeTypeNames);
+            return true;
         }
 
         public bool ProcessType(BindingSourceType bindingSourceType)
@@ -80,7 +75,7 @@ namespace Reqnroll.Bindings.Discovery
 
         private bool IsBindingType(BindingSourceType bindingSourceType)
         {
-            return bindingSourceType.Attributes.Any(attr => typeof(BindingAttribute).IsAssignableFrom(attr.AttributeType));
+            return bindingSourceType.MethodAttributes.Any();
         }
 
         private bool IsStepDefinitionAttribute(BindingSourceAttribute attribute)

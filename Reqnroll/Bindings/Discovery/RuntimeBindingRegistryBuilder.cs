@@ -90,12 +90,34 @@ namespace Reqnroll.Bindings.Discovery
             if (!_bindingSourceProcessor.PreFilterType(filteredAttributes.Select(attr => attr.GetType().FullName)))
                 return false;
 
-            var bindingSourceType = CreateBindingSourceType(type, filteredAttributes);
+            var candiateMethods = type.GetMethods(
+                BindingFlags.Static | 
+                BindingFlags.Instance | 
+                BindingFlags.Public | 
+                BindingFlags.NonPublic);
+
+            List<Attribute> methodAttributes;
+            try
+            {
+                methodAttributes = [.. 
+                    candiateMethods.SelectMany(method => method.GetCustomAttributes(true).Cast<Attribute>())];
+            }
+            catch (TypeLoadException ex)
+            {
+                _bindingSourceProcessor.RegisterTypeLoadError($"Could not load attributes for type '{type.FullName}': {ex}");
+                // When the type attributes cannot be loaded, the type cannot be processed anyway so we can return with false here to avoid reporting further errors.
+                return false;
+            }
+
+            var filteredMethodAttributes = methodAttributes
+                .Where(attr => _bindingSourceProcessor.CanProcessMethodAttribute(attr.GetType().FullName));
+
+            var bindingSourceType = CreateBindingSourceType(type, filteredAttributes, filteredMethodAttributes);
 
             if (!_bindingSourceProcessor.ProcessType(bindingSourceType))
                 return false;
 
-            foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            foreach (var methodInfo in candiateMethods)
             {
                 _bindingSourceProcessor.ProcessMethod(CreateBindingSourceMethod(methodInfo));
             }
@@ -131,7 +153,10 @@ namespace Reqnroll.Bindings.Discovery
             return new RuntimeBindingType(type);
         }
 
-        private BindingSourceType CreateBindingSourceType(Type type, IEnumerable<Attribute> filteredAttributes)
+        private BindingSourceType CreateBindingSourceType(
+            Type type,
+            IEnumerable<Attribute> filteredAttributes,
+            IEnumerable<Attribute> filteredMethodAttributes)
         {
             return new BindingSourceType
                        {
@@ -141,7 +166,8 @@ namespace Reqnroll.Bindings.Discovery
                            IsPublic = type.IsPublic,
                            IsNested = TypeHelper.IsNested(type),
                            IsGenericTypeDefinition = type.IsGenericTypeDefinition,
-                           Attributes = GetAttributes(filteredAttributes)
+                           Attributes = GetAttributes(filteredAttributes),
+                           MethodAttributes = GetAttributes(filteredMethodAttributes)
                        };
         }
 
