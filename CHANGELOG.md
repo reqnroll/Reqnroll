@@ -1,11 +1,12 @@
 # [vNext]
 
 ## Improvements:
+* Make it so that the [Binding] attribute is no longer required on types declaring binding methods (#1044)
 
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments.
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+*Contributors of this release (in alphabetical order):* @clrudolphi, @Code-Grump
 
 # v3.3.3 - 2026-01-27
 
