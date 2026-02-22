@@ -168,33 +168,25 @@ public class CucumberExpressionIntegrationTests
         transformations?.ToList().ForEach(binding => bindingRegistry.RegisterStepArgumentTransformationBinding(binding));
         onBindingRegistryPreparation?.Invoke(bindingRegistry);
 
+        var givenAttribute = new BindingSourceAttribute
+        {
+            AttributeType = new RuntimeBindingType(typeof(GivenAttribute)),
+            AttributeValues = [ new BindingSourceAttributeValueProvider(expression) ]
+        };
+
         var bindingSourceMethod = new BindingSourceMethod
         {
             BindingMethod = new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(methodName)),
             IsPublic = true,
-            Attributes = new[]
-            {
-                new BindingSourceAttribute
-                {
-                    AttributeType = new RuntimeBindingType(typeof(GivenAttribute)),
-                    AttributeValues = new IBindingSourceAttributeValueProvider[]
-                    {
-                        new BindingSourceAttributeValueProvider(expression)
-                    }
-                }
-            }
+            Attributes = [ givenAttribute ]
         };
+
         bindingSourceProcessor.ProcessType(
             new BindingSourceType
             {
                 BindingType = new RuntimeBindingType(typeof(SampleBindings)),
-                Attributes = new[]
-                {
-                    new BindingSourceAttribute
-                    {
-                        AttributeType = new RuntimeBindingType(typeof(BindingAttribute))
-                    }
-                },
+                Attributes = [],
+                MethodAttributes = [ givenAttribute ],
                 IsPublic = true,
                 IsClass = true
             });
