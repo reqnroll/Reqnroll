@@ -75,7 +75,7 @@ namespace Reqnroll.Bindings.Discovery
 
         private bool IsBindingType(BindingSourceType bindingSourceType)
         {
-            return bindingSourceType.MethodAttributes.Any();
+            return bindingSourceType.MethodAttributes != null && bindingSourceType.MethodAttributes.Any();
         }
 
         private bool IsStepDefinitionAttribute(BindingSourceAttribute attribute)
