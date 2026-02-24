@@ -8,7 +8,12 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-
+  
+  <!-- This property is used by Cucumber.CCK as destination of the content files (e.g. .feature, .ndjson) for the tests. -->
+  <PropertyGroup>
+    <CucumberCCKContentPath>CCK\Resources</CucumberCCKContentPath>
+  </PropertyGroup>
+  
   <ItemGroup>
     <Compile Remove="Samples\Resources\**\*.cs" />
     <None Remove="Samples\Resources\**\*.feature" />
@@ -33,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Cucumber.CCK" Version="29.1.4" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -45,8 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
       <PrivateAssets>all</PrivateAssets>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
