@@ -201,9 +201,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         File.Exists(file).Should().BeTrue(file, $"File {v} should exist");
     }
 
-    protected void AddUtilClassWithFileSystemPath()
+    protected void AddUtilClassWithFileSystemPath(string pathsegment)
     {
-        string location = Path.Combine(AppContext.BaseDirectory, "Samples", "Resources");
+        string location = Path.Combine(AppContext.BaseDirectory, pathsegment, "Resources");
         AddBindingClass($$"""
                           public class FileSystemPath 
                           { 
@@ -227,7 +227,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
     {
         var fileName = testName + "." + testName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
-        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "CCK", assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         return expectedJsonText;
     }
 

@@ -14,29 +14,25 @@
     <CucumberCCKContentPath>CCK\Resources</CucumberCCKContentPath>
   </PropertyGroup>
   
+  <!-- Binding classes for scenarios come from the Samples\Resources tree.
+        This tree also includes feature files and other assets for non-CCK scenarios. -->
   <ItemGroup>
     <Compile Remove="Samples\Resources\**\*.cs" />
-    <None Remove="Samples\Resources\**\*.feature" />
-    <None Remove="Samples\Resources\**\*.feature.ndjson" />
-    <None Remove="Samples\Resources\**\*.ts" />
-    <None Update="Samples\Resources\**\*.jpeg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Samples\Resources\**\*.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Samples\Resources\**\*.pdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Samples\Resources\**\*.svg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <EmbeddedResource Include="Samples\Resources\**\*.cs" />
-    <EmbeddedResource Include="Samples\Resources\**\*.feature" />
-    <EmbeddedResource Include="Samples\Resources\**\*.ndjson" />
-    <EmbeddedResource Include="Samples\Resources\**\*.csv" />
+    <EmbeddedResource Include="Samples\Resources\**\*.*" />
   </ItemGroup>
 
+  <!-- This target embeds the feature files and other assets delivered by the Cucumber.CCK package. -->
+  <Target Name="MakeCCKContentEmbeddedResource"
+          AfterTargets="ResolvePackageAssets"
+          BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <_CCKContent Include="@(Content)"
+                   Condition="$([System.String]::Copy('%(Link)').StartsWith('$(CucumberCCKContentPath)\'))" />
+      <Content Remove="@(_CCKContent)" />
+      <EmbeddedResource Include="@(_CCKContent)" />
+    </ItemGroup>
+  </Target>
+  
   <ItemGroup>
     <PackageReference Include="Cucumber.CCK" Version="29.1.4" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">

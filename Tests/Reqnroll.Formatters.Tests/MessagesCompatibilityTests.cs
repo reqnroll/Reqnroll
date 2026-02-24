@@ -39,7 +39,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     // that are not material to the CCK spec (such as IDs don't have to be generated in the same order, timestamps don't have to match, etc.)
     // The rules for what must match and what is allowed to not match are built in to a series of custom FluentAssertion validation rules
     // (located in the CucumberMessagesValidator class)
-    public void CCKScenarios(string testName)
+    public void CCKScenarios(string testName, string featureFileSource = "CCK")
     { 
         var featureFileName = testName.Replace("-", "_");
         ResetCucumberMessages(featureFileName);
@@ -49,9 +49,9 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
         CucumberMessagesAddConfigurationFile("reqnroll_withBothFormatters.json");
         MimicAzurePipelinesEnvironment();
-        AddUtilClassWithFileSystemPath();
+        AddUtilClassWithFileSystemPath(featureFileSource);
 
-        AddFeatureFilesFromResources(featureFileName, "Samples", Assembly.GetExecutingAssembly());
+        AddFeatureFilesFromResources(featureFileName, featureFileSource, Assembly.GetExecutingAssembly());
         AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "Samples", Assembly.GetExecutingAssembly());
 
         ExecuteTests();
@@ -131,6 +131,6 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
         _projectsDriver.AddNuGetPackage(plugin, version);
         var testName = $"{pluginName}-{testNameRoot}";
-        CCKScenarios(testName);
+        CCKScenarios(testName, "Samples");
     }
 }
