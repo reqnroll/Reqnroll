@@ -212,9 +212,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                           """);
     }
 
-    protected IEnumerable<Envelope> GetExpectedResults(string testName)
+    protected IEnumerable<Envelope> GetExpectedResults(string testName, string source = "CCK")
     {
-        string[] expectedJsonText = GetExpectedJsonText(testName);
+        string[] expectedJsonText = GetExpectedJsonText(testName, source);
 
         foreach (var json in expectedJsonText)
         {
@@ -223,11 +223,11 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         }
     }
 
-    protected string[] GetExpectedJsonText(string testName)
+    protected string[] GetExpectedJsonText(string testName, string source)
     {
         var fileName = testName + "." + testName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
-        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "CCK", assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, source, assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         return expectedJsonText;
     }
 

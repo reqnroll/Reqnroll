@@ -7,7 +7,6 @@ namespace Reqnroll.Formatters.Tests;
 public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 {
     [TestMethod]
-    [DataRow("all-statuses")]
     [DataRow("ambiguous")]
     [DataRow("backgrounds")]
     [DataRow("cdata")]
@@ -56,7 +55,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
         ExecuteTests();
         var actualResults = GetActualResults(featureFileName).ToArray();
-        var validator = new CucumberMessagesValidator(actualResults, GetExpectedResults(featureFileName).ToArray());
+        var validator = new CucumberMessagesValidator(actualResults, GetExpectedResults(featureFileName, featureFileSource).ToArray());
         validator.ShouldPassBasicStructuralChecks();
         validator.ResultShouldPassAllComparisonTests();
         validator.ResultShouldPassSanityChecks();
@@ -92,6 +91,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
     [Ignore]
     [TestMethod]
+    [DataRow("all-statuses")] // Reqnroll does not bubble up the matched arguments of ambiguous step definition matches
     [DataRow("attachments")] // Reqnroll does not support user-supplied mime-types for attachments or providing mime-types to WriteLine output
     [DataRow("global-hooks-beforeall-error")] // Cucumber expects execution to continue after a hook failure
     [DataRow("global-hooks-afterall-error")] // Cucumber expects execution to continue after a hook failure

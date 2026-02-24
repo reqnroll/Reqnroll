@@ -15,36 +15,35 @@ internal class all_statuses
         _unitTestRuntimeProvider = unitTestRuntimeProvider;
     }
 
-    [Given("a step")]
+    [Given("^a step$")]
     public void GivenAStep()
     {
     }
 
-    [Given("a failing step")]
+    [Given("^a failing step$")]
     public void GivenAFailingStep()
     {
         throw new Exception("whoops");
     }
 
-    [Given("a pending step")]
+    [Given("^a pending step$")]
     public void GivenAPendingStep()
     {
-        //_unitTestRuntimeProvider.TestPending("pending");
-        throw new PendingStepException("pending");
+        throw new PendingStepException();
     }
 
-    [Given("a skipped step")]
+    [Given("^a skipped step$")]
     public void GivenASkippedStep()
     {
         _unitTestRuntimeProvider.TestIgnore("skipped");
     }
 
-    [Given("an ambiguous step")]
+    [Given("^an ambiguous (.*?)$")]
     public void GivenAnAmbiguousStep()
     {
     }
 
-    [Given("an ambiguous step")]
+    [Given("^(.*?) ambiguous step$")]
     public void GivenAnAmbiguousStep_Duplicate()
     {
     }

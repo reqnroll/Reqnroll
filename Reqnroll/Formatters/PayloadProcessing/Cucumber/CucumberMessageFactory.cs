@@ -188,7 +188,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     {
         return new StepMatchArgument(
             new Group(
-                [],
+                null,
                 argument.StartOffset,
                 argument.Value
             ),
@@ -307,7 +307,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
         return status switch
         {
             ScenarioExecutionStatus.OK => null,
-            ScenarioExecutionStatus.StepDefinitionPending => exception.Message,
+            ScenarioExecutionStatus.StepDefinitionPending => null,
             ScenarioExecutionStatus.UndefinedStep => exception.Message,
             ScenarioExecutionStatus.BindingError => null,
             ScenarioExecutionStatus.TestError => exception.Message,

@@ -29,6 +29,10 @@
       <_CCKContent Include="@(Content)"
                    Condition="$([System.String]::Copy('%(Link)').StartsWith('$(CucumberCCKContentPath)\'))" />
       <Content Remove="@(_CCKContent)" />
+      <!-- Compute LogicalName on _CCKContent (all items have Link) before transferring to EmbeddedResource -->
+      <_CCKContent Update="@(_CCKContent)">
+        <LogicalName>$(RootNamespace).$([System.String]::Copy('%(Link)').Replace('\','.').Replace('/','.').Replace('-','_'))</LogicalName>
+      </_CCKContent>
       <EmbeddedResource Include="@(_CCKContent)" />
     </ItemGroup>
   </Target>
