@@ -39,12 +39,12 @@ internal class all_statuses
     }
 
     [Given("^an ambiguous (.*?)$")]
-    public void GivenAnAmbiguousStep()
+    public void GivenAnAmbiguousStep(string argument)
     {
     }
 
     [Given("^(.*?) ambiguous step$")]
-    public void GivenAnAmbiguousStep_Duplicate()
+    public void GivenAnAmbiguousStep_Duplicate(string argument)
     {
     }
 }
