@@ -11,7 +11,8 @@
   
   <!-- This property is used by Cucumber.CCK as destination of the content files (e.g. .feature, .ndjson) for the tests. -->
   <PropertyGroup>
-    <CucumberCCKContentPath>CCK\Resources</CucumberCCKContentPath>
+    <CucumberCCKContentPath>CCK/Resources</CucumberCCKContentPath>
+    <EmbeddedCCKContentPathPrefix>$(CucumberCCKContentPath)/</EmbeddedCCKContentPathPrefix>
   </PropertyGroup>
   
   <!-- Binding classes for scenarios come from the Samples\Resources tree.
@@ -26,17 +27,24 @@
           AfterTargets="ResolvePackageAssets"
           BeforeTargets="CoreCompile">
     <ItemGroup>
-      <_CCKContent Include="@(Content)"
-                   Condition="$([System.String]::Copy('%(Link)').StartsWith('$(CucumberCCKContentPath)\'))" />
+      <!-- Step 1: Start with Content items that have Link metadata -->
+      <_CCKContent Include="@(Content)" Condition="'%(Link)' != ''">
+        <LinkNormalized>$([System.String]::Copy('%(Link)').Replace('\','/'))</LinkNormalized>
+      </_CCKContent>
+
+      <!-- Step 2: Filter to only those matching the prefix -->
+      <_CCKContent Update="@(_CCKContent)"
+                   Condition="$([System.String]::new('%(LinkNormalized)').StartsWith('$(EmbeddedCCKContentPathPrefix)'))"/>
+
+      <!-- Step 3: Remove from Content and compute LogicalName -->
       <Content Remove="@(_CCKContent)" />
-      <!-- Compute LogicalName on _CCKContent (all items have Link) before transferring to EmbeddedResource -->
       <_CCKContent Update="@(_CCKContent)">
         <LogicalName>$(RootNamespace).$([System.String]::Copy('%(Link)').Replace('\','.').Replace('/','.').Replace('-','_'))</LogicalName>
       </_CCKContent>
       <EmbeddedResource Include="@(_CCKContent)" />
     </ItemGroup>
   </Target>
-  
+
   <ItemGroup>
     <PackageReference Include="Cucumber.CCK" Version="29.1.4" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
