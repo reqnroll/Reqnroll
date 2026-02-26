@@ -49,7 +49,7 @@ namespace Reqnroll
         /// <summary>
         /// This holds the unique identifier for the test ("pickle") represented by this scenario info. Used internally at runtime.
         /// </summary>
-        public string PickleId { get; set; }
+        public string PickleId { get; internal set; }
 
 
         public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleIndex = null)
