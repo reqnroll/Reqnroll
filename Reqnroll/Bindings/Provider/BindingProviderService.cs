@@ -73,7 +73,7 @@ public class BindingProviderService(
         }
     }
 
-    private static string GetDiscoveredBindingsFromRegistry(IBindingRegistry bindingRegistry, Assembly testAssembly)
+    internal static string GetDiscoveredBindingsFromRegistry(IBindingRegistry bindingRegistry, Assembly testAssembly)
     {
         var resultData = ParseDiscoveryResult(bindingRegistry, testAssembly);
         var jsonString = JsonSerializer.Serialize(resultData, BindingJsonSourceGenerator.Default.BindingData);
@@ -171,7 +171,7 @@ public class BindingProviderService(
         return resultData;
     }
 
-    private static void BuildBindingRegistry(Assembly testAssembly, IRuntimeBindingRegistryBuilder bindingRegistryBuilder)
+    internal static void BuildBindingRegistry(Assembly testAssembly, IRuntimeBindingRegistryBuilder bindingRegistryBuilder)
     {
         var bindingAssemblies = bindingRegistryBuilder.GetBindingAssemblies(testAssembly);
         foreach (Assembly assembly in bindingAssemblies)
