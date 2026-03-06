@@ -117,7 +117,6 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
 
                         namespace CucumberMessages.CompatibilityTests.Smoke
                         {
-                            [Binding]
                             internal class Hooks
                             {
                                 public Hooks()

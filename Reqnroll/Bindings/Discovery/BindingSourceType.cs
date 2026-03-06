@@ -14,6 +14,8 @@ namespace Reqnroll.Bindings.Discovery
 
         public BindingSourceAttribute[] Attributes { get; set; }
 
+        public BindingSourceAttribute[] MethodAttributes { get; set; }
+
         public override string ToString() => BindingType?.ToString() ?? "<null>";
     }
 }

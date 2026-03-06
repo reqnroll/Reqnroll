@@ -228,7 +228,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                      using System.Xml.Linq;
                      using Reqnroll;
 
-                     [Binding]
                      {{scopeClassAttributes}}
                      public class {{$"HooksClass_{Guid.NewGuid():N}"}}
                      {
