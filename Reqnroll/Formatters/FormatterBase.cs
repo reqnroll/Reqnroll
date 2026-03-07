@@ -28,6 +28,10 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
     private bool _isDisposed = false;
     protected bool Closed = false;
 
+    protected virtual TimeSpan CloseAsyncTimeout => TimeSpan.FromSeconds(15);
+    protected virtual TimeSpan CloseAsyncCancellationGracePeriod => TimeSpan.FromSeconds(5);
+    protected virtual TimeSpan DisposeTimeout => TimeSpan.FromSeconds(15);
+
     public IFormatterLog Logger => _logger;
     internal IFormattersConfigurationProvider ConfigurationProvider => _configurationProvider;
 
@@ -113,8 +117,40 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         PostedMessages.Writer.Complete();
 
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the Channel is closed. Awaiting the writing task.");
-        await _formatterTask!;
-        Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - The formatterTask is now completed.");
+
+        var timeoutTask = Task.Delay(CloseAsyncTimeout);
+        var finishedTask = await Task.WhenAny(timeoutTask, _formatterTask!);
+
+        if (finishedTask == timeoutTask)
+        {
+            Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - Timed out waiting for formatterTask. Requesting cancellation.");
+            _cancellationTokenSource.Cancel();
+
+            var gracePeriod = Task.Delay(CloseAsyncCancellationGracePeriod);
+            finishedTask = await Task.WhenAny(gracePeriod, _formatterTask!);
+
+            if (finishedTask == gracePeriod)
+            {
+                Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - formatterTask did not respond to cancellation within grace period.");
+            }
+            else
+            {
+                try
+                {
+                    await _formatterTask!;
+                    Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - formatterTask completed after cancellation.");
+                }
+                catch (OperationCanceledException)
+                {
+                    Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - formatterTask threw OperationCanceledException after cancellation (expected).");
+                }
+            }
+        }
+        else
+        {
+            Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - The formatterTask is now completed.");
+            await _formatterTask!;
+        }
 
         if (!PostedMessages.Reader.Completion.IsCompleted)
             throw new InvalidOperationException($"Formatter {Name} has shut down before all messages processed.");
@@ -131,52 +167,28 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                 {
                     if (!_formatterTask.IsCompleted)
                     {
-                        Logger.WriteMessage($"DEBUG: Formatters: Dispose is waiting on the formatter task {Name}.");
-                        // In this situation, the TestEngine is shutting down and has called Dispose on the global container.
-                        // Forcing the Dispose to wait until the formatter has had a chance to complete.
-                        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(15));
+                        // CloseAsync was never called (e.g. TestRunFinished was never received).
+                        // Signal immediate shutdown: complete the channel and cancel the token.
+                        Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} still running; forcing shutdown.");
+                        PostedMessages.Writer.TryComplete();
+                        _cancellationTokenSource.Cancel();
+
+                        var timeoutTask = Task.Delay(DisposeTimeout);
                         var finishedTask = Task.WhenAny(timeoutTask, _formatterTask).GetAwaiter().GetResult();
                         if (finishedTask == timeoutTask)
                         {
-                            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - timeout waiting for formatter {Name}");
-                            _cancellationTokenSource.Cancel();
-                            // the following sends a simulated message to the writer, which will then notice the cancellation token
-                            if (!PostedMessages.Reader.Completion.IsCompleted)
-                            {
-                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - sending cancellation token message");
-                                PostedMessages.Writer.TryWrite(Envelope.Create(new TestRunFinished("forced closure", false, new Timestamp(0, 0), null, "")));
-                            }
-                            else
-                            {
-                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - cancellation message can't be sent as the collection is closed.");
-                            }
-                            _logger.WriteMessage($"DEBUG: Formatters.PluginBase.Dispose - waiting again after cancellation.");
-                            timeoutTask = Task.Delay(TimeSpan.FromSeconds(15));
-                            finishedTask = Task.WhenAny(timeoutTask, _formatterTask).GetAwaiter().GetResult();
-                            if (finishedTask == timeoutTask)
-                            {
-                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - cancellation unsuccessful.");
-                            }
-                            else
-                            {
-                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - cancellation successful.");
-                                _formatterTask?.GetAwaiter().GetResult();
-                            }
+                            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - timeout waiting for formatter {Name} after cancellation.");
                         }
                         else
                         {
-                            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} has finished.");
-
-                            // The formatter task completed before timeout, allow propagation of exceptions from the Task
-                            _formatterTask?.GetAwaiter().GetResult();
+                            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} completed after cancellation.");
+                            _formatterTask.GetAwaiter().GetResult();
                         }
                     }
                     else
                     {
                         Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} had already finished.");
-
-                        // The formatter task completed before timeout, allow propagation of exceptions from the Task
-                        _formatterTask?.GetAwaiter().GetResult();
+                        _formatterTask.GetAwaiter().GetResult();
                     }
                 }
                 else
