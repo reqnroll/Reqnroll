@@ -8,6 +8,7 @@ using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Events;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
@@ -16,6 +17,7 @@ using Reqnroll.Infrastructure;
 using Reqnroll.Plugins;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
+using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -37,6 +39,7 @@ public class FormatterPublisherTests
     private readonly Mock<IFormatterLog> _formatterLoggerMock;
     private readonly Mock<IMetaMessageGenerator> _metaMessageGeneratorMock;
     private readonly Mock<IMessagePublisher> _publishMessageMock;
+    private readonly Mock<IUnitTestRuntimeProvider> _runtimeProviderMock;
     private readonly RuntimePluginEvents _runtimePluginEvents;
     private readonly IFeatureExecutionTrackerFactory _featureTrackerFactory;
     private CucumberMessagePublisher _sut;
@@ -53,12 +56,15 @@ public class FormatterPublisherTests
         _formatterLoggerMock = new Mock<IFormatterLog>();
         _metaMessageGeneratorMock = new Mock<IMetaMessageGenerator>();
         _publishMessageMock = new Mock<IMessagePublisher>();
+        _runtimeProviderMock = new Mock<IUnitTestRuntimeProvider>();
+        _runtimeProviderMock.Setup(rp => rp.AttachmentHandlingOption).Returns(AttachmentHandlingOption.Embed);
+
         _featureTrackerFactory = new FeatureExecutionTrackerFactory(_idGeneratorMock.Object,
                                                                         new Mock<IPickleExecutionTrackerFactory>().Object, _publishMessageMock.Object);
 
         _runtimePluginEvents = new RuntimePluginEvents();
         CreateObjectContainerWithBroker();
-        _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
+        _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(_runtimeProviderMock.Object), _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
     }
     private ObjectContainer CreateObjectContainerWithBroker(bool brokerEnabled = true)
     {
@@ -108,6 +114,10 @@ public class FormatterPublisherTests
 
     class PublisherStartupFactoryStub : CucumberMessageFactory
     {
+        public PublisherStartupFactoryStub(IUnitTestRuntimeProvider unitTestRuntimeProvider) : base(unitTestRuntimeProvider)
+        {
+        }
+
         public override TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
         {
             return new TestRunStarted(new Timestamp(1, 0), "");
@@ -126,7 +136,7 @@ public class FormatterPublisherTests
         // Arrange
         var objectContainerStub = CreateObjectContainerWithBroker();
         // nb. This approach required as Moq can't mock types from Io.Cucumber.Messages.Types (as they're not visibleTo as well as sealed)
-        var msgFactory = new PublisherStartupFactoryStub();
+        var msgFactory = new PublisherStartupFactoryStub(_runtimeProviderMock.Object);
         objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(msgFactory);
         var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object);
         objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(bmg);
@@ -306,7 +316,7 @@ public class FormatterPublisherTests
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
         featureContextMock.Setup(fc => fc.FeatureContainer).Returns(_objectContainerMock.Object);
 
-        var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(), _bindingRegistryMock.Object);
+        var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(_runtimeProviderMock.Object), _bindingRegistryMock.Object);
         _sut.BindingMessagesGenerator = bmg;
         bmg.OnBindingRegistryReady(null, null);
 
@@ -332,7 +342,6 @@ public class FormatterPublisherTests
 
         featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
-        _sut.MessageFactory = new CucumberMessageFactory();
 
         _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
         _sut.Enabled = true;
@@ -379,7 +388,6 @@ public class FormatterPublisherTests
             _ => throw new NotSupportedException()
         };
 
-        _sut.MessageFactory = new CucumberMessageFactory();
         _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
         _sut.Enabled = true;
 
@@ -408,6 +416,10 @@ public class FormatterPublisherTests
 
     private class HookBindingTestCucumberMessageFactoryStub : CucumberMessageFactory
     {
+        public HookBindingTestCucumberMessageFactoryStub(IUnitTestRuntimeProvider unitTestRuntimeProvider) : base(unitTestRuntimeProvider)
+        {
+        }
+
         public override TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
         {
             return new TestRunStarted(new Timestamp(1, 0), "");
@@ -437,7 +449,7 @@ public class FormatterPublisherTests
     {
         // Arrange
         var objectContainerStub = CreateObjectContainerWithBroker();
-        var msgFactory = new HookBindingTestCucumberMessageFactoryStub();
+        var msgFactory = new HookBindingTestCucumberMessageFactoryStub(_runtimeProviderMock.Object);
         objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(msgFactory);
 
         var hookBindingMock = new Mock<IHookBinding>();
@@ -476,7 +488,7 @@ public class FormatterPublisherTests
     {
         // Arrange
         // Hack: Re-using code from a prior test to invoke the BrokerReady and get the sut set-up for this test.
-        var messageFactory = new HookBindingTestCucumberMessageFactoryStub();
+        var messageFactory = new HookBindingTestCucumberMessageFactoryStub(_runtimeProviderMock.Object);
 
         _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
             _ => Task.CompletedTask);
@@ -551,7 +563,6 @@ public class FormatterPublisherTests
 
         _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
         _sut.Enabled = true;
-        _sut.MessageFactory = new CucumberMessageFactory();
 
         // Act 
         await _sut.OnEventAsync(executionEvent);
@@ -587,7 +598,6 @@ public class FormatterPublisherTests
 
         _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
         _sut.Enabled = true;
-        _sut.MessageFactory = new CucumberMessageFactory();
 
         // Act 
         await _sut.OnEventAsync(executionEvent);
@@ -606,6 +616,10 @@ public class FormatterPublisherTests
 
     private class AttachmentMessageFactory : CucumberMessageFactory
     {
+        public AttachmentMessageFactory(IUnitTestRuntimeProvider unitTestRuntimeProvider) : base(unitTestRuntimeProvider)
+        {
+        }
+
         public override Attachment ToAttachment(AttachmentTracker tracker)
         {
             return new Attachment("fake body", AttachmentContentEncoding.BASE64, tracker.FilePath, "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId, tracker.TestRunHookStartedId, Converters.ToTimestamp(tracker.Timestamp));
@@ -615,6 +629,7 @@ public class FormatterPublisherTests
             return new Attachment(tracker.Text, AttachmentContentEncoding.IDENTITY, "", "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId, tracker.TestRunHookStartedId, Converters.ToTimestamp(tracker.Timestamp));
         }
     }
+
 
     // AttachmentAddedEvent - otherwise causes an Attachment message to be added to the messages collection
     // OutputAddedEvent - otherwise causes an Attachment message to be added to the messages collection
@@ -628,7 +643,7 @@ public class FormatterPublisherTests
         var executionEvent = (IExecutionEvent)Activator.CreateInstance(eventType, "attachment-path", null, null);
 
         _sut.Enabled = true;
-        _sut.MessageFactory = new AttachmentMessageFactory();
+        _sut.MessageFactory = new AttachmentMessageFactory(_runtimeProviderMock.Object);
 
         // the SUT needs an active TestRunHookExecutionTracker to be able to add attachments and output messages
 

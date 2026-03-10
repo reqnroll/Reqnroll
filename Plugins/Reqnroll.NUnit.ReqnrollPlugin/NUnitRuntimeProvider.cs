@@ -1,11 +1,14 @@
 using System;
 using NUnit.Framework;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.NUnit.ReqnrollPlugin;
 
 public class NUnitRuntimeProvider : IUnitTestRuntimeProvider
 {
+    public AttachmentHandlingOption AttachmentHandlingOption => AttachmentHandlingOption.External;
+
     public void TestPending(string message)
     {
         TestInconclusive(message);

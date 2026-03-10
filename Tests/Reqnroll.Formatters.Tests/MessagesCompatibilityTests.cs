@@ -1,3 +1,4 @@
+using Reqnroll.TestProjectGenerator;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -40,7 +41,10 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     // The rules for what must match and what is allowed to not match are built in to a series of custom FluentAssertion validation rules
     // (located in the CucumberMessagesValidator class)
     public void CCKScenarios(string testName, string featureFileSource = "CCK")
-    { 
+    {
+        // Forcing the use of xUnit3 here as that framework supports embedded attachments which most CCK scenarios assume.
+        _testRunConfiguration.UnitTestProvider = TestProjectGenerator.UnitTestProvider.xUnit3;
+
         var featureFileName = testName.Replace("-", "_");
         ResetCucumberMessages(featureFileName);
         ResetCucumberMessagesHtml(featureFileName);

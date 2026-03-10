@@ -23,6 +23,9 @@ public abstract class CucumberMessageVisitorBase
             case Attachment attachment:
                 Visit(attachment);
                 break;
+            case ExternalAttachment externalAttachment:
+                Visit(externalAttachment);
+                break;
             case GherkinDocument gherkinDocument:
                 Visit(gherkinDocument);
                 break;
@@ -211,6 +214,12 @@ public abstract class CucumberMessageVisitorBase
     {
         OnVisiting(attachment);
         OnVisited(attachment);
+    }
+
+    public virtual void Visit(ExternalAttachment externalAttachment)
+    {
+        OnVisiting(externalAttachment);
+        OnVisited(externalAttachment);
     }
 
     public virtual void Visit(GherkinDocument gherkinDocument)
@@ -711,6 +720,12 @@ public abstract class CucumberMessageVisitorBase
     { }
 
     public virtual void OnVisited(Attachment attachment)
+    { }
+
+    public virtual void OnVisiting(ExternalAttachment externalAttachment)
+    { }
+
+    public virtual void OnVisited(ExternalAttachment externalAttachment)
     { }
 
     public virtual void OnVisiting(Envelope envelope)
