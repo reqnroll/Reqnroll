@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Formatters: Improve the robustness of Formatter shutdown and handling of cancellation.
 
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments.
