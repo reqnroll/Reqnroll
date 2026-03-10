@@ -91,8 +91,8 @@ public class FileBasedConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(2);
-        result["formatter1"]["config1"].Should().Be("setting1");
-        result["formatter2"]["config2"].Should().Be("setting2");
+        result["formatter1"].AdditionalSettings["config1"].Should().Be("setting1");
+        result["formatter2"].AdditionalSettings["config2"].Should().Be("setting2");
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class FileBasedConfigurationResolverTests
         _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
         _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
         _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(invalidJsonContent);
-        IDictionary<string, IDictionary<string, object>> result;
+        IDictionary<string, FormatterConfiguration> result = null;
         // Act
         var act = () => result = _sut.Resolve();
 
@@ -157,6 +157,7 @@ public class FileBasedConfigurationResolverTests
         var result = _sut.Resolve();
         // Assert
         result.Should().HaveCount(1);
-        result["emptyFormatter"].Should().BeEmpty();
+        result["emptyFormatter"].OutputFilePath.Should().BeNull();
+        result["emptyFormatter"].AdditionalSettings.Should().BeEmpty();
     }
 }

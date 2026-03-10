@@ -35,6 +35,11 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
 
     public string Name => _pluginName;
 
+    /// <summary>
+    /// The resolved configuration for this formatter. Available after LaunchFormatter is called.
+    /// </summary>
+    protected FormatterConfiguration? Configuration { get; private set; }
+
     protected FormatterBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName)
     {
         _configurationProvider = configurationProvider;
@@ -48,12 +53,12 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in Launch().");
         _broker = broker;
 
-        bool IsFormatterEnabled(out IDictionary<string, object> configuration)
+        bool IsFormatterEnabled(out FormatterConfiguration? configuration)
         {
-            configuration = null!;
+            configuration = null;
             if (!_configurationProvider.Enabled)
                 return false;
-            configuration = _configurationProvider.GetFormatterConfigurationByName(_pluginName);
+            configuration = _configurationProvider.GetFormatterConfiguration(_pluginName);
 
             return configuration != null;
         }
@@ -65,12 +70,37 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
             ReportInitialized(false);
             return;
         }
-        LaunchInner(formatterConfiguration, ReportInitialized);
+
+        Configuration = formatterConfiguration;
+        LaunchInner(formatterConfiguration!, ReportInitialized);
         _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(_cancellationTokenSource.Token));
     }
 
-    // Method available to sinks to allow them to initialize.
-    public abstract void LaunchInner(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
+    /// <summary>
+    /// Called to initialize the formatter with its configuration. Override this method in derived classes.
+    /// </summary>
+    /// <param name="configuration">The typed formatter configuration.</param>
+    /// <param name="onAfterInitialization">Callback to report initialization success or failure.</param>
+    public virtual void LaunchInner(FormatterConfiguration configuration, Action<bool> onAfterInitialization)
+    {
+        // Default implementation calls the legacy dictionary-based method for backward compatibility
+        // Derived classes that override the old method will continue to work
+#pragma warning disable CS0618 // Type or member is obsolete
+        LaunchInner(configuration.ToDictionary(), onAfterInitialization);
+#pragma warning restore CS0618
+    }
+
+    /// <summary>
+    /// Legacy method for initializing the formatter. Override LaunchInner(FormatterConfiguration, Action&lt;bool&gt;) instead.
+    /// </summary>
+    /// <param name="formatterConfiguration">The formatter configuration as a dictionary.</param>
+    /// <param name="onAfterInitialization">Callback to report initialization success or failure.</param>
+    [Obsolete("Override LaunchInner(FormatterConfiguration, Action<bool>) instead for type-safe configuration access.")]
+    public virtual void LaunchInner(IDictionary<string, object> formatterConfiguration, Action<bool> onAfterInitialization)
+    {
+        // Default empty implementation - derived classes that override the new method don't need to implement this
+        onAfterInitialization(true);
+    }
 
     private void ReportInitialized(bool status)
     {
