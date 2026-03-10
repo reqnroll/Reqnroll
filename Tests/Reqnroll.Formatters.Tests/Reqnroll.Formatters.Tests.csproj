@@ -8,31 +8,45 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-
+  
+  <!-- This property is used by Cucumber.CCK as destination of the content files (e.g. .feature, .ndjson) for the tests. -->
+  <PropertyGroup>
+    <CucumberCCKContentPath>CCK/Resources</CucumberCCKContentPath>
+    <EmbeddedCCKContentPathPrefix>$(CucumberCCKContentPath)/</EmbeddedCCKContentPathPrefix>
+  </PropertyGroup>
+  
+  <!-- Binding classes for scenarios come from the Samples\Resources tree.
+        This tree also includes feature files and other assets for non-CCK scenarios. -->
   <ItemGroup>
     <Compile Remove="Samples\Resources\**\*.cs" />
-    <None Remove="Samples\Resources\**\*.feature" />
-    <None Remove="Samples\Resources\**\*.feature.ndjson" />
-    <None Remove="Samples\Resources\**\*.ts" />
-    <None Update="Samples\Resources\**\*.jpeg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Samples\Resources\**\*.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Samples\Resources\**\*.pdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Samples\Resources\**\*.svg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <EmbeddedResource Include="Samples\Resources\**\*.cs" />
-    <EmbeddedResource Include="Samples\Resources\**\*.feature" />
-    <EmbeddedResource Include="Samples\Resources\**\*.ndjson" />
-    <EmbeddedResource Include="Samples\Resources\**\*.csv" />
+    <EmbeddedResource Include="Samples\Resources\**\*.*" />
   </ItemGroup>
 
+  <!-- This target embeds the feature files and other assets delivered by the Cucumber.CCK package. -->
+  <Target Name="MakeCCKContentEmbeddedResource"
+          AfterTargets="ResolvePackageAssets"
+          BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <!-- Step 1: Start with Content items that have Link metadata -->
+      <_CCKContent Include="@(Content)" Condition="'%(Link)' != ''">
+        <LinkNormalized>$([System.String]::Copy('%(Link)').Replace('\','/'))</LinkNormalized>
+      </_CCKContent>
+
+      <!-- Step 2: Filter to only those matching the prefix -->
+      <_CCKContent Update="@(_CCKContent)"
+                   Condition="$([System.String]::new('%(LinkNormalized)').StartsWith('$(EmbeddedCCKContentPathPrefix)'))"/>
+
+      <!-- Step 3: Remove from Content and compute LogicalName -->
+      <Content Remove="@(_CCKContent)" />
+      <_CCKContent Update="@(_CCKContent)">
+        <LogicalName>$(RootNamespace).$([System.String]::Copy('%(Link)').Replace('\','.').Replace('/','.').Replace('-','_'))</LogicalName>
+      </_CCKContent>
+      <EmbeddedResource Include="@(_CCKContent)" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
+    <PackageReference Include="Cucumber.CCK" Version="29.1.4" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -45,8 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
       <PrivateAssets>all</PrivateAssets>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
