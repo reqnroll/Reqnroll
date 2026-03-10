@@ -4,6 +4,7 @@ using Moq;
 using Reqnroll.CommonModels;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.Configuration;
@@ -120,7 +121,7 @@ public class JsonEnvironmentConfigurationResolverTests
                               }
                           }
                           """;
-        
+
         _environmentOptionsMock
             .Setup(e => e.FormattersJson)
             .Returns(expectedJson);
@@ -132,5 +133,34 @@ public class JsonEnvironmentConfigurationResolverTests
         result.Should().ContainKey("message");
         result["message"]["outputFilePath"].Should().Be("foo.ndjson");
         result.Should().HaveCount(1);
+    }
+    [Fact]
+    public void Resolve_Should_Parse_Nested_Json_Format_Environment_Variable()
+    {
+        var expectedJson = """
+            {
+                "formatters": {
+                    "formatter1": {
+                        "config1": "setting1",
+                        "nestedConfig": {
+                            "subConfig1": "subSetting1"
+                        }
+                    }
+                }
+            }
+            """;
+        _environmentOptionsMock
+            .Setup(e => e.FormattersJson)
+            .Returns(expectedJson);
+        // Act
+        var result = _sut.Resolve();
+        // Assert
+        result.Should().ContainKey("formatter1");
+        result["formatter1"]["config1"].Should().Be("setting1");
+        var nestedConfig = result["formatter1"]["nestedConfig"] as IDictionary<string, object>;
+        nestedConfig.Should().NotBeNull();
+        nestedConfig!["subConfig1"].Should().Be("subSetting1");
+        result.Should().HaveCount(1);
+
     }
 }

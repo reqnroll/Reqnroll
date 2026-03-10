@@ -18,12 +18,6 @@ namespace CucumberMessages.CompatibilityTests.CCK.skipped
             _unitTestRuntimeProvider = unitTestRuntimeProvider;
         }
          
-        [BeforeScenario("@skip")]
-        public void BeforeScenarioWithSkip()
-        {
-            _unitTestRuntimeProvider.TestIgnore("Skipped before scenario");
-        }
-
         [Given("a step that does not skip")]
         public void GivenAStepThatDoesNotSkip()
         {
