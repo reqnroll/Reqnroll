@@ -62,6 +62,15 @@ public partial class CucumberMessagesValidator
             }
             assignedPartition = 0;
         }
+        public override void OnVisiting(ExternalAttachment externalAttachment)
+        {
+            if (!String.IsNullOrEmpty(externalAttachment.TestCaseStartedId))
+            {
+                assignedPartition = partitionAssignedToPreviouslySeenIds[externalAttachment.TestCaseStartedId];
+            }
+            assignedPartition = 0;
+        }
+
         public override void OnVisiting(Hook hook) { assignedPartition = 0; }
         public override void OnVisiting(StepDefinition stepDefinition) { assignedPartition = 0; }
         public override void OnVisiting(ParameterType parameterType) { assignedPartition = 0; }

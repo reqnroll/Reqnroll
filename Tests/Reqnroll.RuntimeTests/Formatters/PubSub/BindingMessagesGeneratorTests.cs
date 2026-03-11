@@ -4,6 +4,7 @@ using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
+using Reqnroll.UnitTestProvider;
 using System.Linq;
 using Xunit;
 
@@ -14,6 +15,7 @@ public class BindingMessagesGeneratorTests
     private readonly Mock<IBindingRegistry> _bindingRegistryMock;
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly Mock<IIdGenerator> _idGeneratorMock;
+    private readonly Mock<IUnitTestRuntimeProvider> _runtimeProviderMock;
     private readonly BindingMessagesGenerator _sut;
     // ReSharper disable once FieldCanBeMadeReadOnly.Local
     private int _currentId = 0;
@@ -22,8 +24,9 @@ public class BindingMessagesGeneratorTests
     {
         _bindingRegistryMock = new Mock<IBindingRegistry>();
         _idGeneratorMock = new Mock<IIdGenerator>();
+        _runtimeProviderMock = new Mock<IUnitTestRuntimeProvider>();
         _idGeneratorMock.Setup(i => i.GetNewId()).Returns(_currentId++.ToString());
-        _sut = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(), _bindingRegistryMock.Object);
+        _sut = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(_runtimeProviderMock.Object), _bindingRegistryMock.Object);
     }
 
     [Fact]

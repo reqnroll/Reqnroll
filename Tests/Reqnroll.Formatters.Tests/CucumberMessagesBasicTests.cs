@@ -285,7 +285,7 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
         CucumberMessagesAddConfigurationFile("reqnrollConfigurationWithExternalAssembly.json");
 
         //Set up the Default Project (main test assembly)
-        AddUtilClassWithFileSystemPath();
+        AddUtilClassWithFileSystemPath("Samples");
 
         AddFeatureFileFromResource($"ExternalBindingAssemblies/{featureNameText}.feature", "Samples", Assembly.GetExecutingAssembly());
         AddBindingClassFromResource($"ExternalBindingAssemblies/SampleInternalBindingClass.cs", "Samples", Assembly.GetExecutingAssembly());

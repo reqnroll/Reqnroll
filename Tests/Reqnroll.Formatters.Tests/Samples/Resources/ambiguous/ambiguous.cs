@@ -13,7 +13,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.ambiguous
         [Given(@"^a (.*?) with (.*?)$")]
         public void FirstMatchingStep(string p0, string p1) { }
 
-        [Given(@"^a step with (.*)$")]
+        [Given(@"^a step with (.*?)$")]
         public void SecondMatchingStep(string p0) { }
     }
 }

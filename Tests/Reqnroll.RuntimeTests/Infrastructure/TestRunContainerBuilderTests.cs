@@ -5,6 +5,7 @@ using Reqnroll.Configuration;
 using FluentAssertions;
 using Reqnroll.Infrastructure;
 using Reqnroll.UnitTestProvider;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
 {
@@ -96,6 +97,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
         public class CustomUnitTestProvider : IUnitTestRuntimeProvider
         {
+            public AttachmentHandlingOption AttachmentHandlingOption => throw new NotImplementedException();
+
             public void TestPending(string message)
             {
                 throw new NotImplementedException();

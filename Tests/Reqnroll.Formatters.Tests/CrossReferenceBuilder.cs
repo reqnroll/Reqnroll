@@ -17,6 +17,13 @@ internal class CrossReferenceBuilder : CucumberMessageVisitorBase
         _buildCrossReferences(attachment);
         base.OnVisiting(attachment);
     }
+
+    public override void OnVisiting(ExternalAttachment externalAttachment)
+    {
+        _buildCrossReferences(externalAttachment);
+        base.OnVisiting(externalAttachment);
+    }
+
     public override void OnVisiting(Background background)
     {
         _buildCrossReferences(background);
