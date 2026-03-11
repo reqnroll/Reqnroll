@@ -4,6 +4,7 @@
 
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments.
+* Enhancement: Changed visibility of PickleId property of ScenarioInfo to public.
 
 *Contributors of this release (in alphabetical order):* @clrudolphi
 
