@@ -5,17 +5,26 @@ using System.Text;
 using FluentAssertions;
 using Io.Cucumber.Messages.Types;
 using Moq;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Reqnroll.UnitTestProvider;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub;
 
 public class CucumberMessageFactoryTests : IDisposable
 {
-    private readonly CucumberMessageFactory _sut = new();
+    private readonly CucumberMessageFactory _sut;
+    private readonly Mock<IUnitTestRuntimeProvider> _MockRuntimeProvider;
     private readonly List<string> _tempFiles = new();
 
+    public CucumberMessageFactoryTests()
+    {
+        _MockRuntimeProvider = new Mock<IUnitTestRuntimeProvider>();
+        _MockRuntimeProvider.Setup(p => p.AttachmentHandlingOption).Returns(AttachmentHandlingOption.Embed);
+        _sut = new CucumberMessageFactory(_MockRuntimeProvider.Object);
+    }
     private string CreateTempFile(string extension, string content, Encoding encoding)
     {
         var path = Path.Combine(Path.GetTempPath(), $"test_{Guid.NewGuid()}{extension}");
@@ -35,7 +44,7 @@ public class CucumberMessageFactoryTests : IDisposable
     private AttachmentTracker CreateTracker(string filePath)
     {
         // Use reflection to construct AttachmentTracker (internal constructor)
-        var factory = new CucumberMessageFactory();
+        var factory = new CucumberMessageFactory(_MockRuntimeProvider.Object);
         var publisher = new Mock<Reqnroll.Formatters.PubSub.IMessagePublisher>().Object;
         return (AttachmentTracker)Activator.CreateInstance(
             typeof(AttachmentTracker),
