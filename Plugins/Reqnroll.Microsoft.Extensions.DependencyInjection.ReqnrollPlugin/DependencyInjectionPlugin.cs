@@ -29,6 +29,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
             runtimePluginEvents.CustomizeGlobalDependencies += CustomizeGlobalDependencies;
+            runtimePluginEvents.CustomizeTestThreadDependencies += CustomizeTestThreadDependenciesEventHandler;
             runtimePluginEvents.CustomizeFeatureDependencies += CustomizeFeatureDependenciesEventHandler;
             runtimePluginEvents.CustomizeScenarioDependencies += CustomizeScenarioDependenciesEventHandler;
         }
@@ -45,21 +46,15 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                         args.ObjectContainer.RegisterTypeAs<ServiceCollectionFinder, IServiceCollectionFinder>();
                     }
 
-                    // We store the (MS) service provider in the global (BoDi) container, we create it only once.
-                    // It must be lazy (hence factory) because at this point we still don't have the bindings mapped.
-                    args.ObjectContainer.RegisterFactoryAs<RootServiceProviderContainer>(() =>
-                    {
-                        var serviceCollectionFinder = args.ObjectContainer.Resolve<IServiceCollectionFinder>();
-                        var (services, scoping) = serviceCollectionFinder.GetServiceCollection();
+                    var serviceCollectionFinder = args.ObjectContainer.Resolve<IServiceCollectionFinder>();
+                    var lifetime = serviceCollectionFinder.GetServiceProviderLifetime();
 
-                        RegisterProxyBindings(args.ObjectContainer, services);
-                        return new RootServiceProviderContainer(services.BuildServiceProvider(), scoping);
-                    });
-
-                    args.ObjectContainer.RegisterFactoryAs<IServiceProvider>(() =>
+                    if (lifetime == ServiceProviderLifetimeType.Global)
                     {
-                        return args.ObjectContainer.Resolve<RootServiceProviderContainer>().ServiceProvider;
-                    });
+                        args.ObjectContainer.RegisterFactoryAs<RootServiceProviderContainer>(() => BuildRootServiceProviderContainer(args.ObjectContainer));
+                    }
+
+                    args.ObjectContainer.RegisterFactoryAs<IServiceProvider>(c => c.Resolve<RootServiceProviderContainer>().ServiceProvider);
 
                     // Will make sure DI scope is disposed.
                     var lcEvents = args.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
@@ -70,8 +65,27 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             }
         }
 
+        private static void CustomizeTestThreadDependenciesEventHandler(object sender, CustomizeTestThreadDependenciesEventArgs args)
+        {
+            var serviceCollectionFinder = args.ObjectContainer.Resolve<IServiceCollectionFinder>();
+            var lifetime = serviceCollectionFinder.GetServiceProviderLifetime();
+
+            if (lifetime == ServiceProviderLifetimeType.TestThread)
+            {
+                args.ObjectContainer.RegisterFactoryAs<RootServiceProviderContainer>(() => BuildRootServiceProviderContainer(args.ObjectContainer));
+            }
+        }
+
         private static void CustomizeFeatureDependenciesEventHandler(object sender, CustomizeFeatureDependenciesEventArgs args)
         {
+            var serviceCollectionFinder = args.ObjectContainer.Resolve<IServiceCollectionFinder>();
+            var lifetime = serviceCollectionFinder.GetServiceProviderLifetime();
+
+            if (lifetime == ServiceProviderLifetimeType.Feature)
+            {
+                args.ObjectContainer.RegisterFactoryAs<RootServiceProviderContainer>(() => BuildRootServiceProviderContainer(args.ObjectContainer));
+            }
+
             // At this point we have the bindings, we can resolve the service provider, which will build it if it's the first time.
             var spContainer = args.ObjectContainer.Resolve<RootServiceProviderContainer>();
 
@@ -101,6 +115,14 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 
         private static void CustomizeScenarioDependenciesEventHandler(object sender, CustomizeScenarioDependenciesEventArgs args)
         {
+            var serviceCollectionFinder = args.ObjectContainer.Resolve<IServiceCollectionFinder>();
+            var lifetime = serviceCollectionFinder.GetServiceProviderLifetime();
+
+            if (lifetime == ServiceProviderLifetimeType.Scenario)
+            {
+                args.ObjectContainer.RegisterFactoryAs<RootServiceProviderContainer>(() => BuildRootServiceProviderContainer(args.ObjectContainer));
+            }
+
             // At this point we have the bindings, we can resolve the service provider, which will build it if it's the first time.
             var spContainer = args.ObjectContainer.Resolve<RootServiceProviderContainer>();
 
@@ -125,6 +147,15 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                 BindMappings.TryRemove(serviceScope.ServiceProvider, out _);
                 serviceScope.Dispose();
             }
+        }
+
+        private static RootServiceProviderContainer BuildRootServiceProviderContainer(IObjectContainer container)
+        {
+            var serviceCollectionFinder = container.Resolve<IServiceCollectionFinder>();
+            var (services, scoping) = serviceCollectionFinder.GetServiceCollection();
+
+            RegisterProxyBindings(container, services);
+            return new RootServiceProviderContainer(services.BuildServiceProvider(), scoping);
         }
 
         private static void RegisterProxyBindings(IObjectContainer objectContainer, IServiceCollection services)

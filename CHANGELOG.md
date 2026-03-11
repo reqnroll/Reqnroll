@@ -2,10 +2,12 @@
 
 ## Improvements:
 
+* Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Added support for configurable service provider lifetimes to control which level the services are registered. Options are Global (default, previous behavior), Test Thread, Feature, Scenario. (#998)
+
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments.
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+*Contributors of this release (in alphabetical order):* @AidenFuller, @clrudolphi
 
 # v3.3.3 - 2026-01-27
 
