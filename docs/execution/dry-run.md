@@ -6,7 +6,7 @@ Introduced in Reqnroll v3
 
 The Runtime of Reqnroll supports running tests in a "dry run" mode. This means that when each test is executed, the runtime will skip executing the code in your step handlers.
 
-This can be useful for Pull Request/CI scenarios where you want to ensure all steps declared in the feature files match to a step handler in your C# code, but executing the test suite as normal is lengthy, expensive, or not possible. This feature is usually paired with the [runtime configuration](../installation/configuration.md#runtime) option `"missingOrPendingStepsOutcome": "Error"` to ensure any unbound steps are reported as errors.
+This can be useful for Pull Request/CI scenarios where you want to ensure all steps declared in the feature files match to a step handler in your C# code, but executing the test suite as normal is lengthy, expensive, or not possible. This feature is usually paired with the [runtime configuration](../installation/configuration.md#runtime) option `"missingOrPendingStepsOutcome": "Error"` to ensure any unbound steps are reported as errors. Another example use is for downstream reporting/analysis. By combining the use of Dry Run mode with [Formatters](../reporting/reqnroll-formatters.md) you can obtain information for reports such as Feature names, lists of Scenarios, and lists of step definition bindings used by scenarios (and by inference, those not used).
 
 ## Enabling Dry Run
 To enable dry run mode, set the environment variable `REQNROLL_DRY_RUN=true` when executing your tests.

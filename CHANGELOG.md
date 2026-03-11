@@ -4,8 +4,9 @@
 * Updated Cucumber dependencies to: Gherkin v38.0.0, Cucumber.Messages v32.0.1 and Cucumber.HtmlFormatter v23.0.0. (#984)
 
 ## Bug fixes:
+* Fix: Formatters incorrectly handle Unicode text file content of attachments.
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.3 - 2026-01-27
 
