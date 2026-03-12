@@ -8,21 +8,21 @@ namespace Reqnroll.TestProjectGenerator
 {
     public class MSBuildFinder(IOutputWriter _outputWriter, ConfigurationDriver _configDriver)
     {
-        private string FindUsingVS2022()
+        private string FindUsingVS2026()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return null;
 
             // Finding paths, like
-            //   C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe
+            //   C:\Program Files\Microsoft Visual Studio\18\Enterprise\MSBuild\Current\Bin\MSBuild.exe
 
-            string GetVs2022Path(string edition)
+            string GetVs2026Path(string edition)
             {
                 var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-                return Path.Combine(programFiles, "Microsoft Visual Studio", "2022", edition);
+                return Path.Combine(programFiles, "Microsoft Visual Studio", "18", edition);
             }
 
             var editions = new[] { "Enterprise", "Community", "Professional" };
-            foreach (var vsPath in editions.Select(GetVs2022Path))
+            foreach (var vsPath in editions.Select(GetVs2026Path))
             {
                 var msBuildPath = Path.Combine(vsPath, "MSBuild", "Current", "Bin", "MSBuild.exe");
                 if (File.Exists(msBuildPath)) return msBuildPath;
@@ -66,7 +66,7 @@ namespace Reqnroll.TestProjectGenerator
         public string FindMSBuild()
         {
             return FindUsingEnvironmentVariableAndConfig() ??
-                   FindUsingVS2022() ??
+                   FindUsingVS2026() ??
                    FindUsingVsWhere() ?? 
                    "msbuild";
         }

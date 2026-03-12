@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+    <IsPackable>false</IsPackable>
 
     <!-- This is required to ensure dependencies are made available for packing -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
