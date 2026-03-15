@@ -19,7 +19,7 @@ This documentation provides a comprehensive source of information about how to u
 ## How to use the documentation
 
 ```{admonition} Documentation suggestions
-:class: info
+:class: note
 
 Feel free to suggest changes to our documentation!
 Each page contains a small ✏️ (*edit*) icon to perform quick edits.
