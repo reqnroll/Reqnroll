@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Improve the command line dotnet new project templates to support .NET 10, xUnit v3 and support of global usings when appropriate.
 
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments.
