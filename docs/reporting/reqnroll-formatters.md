@@ -177,7 +177,7 @@ dotnet test --logger "console;verbosity=detailed" > log.txt
 
 Note: The built-in `TraceListenerFormatterLog` does not seem to produce visible results for NUnit (works with MsTest). As an alternative, you can implement a simple listener that saves the messages to a file (the file will be generated in the output folder, e.g. `bin\Debug\net8.0`).
 
-```
+```{code-block} c#
 public class FileFormatterLog : IFormatterLog
 {
     private readonly List<string> _entries = new();

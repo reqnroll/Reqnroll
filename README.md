@@ -10,7 +10,7 @@ Reqnroll is a .NET port of [Cucumber](https://cucumber.io/) and it is based on t
 
 Reqnroll enables writing executable specifications for BDD using [Gherkin](https://cucumber.io/docs/gherkin/), the widely-accepted *feature file* specification format. With that you can define the requirements using *Given-When-Then* style *scenarios* and turn them to automated tests in order to verify their implementation.
 
-Reqnroll works on all major operating systems (Windows, Linux, macOS), on all commonly used .NET implementations (including .NET Framework 4.6.2+ and up to .NET 9.0). For executing the automated scenarios, Reqnroll can use [MsTest](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-mstest), [NUnit](https://nunit.org/), [xUnit](https://xunit.net/) or [TUnit](https://tunit.dev/). On Reqnroll projects you can work using Visual Studio 2022, Visual Studio Core and Rider, but you can also use Reqnroll without any IDE.
+Reqnroll works on all major operating systems (Windows, Linux, macOS), on all commonly used .NET implementations (including .NET Framework 4.6.2+ and up to .NET 10.0). For executing the automated scenarios, Reqnroll can use [MsTest](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-mstest), [NUnit](https://nunit.org/), [xUnit](https://xunit.net/) or [TUnit](https://tunit.dev/). On Reqnroll projects you can work using Visual Studio 2022, Visual Studio Core and Rider, but you can also use Reqnroll without any IDE.
 
 ## Useful links
 
@@ -33,7 +33,7 @@ All contributors are welcome! For more information see the [Contribution guideli
 
 * [Spec Solutions](https://www.specsolutions.eu/)
 * [Info Support](https://www.infosupport.com/)
-* [LambdaTest](https://www.lambdatest.com/)
+* [TestMu AI (formerly LambdaTest)](https://www.testmuai.com/)
 
 See all sponsors and information about sponsorship on the [Sponsorship page](https://reqnroll.net/sponsorship) of our website.
 
@@ -41,6 +41,6 @@ See all sponsors and information about sponsorship on the [Sponsorship page](htt
 
 Reqnroll for VisualStudio is licensed under the [BSD 3-Clause License](LICENSE).
 
-Copyright (c) 2024-2025 Reqnroll
+Copyright (c) 2024-2026 Reqnroll
 
 This project is based on the SpecFlow framework.

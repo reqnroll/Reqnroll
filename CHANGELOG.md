@@ -6,7 +6,29 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):*
+
+# v3.3.4 - 2026-03-23
+
+## Improvements:
+* Improve the command line dotnet new project templates to support .NET 10, xUnit v3 and support of implicit usings when appropriate. Removed the option to include FluentAssertions from the template. (#1061)
+
+## Bug fixes:
+* Fix: Formatters incorrectly handle Unicode text file content of attachments (#1041)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi
+
+# v3.3.3 - 2026-01-27
+
+## Improvements:
+
+* Improve binding discovery so that the discovery can continue even if the attributes of a type fail to load (#1006)
+
+## Bug fixes:
+* Fix: xUnit VB.NET generates code with async warning (#1009)
+* Fix: disableFriendlyTestNames doesn't work in Reqnroll 3.3.2 (#1013)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.2 - 2026-01-14
 
