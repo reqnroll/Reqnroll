@@ -1,4 +1,4 @@
-<!--#if (!useGlobalUsings) -->
+<!--#if (!useImplicitUsings) -->
 using Reqnroll;
 <!--#endif -->
 
