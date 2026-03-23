@@ -395,7 +395,7 @@ jobs:
         path: "TestResults/specs-results.trx"
 
   system-tests-windows:
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     needs: build
     env:
       # D:\ (temporary) drive has better performance then C:\ (remote) drive on the Github Runner, so place all temporary files on D:\, see https://github.com/actions/setup-dotnet/issues/260

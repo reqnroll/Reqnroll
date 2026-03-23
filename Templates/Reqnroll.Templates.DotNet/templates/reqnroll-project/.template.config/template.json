@@ -10,134 +10,141 @@
         "type": "project"
     },
     "sourceName": "Template",
-    "symbols": {
-        "targetFramework": {
-            "type": "parameter",
-            "description": "Target Framework",
-            "datatype": "choice",
-            "defaultValue": "net8.0",
-            "replaces": "$target$",
-            "choices": [
-                {
-                    "choice": "net8.0",
-                    "description": ".NET 8.0"
-                },
-                {
-                    "choice": "net9.0",
-                    "description": ".NET 9.0"
-                },
-                {
-                    "choice": "net462",
-                    "description": ".NET Framework 4.6.2"
-                },
-                {
-                    "choice": "net472",
-                    "description": ".NET Framework 4.7.2"
-                },
-                {
-                    "choice": "net481",
-                    "description": ".NET Framework 4.8.1"
-                }
-            ]
+  "symbols": {
+    "targetFramework": {
+      "type": "parameter",
+      "description": "Target Framework",
+      "datatype": "choice",
+      "defaultValue": "net8.0",
+      "replaces": "$target$",
+      "choices": [
+        {
+          "choice": "net8.0",
+          "description": ".NET 8.0"
         },
-        "testExecutionFramework": {
-            "type": "parameter",
-            "description": "Test Execution Framework",
-            "datatype": "choice",
-            "defaultValue": "nunit",
-            "choices": [
-                {
-                    "choice": "xunit",
-                    "description": "xUnit"
-                },
-                {
-                    "choice": "nunit",
-                    "description": "NUnit"
-                },
-                {
-                    "choice": "mstest",
-                    "description": "MSTest"
-                },
-                {
-                    "choice": "tunit",
-                    "description": "TUnit"
-                }
-            ]
+        {
+          "choice": "net9.0",
+          "description": ".NET 9.0"
         },
-        "includeFluentAssertions": {
-            "type": "parameter",
-            "datatype": "bool",
-            "description": "Add FluentAssertions library",
-            "defaultValue": "true"
+        {
+          "choice": "net10.0",
+          "description": ".NET 10.0"
         },
-        "ReqnrollNugetPackages": {
-            "type": "generated",
-            "generator": "switch",
-            "replaces": "$ReqnrollNugetPackages$",
-            "parameters": {
-                "evaluator": "C++",
-                "datatype": "string",
-                "cases": [
-                    {
-                        "condition": "(testExecutionFramework == 'xunit')",
-                        "value": "<PackageReference Include=\"Reqnroll.xUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
-                    },
-                    {
-                        "condition": "(testExecutionFramework == 'mstest')",
-                        "value": "<PackageReference Include=\"Reqnroll.MsTest\" Version=\"$$$NuGetPackageVersion$$$\" />"
-                    },
-                    {
-                        "condition": "(testExecutionFramework == 'nunit')",
-                        "value": "<PackageReference Include=\"Reqnroll.NUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
-                    },
-                    {
-                        "condition": "(testExecutionFramework == 'tunit')",
-                        "value": "<PackageReference Include=\"Reqnroll.TUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
-                    }
-                ]
-            }
+        {
+          "choice": "net462",
+          "description": ".NET Framework 4.6.2"
         },
-        "AdditionalNugetPackages": {
-            "type": "generated",
-            "generator": "switch",
-            "replaces": "$additionalNugetPackages$",
-            "parameters": {
-                "evaluator": "C++",
-                "datatype": "string",
-                "cases": [
-                    {
-                        "condition": "(testExecutionFramework == 'xunit')",
-                        "value": "<PackageReference Include=\"xunit\" Version=\"2.6.6\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"2.5.6\">\n    <PrivateAssets>all</PrivateAssets>\n        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>\n    </PackageReference>"
-                    },
-                    {
-                        "condition": "(testExecutionFramework == 'mstest')",
-                        "value": "<PackageReference Include=\"MSTest.TestFramework\" Version=\"3.1.1\" />\n    <PackageReference Include=\"MSTest.TestAdapter\" Version=\"3.1.1\" />"
-                    },
-                    {
-                        "condition": "(testExecutionFramework == 'nunit')",
-                        "value": "<PackageReference Include=\"nunit\" Version=\"4.4.0\" />\n    <PackageReference Include=\"NUnit3TestAdapter\" Version=\"5.2.0\" />"
-                    },
-                    {
-                        "condition": "(testExecutionFramework == 'tunit')",
-                        "value": "<PackageReference Include=\"TUnit\" Version=\"0.25.21\" />"
-                    }
-                ]
-            }
+        {
+          "choice": "net472",
+          "description": ".NET Framework 4.7.2"
         },
-        "FluentAssertionsNugetPackage": {
-            "type": "generated",
-            "generator": "switch",
-            "replaces": "$fluentAssertionsNugetPackage$",
-            "parameters": {
-                "evaluator": "C++",
-                "datatype": "string",
-                "cases": [
-                    {
-                        "condition": "(includeFluentAssertions)",
-                        "value": "<PackageReference Include=\"FluentAssertions\" Version=\"6.12.0\" />"
-                    }
-                ]
-            }
+        {
+          "choice": "net481",
+          "description": ".NET Framework 4.8.1"
         }
+      ]
+    },
+    "testExecutionFramework": {
+      "type": "parameter",
+      "description": "Test Execution Framework",
+      "datatype": "choice",
+      "defaultValue": "nunit",
+      "choices": [
+        {
+          "choice": "xunit",
+          "description": "xUnit"
+        },
+        {
+          "choice": "xunit.v3",
+          "description": "xUnit.v3"
+        },
+        {
+          "choice": "nunit",
+          "description": "NUnit"
+        },
+        {
+          "choice": "mstest",
+          "description": "MSTest"
+        },
+        {
+          "choice": "tunit",
+          "description": "TUnit"
+        }
+      ]
+    },
+    "ReqnrollNugetPackages": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "$ReqnrollNugetPackages$",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(testExecutionFramework == 'xunit')",
+            "value": "<PackageReference Include=\"Reqnroll.xUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
+          },
+          {
+            "condition": "(testExecutionFramework == 'xunit.v3')",
+            "value": "<PackageReference Include=\"Reqnroll.xunit.v3\" Version=\"$$$NuGetPackageVersion$$$\" />"
+          },
+          {
+            "condition": "(testExecutionFramework == 'mstest')",
+            "value": "<PackageReference Include=\"Reqnroll.MsTest\" Version=\"$$$NuGetPackageVersion$$$\" />"
+          },
+          {
+            "condition": "(testExecutionFramework == 'nunit')",
+            "value": "<PackageReference Include=\"Reqnroll.NUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
+          },
+          {
+            "condition": "(testExecutionFramework == 'tunit')",
+            "value": "<PackageReference Include=\"Reqnroll.TUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
+          }
+        ]
+      }
+    },
+    "AdditionalNugetPackages": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "$additionalNugetPackages$",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(testExecutionFramework == 'xunit')",
+            "value": "<PackageReference Include=\"xunit\" Version=\"2.9.3\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"3.1.5\">\n    <PrivateAssets>all</PrivateAssets>\n        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>\n    </PackageReference>"
+          },
+          {
+            "condition": "(testExecutionFramework == 'xunit.v3')",
+            "value": "<PackageReference Include=\"xunit.v3\" Version=\"3.2.2\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"3.1.5\">\n    <PrivateAssets>all</PrivateAssets>\n        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>\n    </PackageReference>"
+          },
+          {
+            "condition": "(testExecutionFramework == 'mstest')",
+            "value": "<PackageReference Include=\"MSTest.TestFramework\" Version=\"4.1.0\" />\n    <PackageReference Include=\"MSTest.TestAdapter\" Version=\"4.1.0\" />"
+          },
+          {
+            "condition": "(testExecutionFramework == 'nunit')",
+            "value": "<PackageReference Include=\"nunit\" Version=\"4.5.1\" />\n    <PackageReference Include=\"NUnit3TestAdapter\" Version=\"6.1.0\" />"
+          },
+          {
+            "condition": "(testExecutionFramework == 'tunit')",
+            "value": "<PackageReference Include=\"TUnit\" Version=\"1.20.0\" />"
+          }
+        ]
+      }
+    },
+    "isNetFramework": {
+      "type": "computed",
+      "value": "(targetFramework == 'net462' || targetFramework == 'net472' || targetFramework == 'net481')"
+    },
+    "useImplicitUsings": {
+      "type": "computed",
+      "value": "(!isNetFramework)"
+    },
+    "includeMicrosoftNetTestSdk": {
+      "type": "computed",
+      "value": "(!( testExecutionFramework == 'tunit' ) )"
     }
+  }
 }

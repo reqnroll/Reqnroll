@@ -2,13 +2,35 @@
 
   <PropertyGroup>
     <TargetFramework>$target$</TargetFramework>
+<!--#if (useImplicitUsings) -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+<!--#endif -->
+<!--#if (testExecutionFramework == "tunit") -->
+    <OutputType>Exe</OutputType>
+<!--#endif -->
   </PropertyGroup>
 
   <ItemGroup>
+<!--#if (includeMicrosoftNetTestSdk) -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+<!--#endif -->
     $ReqnrollNugetPackages$
     $additionalNugetPackages$
-    $fluentAssertionsNugetPackage$
   </ItemGroup>
 
+<!--#if (useImplicitUsings) -->
+  <ItemGroup>
+    <Using Include="Reqnroll" />
+<!--#if (testExecutionFramework == "mstest") -->
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+<!--#endif -->
+<!--#if (testExecutionFramework == "nunit") -->
+    <Using Include="NUnit.Framework" />
+<!--#endif -->
+<!--#if (testExecutionFramework == "xunit" || testExecutionFramework == "xunit.v3") -->
+    <Using Include="Xunit" />
+<!--#endif -->
+  </ItemGroup>
+<!--#endif -->
 </Project>

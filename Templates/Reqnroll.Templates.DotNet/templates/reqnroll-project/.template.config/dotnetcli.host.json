@@ -7,10 +7,6 @@
         "targetFramework": {
             "longName": "framework",
             "shortName": "f"
-        },
-        "includeFluentAssertions": {
-            "longName": "includeFluentAssertions",
-            "shortName": "fa"
         }
     }
 }
