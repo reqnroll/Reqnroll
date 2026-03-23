@@ -1,7 +1,7 @@
 # [vNext]
 
 ## Improvements:
-* Improve the command line dotnet new project templates to support .NET 10, xUnit v3 and support of global usings when appropriate.
+* Improve the command line dotnet new project templates to support .NET 10, xUnit v3 and support of implicit usings when appropriate. Removed the option to include FluentAssertions from the template.
 
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments.

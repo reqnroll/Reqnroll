@@ -72,12 +72,6 @@
         }
       ]
     },
-    "includeFluentAssertions": {
-      "type": "parameter",
-      "datatype": "bool",
-      "description": "Add FluentAssertions library",
-      "defaultValue": "true"
-    },
     "ReqnrollNugetPackages": {
       "type": "generated",
       "generator": "switch",
@@ -140,26 +134,11 @@
         ]
       }
     },
-    "FluentAssertionsNugetPackage": {
-      "type": "generated",
-      "generator": "switch",
-      "replaces": "$fluentAssertionsNugetPackage$",
-      "parameters": {
-        "evaluator": "C++",
-        "datatype": "string",
-        "cases": [
-          {
-            "condition": "(includeFluentAssertions)",
-            "value": "<PackageReference Include=\"FluentAssertions\" Version=\"6.12.0\" />"
-          }
-        ]
-      }
-    },
     "isNetFramework": {
       "type": "computed",
       "value": "(targetFramework == 'net462' || targetFramework == 'net472' || targetFramework == 'net481')"
     },
-    "useGlobalUsings": {
+    "useImplicitUsings": {
       "type": "computed",
       "value": "(!isNetFramework)"
     },

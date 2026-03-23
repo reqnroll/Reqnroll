@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>$target$</TargetFramework>
-<!--#if (useGlobalUsings) -->
+<!--#if (useImplicitUsings) -->
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 <!--#endif -->
@@ -17,10 +17,9 @@
 <!--#endif -->
     $ReqnrollNugetPackages$
     $additionalNugetPackages$
-    $fluentAssertionsNugetPackage$
   </ItemGroup>
 
-<!--#if (useGlobalUsings) -->
+<!--#if (useImplicitUsings) -->
   <ItemGroup>
     <Using Include="Reqnroll" />
 <!--#if (testExecutionFramework == "mstest") -->
@@ -31,9 +30,6 @@
 <!--#endif -->
 <!--#if (testExecutionFramework == "xunit" || testExecutionFramework == "xunit.v3") -->
     <Using Include="Xunit" />
-<!--#endif -->
-<!--#if (includeFluentAssertions) -->
-    <Using Include="FluentAssertions" />
 <!--#endif -->
   </ItemGroup>
 <!--#endif -->
