@@ -5,6 +5,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeMainProjectInDepsFile>false</IncludeMainProjectInDepsFile>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <IncludeSource>false</IncludeSource>
 
     <!-- NuGet configuration -->
     <PackageId>Reqnroll.CustomPlugin</PackageId>

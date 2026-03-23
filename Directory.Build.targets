@@ -10,7 +10,7 @@
     Name="CopyPackageToPackagesOutputPath"
     AfterTargets="Pack">
     <ItemGroup>
-      <GeneratedPackages Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
+      <GeneratedPackages Include="$(PackageOutputAbsolutePath)\*$(Version).*nupkg"/>
     </ItemGroup>
     <Copy SourceFiles="@(GeneratedPackages)" DestinationFolder="$(PackagesOutputPath)" />
   </Target>
