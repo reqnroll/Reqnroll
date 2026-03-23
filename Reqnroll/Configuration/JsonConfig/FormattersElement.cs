@@ -16,6 +16,6 @@ namespace Reqnroll.Configuration.JsonConfig
         /// Captures any additional/custom formatters not explicitly defined above.
         /// </summary>
         [JsonExtensionData]
-        public Dictionary<string, JsonElement> AdditionalFormatters { get; set; }
+        public IDictionary<string, JsonElement> AdditionalFormatters { get; set; }
     }
 }

@@ -40,14 +40,6 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
         return null;
     }
 
-    /// <inheritdoc />
-    [Obsolete("Use GetFormatterConfiguration instead for type-safe access to configuration values.")]
-    public IDictionary<string, object> GetFormatterConfigurationByName(string formatterName)
-    {
-        var config = GetFormatterConfiguration(formatterName);
-        return config?.ToDictionary();
-    }
-
     private FormattersConfiguration ResolveConfiguration()
     {
         var combinedConfig = new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);

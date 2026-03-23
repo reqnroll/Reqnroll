@@ -57,21 +57,11 @@ public static class FormattersConfigExtractor
 
         // Process additional/custom formatters captured by JsonExtensionData
         if (formatters.AdditionalFormatters != null)
-        {
             foreach (var kvp in formatters.AdditionalFormatters)
             {
-                if (kvp.Value.ValueKind == JsonValueKind.Object)
-                {
-                    result[kvp.Key] = ConvertJsonElementToFormatterConfiguration(kvp.Value);
-                }
-                else
-                {
-                    // Non-object values get an empty config
-                    result[kvp.Key] = new FormatterConfiguration();
-                }
+                result[kvp.Key] = ConvertFormatterOptions(kvp.Value.Deserialize<FormatterOptionsElement>());
             }
-        }
-
+    
         return result;
     }
 
@@ -84,7 +74,6 @@ public static class FormattersConfigExtractor
 
         // Process additional options captured by JsonExtensionData
         if (options.AdditionalOptions != null)
-        {
             foreach (var kvp in options.AdditionalOptions)
             {
                 var value = GetConfigValue(kvp.Value);
@@ -93,30 +82,6 @@ public static class FormattersConfigExtractor
                     config.AdditionalSettings[kvp.Key] = value;
                 }
             }
-        }
-
-        return config;
-    }
-
-    private static FormatterConfiguration ConvertJsonElementToFormatterConfiguration(JsonElement element)
-    {
-        var config = new FormatterConfiguration();
-
-        foreach (var property in element.EnumerateObject())
-        {
-            if (string.Equals(property.Name, "outputFilePath", StringComparison.OrdinalIgnoreCase))
-            {
-                config.OutputFilePath = property.Value.GetString();
-            }
-            else
-            {
-                var value = GetConfigValue(property.Value);
-                if (value != null)
-                {
-                    config.AdditionalSettings[property.Name] = value;
-                }
-            }
-        }
 
         return config;
     }
