@@ -1,11 +1,7 @@
 # [vNext]
 
 ## Improvements:
-<<<<<<< update_Cucumber_Dependencies_01_2026
 * Updated Cucumber dependencies to: Gherkin v38.0.0, Cucumber.Messages v32.0.1 and Cucumber.HtmlFormatter v23.0.0. (#984)
-* Improve the command line dotnet new project templates to support .NET 10, xUnit v3 and support of implicit usings when appropriate. Removed the option to include FluentAssertions from the template.
-=======
->>>>>>> main
 
 ## Bug fixes:
 
