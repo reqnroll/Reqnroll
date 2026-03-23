@@ -18,10 +18,11 @@ This documentation provides a comprehensive source of information about how to u
 
 ## How to use the documentation
 
-```{admonition} Documentation is in progress
-:class: warning
+```{admonition} Documentation suggestions
+:class: note
 
-We are currently in progress of reviewing and restructuring the documentation ported from SpecFlow. If you find any glitches, please help with fixing it in our GitHub repository. Each page contains a small ✏️ (*edit*) icon to perform quick edits.
+Feel free to suggest changes to our documentation!
+Each page contains a small ✏️ (*edit*) icon to perform quick edits.
 ```
 
 The documentation is structured in a way that you can find all relevant information quickly.

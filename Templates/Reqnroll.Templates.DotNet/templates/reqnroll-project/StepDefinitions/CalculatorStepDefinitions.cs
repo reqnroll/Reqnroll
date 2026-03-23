@@ -1,4 +1,6 @@
+<!--#if (!useImplicitUsings) -->
 using Reqnroll;
+<!--#endif -->
 
 namespace Template.StepDefinitions;
 
