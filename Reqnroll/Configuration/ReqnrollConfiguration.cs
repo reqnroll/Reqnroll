@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Reqnroll.BindingSkeletons;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.Configuration
 {
@@ -33,7 +34,8 @@ namespace Reqnroll.Configuration
             string[] addNonParallelizableMarkerForTags,
             bool disableFriendlyTestNames,
             ObsoleteBehavior obsoleteBehavior,
-            bool coloredOutput
+            bool coloredOutput,
+            IDictionary<string, FormatterConfiguration> formatters
         )
         {
             ConfigSource = configSource;
@@ -54,6 +56,7 @@ namespace Reqnroll.Configuration
             DisableFriendlyTestNames = disableFriendlyTestNames;
             ObsoleteBehavior = obsoleteBehavior;
             ColoredOutput = coloredOutput;
+            Formatters = formatters ?? new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
         }
 
         public ConfigSource ConfigSource { get; set; }
@@ -86,6 +89,8 @@ namespace Reqnroll.Configuration
 
         public List<string> AdditionalStepAssemblies { get; set; }
 
+        public IDictionary<string, FormatterConfiguration> Formatters { get; set; }
+
         protected bool Equals(ReqnrollConfiguration other) => ConfigSource == other.ConfigSource
                                                               && Equals(CustomDependencies, other.CustomDependencies)
                                                               && Equals(GeneratorCustomDependencies, other.GeneratorCustomDependencies)
@@ -102,7 +107,8 @@ namespace Reqnroll.Configuration
                                                               && StepDefinitionSkeletonStyle == other.StepDefinitionSkeletonStyle
                                                               && AdditionalStepAssemblies.SequenceEqual(other.AdditionalStepAssemblies)
                                                               && AddNonParallelizableMarkerForTags.SequenceEqual(other.AddNonParallelizableMarkerForTags)
-                                                              && DisableFriendlyTestNames == other.DisableFriendlyTestNames;
+                                                              && DisableFriendlyTestNames == other.DisableFriendlyTestNames
+                                                              && Formatters == other.Formatters;
 
         public override bool Equals(object obj)
         {
@@ -145,6 +151,7 @@ namespace Reqnroll.Configuration
                 hashCode = (hashCode * 397) ^ (AdditionalStepAssemblies != null ? AdditionalStepAssemblies.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (AddNonParallelizableMarkerForTags != null ? AddNonParallelizableMarkerForTags.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ DisableFriendlyTestNames.GetHashCode();
+                hashCode = (hashCode * 397) ^ (Formatters != null ? Formatters.GetHashCode() : 0);
                 return hashCode;
             }
         }

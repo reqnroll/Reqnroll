@@ -11,7 +11,7 @@ namespace Reqnroll.Formatters.Configuration;
 /// When any consumer of this class asks for one of the properties of <see cref="IFormattersConfigurationProvider"/>,
 /// the class will resolve the configuration (only once).
 /// 
-/// One or more profiles may be read from the configuration file (<see cref="FileBasedConfigurationResolver"/>)
+/// One or more profiles may be read from the configuration file (<see cref="ReqnrollConfigConfigurationResolver"/>)
 /// then environment variable overrides are applied (first <see cref="JsonEnvironmentConfigurationResolver"/>, then <see cref="KeyValueEnvironmentConfigurationResolver"/>).
 /// </summary>
 public class FormattersConfigurationProvider : IFormattersConfigurationProvider
@@ -23,7 +23,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IFileBasedConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider, IVariableSubstitutionService variableSubstitutionService)
+    public FormattersConfigurationProvider(IReqnrollConfigConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider, IVariableSubstitutionService variableSubstitutionService)
     {
         _resolvers = [fileBasedConfigurationResolver, jsonEnvironmentConfigurationResolver, keyValueEnvironmentConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);

@@ -6,8 +6,7 @@ using System.Text.Json;
 namespace Reqnroll.Formatters.Configuration;
 
 /// <summary>
-/// Utility class for extracting formatters configuration from JSON content
-/// using the centralized JsonConfig deserialization.
+/// Utility class for extracting formatters configuration from JSON content.
 /// </summary>
 public static class FormattersConfigExtractor
 {
@@ -23,8 +22,8 @@ public static class FormattersConfigExtractor
 
         try
         {
-            var jsonConfig = JsonSerializer.Deserialize(jsonContent, JsonConfigurationSourceGenerator.Default.JsonConfig);
-            return ConvertFormattersElement(jsonConfig?.Formatters);
+            var jsonConfig = JsonSerializer.Deserialize(jsonContent, FormattersConfigurationSourceGenerator.Default.FormattersElement);
+            return ConvertFormattersElement(jsonConfig);
         }
         catch (JsonException)
         {
@@ -44,29 +43,20 @@ public static class FormattersConfigExtractor
         if (formatters == null)
             return result;
 
-        // Process known formatters
-        if (formatters.Html != null)
-        {
-            result["html"] = ConvertFormatterOptions(formatters.Html);
-        }
-
-        if (formatters.Message != null)
-        {
-            result["message"] = ConvertFormatterOptions(formatters.Message);
-        }
-
-        // Process additional/custom formatters captured by JsonExtensionData
-        if (formatters.AdditionalFormatters != null)
-            foreach (var kvp in formatters.AdditionalFormatters)
+        if (formatters.Formatters != null)
+            foreach (var kvp in formatters.Formatters)
             {
-                result[kvp.Key] = ConvertFormatterOptions(kvp.Value.Deserialize<FormatterOptionsElement>());
+                result[kvp.Key] = ConvertFormatterOptions(kvp.Value);
             }
     
         return result;
     }
 
-    private static FormatterConfiguration ConvertFormatterOptions(FormatterOptionsElement options)
+    internal static FormatterConfiguration ConvertFormatterOptions(FormatterOptionsElement options)
     {
+        if (options == null)
+            return new FormatterConfiguration();
+
         var config = new FormatterConfiguration
         {
             OutputFilePath = options.OutputFilePath
@@ -76,7 +66,7 @@ public static class FormattersConfigExtractor
         if (options.AdditionalOptions != null)
             foreach (var kvp in options.AdditionalOptions)
             {
-                var value = GetConfigValue(kvp.Value);
+                var value = ConvertJsonElement(kvp.Value);
                 if (value != null)
                 {
                     config.AdditionalSettings[kvp.Key] = value;
@@ -86,22 +76,32 @@ public static class FormattersConfigExtractor
         return config;
     }
 
-    private static object GetConfigValue(JsonElement valueElement)
+    private static object ConvertJsonElement(JsonElement element)
     {
-        switch (valueElement.ValueKind)
+        switch (element.ValueKind)
         {
             case JsonValueKind.String:
-                return valueElement.GetString();
-            case JsonValueKind.False:
-            case JsonValueKind.True:
-                return valueElement.GetBoolean();
+                return element.GetString();
             case JsonValueKind.Number:
-                return valueElement.GetDouble();
+                return element.TryGetInt64(out var l) ? (object)l : element.GetDouble();
+            case JsonValueKind.True:
+            case JsonValueKind.False:
+                return element.GetBoolean();
+            case JsonValueKind.Object:
+                var dict = new Dictionary<string, object>();
+                foreach (var prop in element.EnumerateObject())
+                    dict[prop.Name] = ConvertJsonElement(prop.Value);
+                return dict;
+            case JsonValueKind.Array:
+                var list = new List<object>();
+                foreach (var item in element.EnumerateArray())
+                    list.Add(ConvertJsonElement(item));
+                return list;
             case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
                 return null;
             default:
-                // For embedded JSON objects or arrays, keep as JsonElement
-                return valueElement;
+                throw new ArgumentOutOfRangeException($"Unexpected JsonElement.ValueKind: {element.ValueKind}. Formatter configuration only supports strings, numbers, booleans, null, nested objects and arrays of the above.");
         }
     }
 }

@@ -9,241 +9,106 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration;
 
 public class FormattersConfigExtractorTests
 {
-    [Fact]
-    public void ExtractFormatters_Should_Return_Empty_Dictionary_When_Json_Is_Null()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void ExtractFormatters_Should_Return_Empty_For_NullOrWhitespace(string input)
     {
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(null);
-
-        // Assert
-        result.Should().BeEmpty();
+        FormattersConfigExtractor.ExtractFormatters(input).Should().BeEmpty();
     }
 
     [Fact]
-    public void ExtractFormatters_Should_Return_Empty_Dictionary_When_Json_Is_Empty()
+    public void ExtractFormatters_Should_Return_Empty_For_Invalid_Json()
     {
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters("");
-
-        // Assert
-        result.Should().BeEmpty();
+        FormattersConfigExtractor.ExtractFormatters("{ not json }").Should().BeEmpty();
     }
 
     [Fact]
-    public void ExtractFormatters_Should_Return_Empty_Dictionary_When_Json_Has_No_Formatters()
+    public void ExtractFormatters_Should_Return_Empty_When_No_Formatters_Key()
     {
-        // Arrange
-        var json = @"{ ""language"": { ""feature"": ""en"" } }";
-
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result.Should().BeEmpty();
+        FormattersConfigExtractor.ExtractFormatters(@"{ ""other"": {} }").Should().BeEmpty();
     }
 
     [Fact]
-    public void ExtractFormatters_Should_Return_Empty_Dictionary_For_Invalid_Json()
+    public void ExtractFormatters_Should_Return_Formatter_With_OutputFilePath()
     {
-        // Arrange
-        var invalidJson = "{ not valid json }";
+        var result = FormattersConfigExtractor.ExtractFormatters(@"{
+            ""formatters"": { ""html"": { ""outputFilePath"": ""out.html"" } }
+        }");
 
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(invalidJson);
-
-        // Assert
-        result.Should().BeEmpty();
+        result["html"].OutputFilePath.Should().Be("out.html");
     }
 
     [Fact]
-    public void ExtractFormatters_Should_Extract_Known_Html_Formatter()
+    public void ConvertFormatterOptions_Should_Return_Empty_Config_For_Null()
     {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""html"": { ""outputFilePath"": ""report.html"" }
-            }
-        }";
+        var result = FormattersConfigExtractor.ConvertFormatterOptions(null);
 
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result.Should().ContainKey("html");
-        result["html"].OutputFilePath.Should().Be("report.html");
+        result.Should().NotBeNull();
+        result.OutputFilePath.Should().BeNull();
+        result.AdditionalSettings.Should().BeEmpty();
     }
 
-    [Fact]
-    public void ExtractFormatters_Should_Extract_Known_Message_Formatter()
+    [Theory]
+    [InlineData("stringVal", "hello", "hello")]
+    public void ConvertFormatterOptions_Should_Map_String_AdditionalOption(string key, string jsonValue, string expected)
     {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""message"": { ""outputFilePath"": ""messages.ndjson"" }
-            }
-        }";
-
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result.Should().ContainKey("message");
-        result["message"].OutputFilePath.Should().Be("messages.ndjson");
-    }
-
-    [Fact]
-    public void ExtractFormatters_Should_Extract_Custom_Formatter_Via_AdditionalFormatters()
-    {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""customFormatter"": { ""setting1"": ""value1"", ""setting2"": ""value2"" }
-            }
-        }";
-
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result.Should().ContainKey("customFormatter");
-        result["customFormatter"].AdditionalSettings["setting1"].Should().Be("value1");
-        result["customFormatter"].AdditionalSettings["setting2"].Should().Be("value2");
-    }
-
-    [Fact]
-    public void ExtractFormatters_Should_Extract_Multiple_Formatters()
-    {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""html"": { ""outputFilePath"": ""report.html"" },
-                ""message"": { ""outputFilePath"": ""messages.ndjson"" },
-                ""custom"": { ""customSetting"": ""customValue"" }
-            }
-        }";
-
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result.Should().HaveCount(3);
-        result.Should().ContainKeys("html", "message", "custom");
-    }
-
-    [Fact]
-    public void ExtractFormatters_Should_Handle_Additional_Options_On_Known_Formatter()
-    {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""html"": { 
-                    ""outputFilePath"": ""report.html"",
-                    ""customOption"": ""customValue""
-                }
-            }
-        }";
-
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result["html"].OutputFilePath.Should().Be("report.html");
-        result["html"].AdditionalSettings["customOption"].Should().Be("customValue");
-    }
-
-    [Fact]
-    public void ExtractFormatters_Should_Handle_Boolean_Config_Values()
-    {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""custom"": { ""enabled"": true, ""debug"": false }
-            }
-        }";
-
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result["custom"].AdditionalSettings["enabled"].Should().Be(true);
-        result["custom"].AdditionalSettings["debug"].Should().Be(false);
-    }
-
-    [Fact]
-    public void ExtractFormatters_Should_Handle_Numeric_Config_Values()
-    {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""custom"": { ""timeout"": 30.5, ""retries"": 3 }
-            }
-        }";
-
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
-
-        // Assert
-        result["custom"].AdditionalSettings["timeout"].Should().Be(30.5);
-        result["custom"].AdditionalSettings["retries"].Should().Be(3.0); // Numbers are parsed as double
-    }
-
-    [Fact]
-    public void ConvertFormattersElement_Should_Return_Empty_Dictionary_When_Null()
-    {
-        // Act
-        var result = FormattersConfigExtractor.ConvertFormattersElement(null);
-
-        // Assert
-        result.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void ConvertFormattersElement_Should_Return_Empty_Dictionary_When_No_Formatters_Defined()
-    {
-        // Arrange
-        var element = new FormattersElement();
-
-        // Act
-        var result = FormattersConfigExtractor.ConvertFormattersElement(element);
-
-        // Assert
-        result.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void ConvertFormattersElement_Should_Handle_Empty_Formatter_Options()
-    {
-        // Arrange
-        var element = new FormattersElement
+        var options = new FormatterOptionsElement
         {
-            Html = new FormatterOptionsElement()
+            AdditionalOptions = new Dictionary<string, JsonElement>
+            {
+                { key, JsonDocument.Parse($@"""{jsonValue}""").RootElement }
+            }
         };
 
-        // Act
-        var result = FormattersConfigExtractor.ConvertFormattersElement(element);
+        var result = FormattersConfigExtractor.ConvertFormatterOptions(options);
 
-        // Assert
-        result.Should().ContainKey("html");
-        result["html"].OutputFilePath.Should().BeNull();
-        result["html"].AdditionalSettings.Should().BeEmpty();
+        result.AdditionalSettings[key].Should().Be(expected);
     }
 
     [Fact]
-    public void ExtractFormatters_Should_Be_Case_Insensitive_For_Formatter_Names()
+    public void ConvertFormatterOptions_Should_Map_Boolean_AdditionalOption()
     {
-        // Arrange
-        var json = @"{
-            ""formatters"": {
-                ""HTML"": { ""outputFilePath"": ""report.html"" }
+        var options = new FormatterOptionsElement
+        {
+            AdditionalOptions = new Dictionary<string, JsonElement>
+            {
+                { "flag", JsonDocument.Parse("true").RootElement }
             }
-        }";
+        };
 
-        // Act
-        var result = FormattersConfigExtractor.ExtractFormatters(json);
+        FormattersConfigExtractor.ConvertFormatterOptions(options)
+            .AdditionalSettings["flag"].Should().Be(true);
+    }
 
-        // Assert
-        // The key should be accessible case-insensitively due to StringComparer.OrdinalIgnoreCase
-        result["html"].OutputFilePath.Should().Be("report.html");
-        result["HTML"].OutputFilePath.Should().Be("report.html");
+    [Fact]
+    public void ConvertFormatterOptions_Should_Map_Integer_AdditionalOption()
+    {
+        var options = new FormatterOptionsElement
+        {
+            AdditionalOptions = new Dictionary<string, JsonElement>
+            {
+                { "count", JsonDocument.Parse("42").RootElement }
+            }
+        };
+
+        FormattersConfigExtractor.ConvertFormatterOptions(options)
+            .AdditionalSettings["count"].Should().Be(42L);
+    }
+
+    [Fact]
+    public void ConvertFormatterOptions_Should_Exclude_Null_AdditionalOption()
+    {
+        var options = new FormatterOptionsElement
+        {
+            AdditionalOptions = new Dictionary<string, JsonElement>
+            {
+                { "nullKey", JsonDocument.Parse("null").RootElement }
+            }
+        };
+
+        FormattersConfigExtractor.ConvertFormatterOptions(options)
+            .AdditionalSettings.Should().NotContainKey("nullKey");
     }
 }

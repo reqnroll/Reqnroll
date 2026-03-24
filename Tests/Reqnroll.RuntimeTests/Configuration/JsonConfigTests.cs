@@ -502,6 +502,8 @@ namespace Reqnroll.RuntimeTests.Configuration
 
             config.AdditionalStepAssemblies.Should().NotBeNull();
             config.AdditionalStepAssemblies.Should().BeEmpty();
+
+            config.Formatters.Should().BeEmpty();
         }
 
         #region Formatters Deserialization Tests
@@ -528,25 +530,10 @@ namespace Reqnroll.RuntimeTests.Configuration
             var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
 
             jsonConfig.Formatters.Should().NotBeNull();
-            jsonConfig.Formatters.Html.Should().NotBeNull();
-            jsonConfig.Formatters.Html.OutputFilePath.Should().Be("report.html");
+            jsonConfig.Formatters["html"].Should().NotBeNull();
+            jsonConfig.Formatters["html"].OutputFilePath.Should().Be("report.html");
         }
 
-        [Fact]
-        public void Check_Formatters_Message_OutputFilePath()
-        {
-            string config = @"{
-                ""formatters"": {
-                    ""message"": { ""outputFilePath"": ""messages.ndjson"" }
-                }
-            }";
-
-            var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
-
-            jsonConfig.Formatters.Should().NotBeNull();
-            jsonConfig.Formatters.Message.Should().NotBeNull();
-            jsonConfig.Formatters.Message.OutputFilePath.Should().Be("messages.ndjson");
-        }
 
         [Fact]
         public void Check_Formatters_Multiple_Known_Formatters()
@@ -560,8 +547,8 @@ namespace Reqnroll.RuntimeTests.Configuration
 
             var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
 
-            jsonConfig.Formatters.Html.OutputFilePath.Should().Be("report.html");
-            jsonConfig.Formatters.Message.OutputFilePath.Should().Be("messages.ndjson");
+            jsonConfig.Formatters["html"].OutputFilePath.Should().Be("report.html");
+            jsonConfig.Formatters["message"].OutputFilePath.Should().Be("messages.ndjson");
         }
 
         [Fact]
@@ -576,8 +563,7 @@ namespace Reqnroll.RuntimeTests.Configuration
             var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
 
             jsonConfig.Formatters.Should().NotBeNull();
-            jsonConfig.Formatters.AdditionalFormatters.Should().NotBeNull();
-            jsonConfig.Formatters.AdditionalFormatters.Should().ContainKey("customFormatter");
+            jsonConfig.Formatters["customFormatter"].Should().NotBeNull();
         }
 
         [Fact]
@@ -594,8 +580,8 @@ namespace Reqnroll.RuntimeTests.Configuration
 
             var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
 
-            jsonConfig.Formatters.Html.OutputFilePath.Should().Be("report.html");
-            jsonConfig.Formatters.Html.AdditionalOptions.Should().ContainKey("customOption");
+            jsonConfig.Formatters["html"].OutputFilePath.Should().Be("report.html");
+            jsonConfig.Formatters["html"].AdditionalOptions.Should().ContainKey("customOption");
         }
 
         [Fact]
@@ -609,8 +595,8 @@ namespace Reqnroll.RuntimeTests.Configuration
 
             var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
 
-            jsonConfig.Formatters.Html.Should().NotBeNull();
-            jsonConfig.Formatters.Html.OutputFilePath.Should().BeNull();
+            jsonConfig.Formatters["html"].Should().NotBeNull();
+            jsonConfig.Formatters["html"].OutputFilePath.Should().BeNull();
         }
 
         #endregion

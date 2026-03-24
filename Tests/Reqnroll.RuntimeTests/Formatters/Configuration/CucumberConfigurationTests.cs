@@ -9,7 +9,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration;
 public class CucumberConfigurationTests
 {
     private readonly Mock<IFormattersConfigurationDisableOverrideProvider> _disableOverrideProviderMock;
-    private readonly Mock<IFileBasedConfigurationResolver> _fileResolverMock;
+    private readonly Mock<IReqnrollConfigConfigurationResolver> _fileResolverMock;
     private readonly Mock<IJsonEnvironmentConfigurationResolver> _jsonEnvironmentResolverMock;
     private readonly Mock<IKeyValueEnvironmentConfigurationResolver> _keyValueEnvironmentResolverMock;
     private readonly Mock<IVariableSubstitutionService> _variableSubstitutionServiceMock;   
@@ -18,7 +18,7 @@ public class CucumberConfigurationTests
     public CucumberConfigurationTests()
     {
         _disableOverrideProviderMock = new Mock<IFormattersConfigurationDisableOverrideProvider>();
-        _fileResolverMock = new Mock<IFileBasedConfigurationResolver>();
+        _fileResolverMock = new Mock<IReqnrollConfigConfigurationResolver>();
         _jsonEnvironmentResolverMock = new Mock<IJsonEnvironmentConfigurationResolver>();
         _keyValueEnvironmentResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
         _variableSubstitutionServiceMock = new Mock<IVariableSubstitutionService>();

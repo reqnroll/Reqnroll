@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Configuration.JsonConfig;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.Tracing;
 
@@ -49,6 +50,8 @@ namespace Reqnroll.Configuration
         public static ObsoleteBehavior DefaultObsoleteBehavior => ConfigDefaults.ObsoleteBehavior;
 
         public static bool DefaultColoredOutput => ConfigDefaults.ColoredOutput;
+
+        private static Dictionary<string, FormatterConfiguration> DefaultFormatters => ConfigDefaults.Formatters;
 
         public bool HasJsonConfig
         {
@@ -132,7 +135,8 @@ namespace Reqnroll.Configuration
                 DefaultAddNonParallelizableMarkerForTags,
                 DefaultDisableFriendlyTestNames,
                 DefaultObsoleteBehavior,
-                DefaultColoredOutput
+                DefaultColoredOutput,
+                DefaultFormatters
                 );
         }
 

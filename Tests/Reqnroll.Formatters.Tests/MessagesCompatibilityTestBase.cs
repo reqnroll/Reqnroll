@@ -13,6 +13,7 @@ using Reqnroll.Tracing;
 using Reqnroll.Utils;
 using System.Reflection;
 using Reqnroll.Time;
+using Reqnroll.Configuration.JsonConfig;
 
 namespace Reqnroll.Formatters.Tests;
 
@@ -165,10 +166,8 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var substitutionServiceMock = new Mock<IVariableSubstitutionService>();
         var env = new EnvironmentWrapper();
         var envOptions = new EnvironmentOptions(env);
-        var jsonConfigFileLocator = new ReqnrollJsonLocator();
-        var fileSystem = new FileSystem();
-        var fileService = new FileService();
-        var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
+        var configLoader = new ConfigurationLoader(new ReqnrollJsonLocator());
+        var configFileResolver = new ReqnrollConfigConfigurationResolver(configLoader);
         var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(envOptions);
 
         var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
