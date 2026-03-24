@@ -92,7 +92,8 @@ public class KeyValueEnvironmentConfigurationResolverTests
         // Assert
         result.Should().HaveCount(1);
         result.Should().ContainKey(SampleFormatterName)
-              .WhoseValue.Should().BeEmpty();
+              .WhoseValue.OutputFilePath.Should().BeNull();
+        result[SampleFormatterName].AdditionalSettings.Should().BeEmpty();
     }
 
     [Fact]
@@ -153,7 +154,7 @@ public class KeyValueEnvironmentConfigurationResolverTests
         // Assert
         result.Should().HaveCount(1);
         result.Should().ContainKey(SampleFormatterName)
-              .WhoseValue.Should().Contain("outputFilePath", "foo.txt");
+              .WhoseValue.OutputFilePath.Should().Be("foo.txt");
     }
 
     [Fact]
@@ -174,7 +175,7 @@ public class KeyValueEnvironmentConfigurationResolverTests
         // Assert
         result.Should().HaveCount(1);
         result.Should().ContainKey(SampleFormatterName)
-              .WhoseValue.Should().Contain("outputFilePath", "foo.txt");
+              .WhoseValue.OutputFilePath.Should().Be("foo.txt");
     }
 
     [Fact]
@@ -194,8 +195,8 @@ public class KeyValueEnvironmentConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(1);
-        result.Should().ContainKey(SampleFormatterName)
-              .WhoseValue.Should().Contain("setting1", "value1")
+        result.Should().ContainKey(SampleFormatterName);
+        result[SampleFormatterName].AdditionalSettings.Should().Contain("setting1", "value1")
               .And.Contain("setting2", "value2");
     }
 
@@ -216,8 +217,8 @@ public class KeyValueEnvironmentConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(1);
-        result.Should().ContainKey(SampleFormatterName)
-              .WhoseValue.Should().Contain("setting1", "value1")
+        result.Should().ContainKey(SampleFormatterName);
+        result[SampleFormatterName].AdditionalSettings.Should().Contain("setting1", "value1")
               .And.Contain("setting2", "value2");
     }
 
@@ -240,8 +241,8 @@ public class KeyValueEnvironmentConfigurationResolverTests
         // Assert
         result.Should().HaveCount(2);
         result.Should().ContainKey("f1")
-              .WhoseValue.Should().Contain("outputFilePath", "foo.txt");
+              .WhoseValue.OutputFilePath.Should().Be("foo.txt");
         result.Should().ContainKey("f2")
-              .WhoseValue.Should().Contain("outputFilePath", "bar.txt");
+              .WhoseValue.OutputFilePath.Should().Be("bar.txt");
     }
 }

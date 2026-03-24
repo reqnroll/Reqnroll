@@ -1,4 +1,6 @@
+using Reqnroll.Formatters.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
 
@@ -32,6 +34,7 @@ namespace Reqnroll.Configuration.JsonConfig
             var addNonParallelizableMarkerForTags = reqnrollConfiguration.AddNonParallelizableMarkerForTags;
             bool disableFriendlyTestNames = reqnrollConfiguration.DisableFriendlyTestNames;
             var obsoleteBehavior = reqnrollConfiguration.ObsoleteBehavior;
+            var formatters = new Dictionary<string, FormatterConfiguration>(reqnrollConfiguration.Formatters, StringComparer.OrdinalIgnoreCase);
 
             if (jsonConfig.Language != null)
             {
@@ -106,6 +109,13 @@ namespace Reqnroll.Configuration.JsonConfig
                 }
             }
 
+            if (jsonConfig.Formatters != null)
+            {
+                foreach (var formatterEntry in jsonConfig.Formatters)
+                {
+                    formatters[formatterEntry.Key] = FormattersConfigExtractor.ConvertFormatterOptions(formatterEntry.Value);
+                }
+            }
             return new ReqnrollConfiguration(
                 ConfigSource.Json,
                 containerRegistrationCollection,
@@ -124,7 +134,8 @@ namespace Reqnroll.Configuration.JsonConfig
                 addNonParallelizableMarkerForTags,
                 disableFriendlyTestNames,
                 obsoleteBehavior,
-                coloredOutput
+                coloredOutput,
+                formatters
             )
             {
                 ConfigSourceText = jsonContent

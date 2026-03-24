@@ -502,6 +502,103 @@ namespace Reqnroll.RuntimeTests.Configuration
 
             config.AdditionalStepAssemblies.Should().NotBeNull();
             config.AdditionalStepAssemblies.Should().BeEmpty();
+
+            config.Formatters.Should().BeEmpty();
         }
+
+        #region Formatters Deserialization Tests
+
+        [Fact]
+        public void Check_Formatters_IsNull_When_Not_Present()
+        {
+            string config = @"{}";
+
+            var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
+
+            jsonConfig.Formatters.Should().BeNull();
+        }
+
+        [Fact]
+        public void Check_Formatters_Html_OutputFilePath()
+        {
+            string config = @"{
+                ""formatters"": {
+                    ""html"": { ""outputFilePath"": ""report.html"" }
+                }
+            }";
+
+            var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
+
+            jsonConfig.Formatters.Should().NotBeNull();
+            jsonConfig.Formatters["html"].Should().NotBeNull();
+            jsonConfig.Formatters["html"].OutputFilePath.Should().Be("report.html");
+        }
+
+
+        [Fact]
+        public void Check_Formatters_Multiple_Known_Formatters()
+        {
+            string config = @"{
+                ""formatters"": {
+                    ""html"": { ""outputFilePath"": ""report.html"" },
+                    ""message"": { ""outputFilePath"": ""messages.ndjson"" }
+                }
+            }";
+
+            var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
+
+            jsonConfig.Formatters["html"].OutputFilePath.Should().Be("report.html");
+            jsonConfig.Formatters["message"].OutputFilePath.Should().Be("messages.ndjson");
+        }
+
+        [Fact]
+        public void Check_Formatters_CustomFormatter_CapturedInAdditionalFormatters()
+        {
+            string config = @"{
+                ""formatters"": {
+                    ""customFormatter"": { ""setting1"": ""value1"" }
+                }
+            }";
+
+            var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
+
+            jsonConfig.Formatters.Should().NotBeNull();
+            jsonConfig.Formatters["customFormatter"].Should().NotBeNull();
+        }
+
+        [Fact]
+        public void Check_Formatters_Html_AdditionalOptions_Captured()
+        {
+            string config = @"{
+                ""formatters"": {
+                    ""html"": { 
+                        ""outputFilePath"": ""report.html"",
+                        ""customOption"": ""customValue""
+                    }
+                }
+            }";
+
+            var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
+
+            jsonConfig.Formatters["html"].OutputFilePath.Should().Be("report.html");
+            jsonConfig.Formatters["html"].AdditionalOptions.Should().ContainKey("customOption");
+        }
+
+        [Fact]
+        public void Check_Formatters_EmptyFormatter_Parsed()
+        {
+            string config = @"{
+                ""formatters"": {
+                    ""html"": {}
+                }
+            }";
+
+            var jsonConfig = System.Text.Json.JsonSerializer.Deserialize(config, JsonConfigurationSourceGenerator.Default.JsonConfig);
+
+            jsonConfig.Formatters["html"].Should().NotBeNull();
+            jsonConfig.Formatters["html"].OutputFilePath.Should().BeNull();
+        }
+
+        #endregion
     }
 }

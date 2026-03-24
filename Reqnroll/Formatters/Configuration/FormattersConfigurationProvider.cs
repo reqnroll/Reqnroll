@@ -11,7 +11,7 @@ namespace Reqnroll.Formatters.Configuration;
 /// When any consumer of this class asks for one of the properties of <see cref="IFormattersConfigurationProvider"/>,
 /// the class will resolve the configuration (only once).
 /// 
-/// One or more profiles may be read from the configuration file (<see cref="FileBasedConfigurationResolver"/>)
+/// One or more profiles may be read from the configuration file (<see cref="ReqnrollConfigConfigurationResolver"/>)
 /// then environment variable overrides are applied (first <see cref="JsonEnvironmentConfigurationResolver"/>, then <see cref="KeyValueEnvironmentConfigurationResolver"/>).
 /// </summary>
 public class FormattersConfigurationProvider : IFormattersConfigurationProvider
@@ -23,7 +23,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IFileBasedConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider, IVariableSubstitutionService variableSubstitutionService)
+    public FormattersConfigurationProvider(IReqnrollConfigConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider, IVariableSubstitutionService variableSubstitutionService)
     {
         _resolvers = [fileBasedConfigurationResolver, jsonEnvironmentConfigurationResolver, keyValueEnvironmentConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
@@ -31,7 +31,8 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
         _variableSubstitutionService = variableSubstitutionService;
     }
 
-    public IDictionary<string, object> GetFormatterConfigurationByName(string formatterName)
+    /// <inheritdoc />
+    public FormatterConfiguration GetFormatterConfiguration(string formatterName)
     {
         var config = _resolvedConfiguration.Value;
         if (config.Formatters.TryGetValue(formatterName, out var formatterConfig))
@@ -41,16 +42,27 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 
     private FormattersConfiguration ResolveConfiguration()
     {
-        var combinedConfig = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+        var combinedConfig = new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var resolver in _resolvers)
         {
             foreach (var entry in resolver.Resolve())
             {
-                if (entry.Value == null) 
+                if (entry.Value == null)
+                {
+                    // null means "disable this formatter"
                     combinedConfig.Remove(entry.Key);
-                else 
+                }
+                else if (resolver.ShouldMergeSettings && combinedConfig.TryGetValue(entry.Key, out var existing))
+                {
+                    // Merge: only override settings that are explicitly set in the new config
+                    existing.MergeFrom(entry.Value);
+                }
+                else
+                {
+                    // Replace: set the entire configuration
                     combinedConfig[entry.Key] = entry.Value;
+                }
             }
         }
         bool enabled = combinedConfig.Count > 0 && !_envVariableDisableFlagProvider.Disabled();

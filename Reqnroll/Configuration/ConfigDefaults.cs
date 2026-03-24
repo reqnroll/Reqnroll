@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Reqnroll.BindingSkeletons;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.Configuration
 {
@@ -30,6 +32,7 @@ namespace Reqnroll.Configuration
         public const bool DisableFriendlyTestNames = false;
 
         public static readonly string[] AddNonParallelizableMarkerForTags = Array.Empty<string>();
+        public static Dictionary<string, FormatterConfiguration> Formatters => new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
     }
 // ReSharper restore RedundantNameQualifier
 }
