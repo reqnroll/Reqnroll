@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <!-- This target embeds the feature files and other assets delivered by the Cucumber.CCK package. -->
-  <Target Name="MakeCCKContentEmbeddedResource"
-          AfterTargets="ResolvePackageAssets"
-          BeforeTargets="CoreCompile">
+  <Target Name="MakeCCKContentEmbeddedResource" AfterTargets="ResolvePackageAssets" BeforeTargets="CoreCompile">
     <ItemGroup>
       <!-- Step 1: Start with Content items that have Link metadata -->
       <_CCKContent Include="@(Content)" Condition="'%(Link)' != ''">
@@ -33,8 +31,7 @@
       </_CCKContent>
 
       <!-- Step 2: Filter to only those matching the prefix -->
-      <_CCKContent Update="@(_CCKContent)"
-                   Condition="$([System.String]::new('%(LinkNormalized)').StartsWith('$(EmbeddedCCKContentPathPrefix)'))"/>
+      <_CCKContent Update="@(_CCKContent)" Condition="$([System.String]::new('%(LinkNormalized)').StartsWith('$(EmbeddedCCKContentPathPrefix)'))" />
 
       <!-- Step 3: Remove from Content and compute LogicalName -->
       <Content Remove="@(_CCKContent)" />
