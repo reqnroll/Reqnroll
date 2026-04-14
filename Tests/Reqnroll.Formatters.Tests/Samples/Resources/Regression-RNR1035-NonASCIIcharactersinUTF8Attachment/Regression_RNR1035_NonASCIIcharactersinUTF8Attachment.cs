@@ -20,9 +20,13 @@ internal class Attachments
     [When(@"attaching the non-ASCII string")]
     public void WhenAttachTextAs(string text)
     {
+        // Normalize line endings to LF so the file content — and therefore
+        // its Base64 encoding — is identical on Windows and Linux.
+        var normalizedText = text.Replace("\r\n", "\n");
+
         // write the string to a file as UTF-8 in current directory
         var fileName = $"Regression-RNR1035-NonASCIIcharactersinUTF8Attachment.txt";
-        System.IO.File.WriteAllText(fileName, text, Encoding.UTF8);
+        System.IO.File.WriteAllText(fileName, normalizedText, Encoding.UTF8);
         reqnrollOutputHelper.AddAttachment(fileName);
     }
 
