@@ -1,29 +1,30 @@
+using System;
 using System.IO;
 using System.Text;
 using Reqnroll.Utils;
 
 namespace Reqnroll.Tools.MsBuild.Generation;
 
-/// <summary>
-/// This class is going to be obsolete once we implement MsBuild level up-to-date checks.
-/// </summary>
 public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
 {
     public void WriteGeneratedFile(string outputPath, string generatedFileContent)
     {
+        var path = NormalizePath(outputPath);
         log.LogTaskDiagnosticMessage($"Writing data to {outputPath}");
-        WriteFile(outputPath, generatedFileContent);
+        WriteFile(path, generatedFileContent);
     }
 
     public void DeleteGeneratedFile(string outputPath)
     {
-        if (!File.Exists(outputPath))
+        var path = NormalizePath(outputPath);
+
+        if (!File.Exists(path))
             return;
 
         log.LogTaskDiagnosticMessage($"Deleting {outputPath}");
         try
         {
-            File.Delete(outputPath);
+            File.Delete(path);
         }
         catch (IOException ex)
         {
@@ -34,7 +35,7 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
     private void WriteFile(string filePath, string content)
     {
         string directoryPath = Path.GetDirectoryName(filePath);
-        if (directoryPath != null && !Directory.Exists(directoryPath))
+        if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath);
         }
@@ -42,13 +43,33 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
         WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
     }
 
-    /// <summary>
-    /// When building a multi-targeted project, the build system may try to write the same file multiple times,
-    /// and this can cause an IOException ("The process cannot access the file because it is being used by another process.").
-    /// See https://github.com/reqnroll/Reqnroll/issues/197
-    /// Once we move to Roslyn-based generation, this problem will go away, but for now, we use a workaround of
-    /// retrying the write operation a few times (the content is anyway the same).
-    /// </summary>
+    private static string NormalizePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("Path must not be null or empty.", nameof(path));
+
+        string fullPath = Path.GetFullPath(path);
+
+        // Cross-platform: only apply extended syntax on Windows.
+        if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+                System.Runtime.InteropServices.OSPlatform.Windows))
+        {
+            return fullPath;
+        }
+
+        // Already device/extended syntax.
+        if (fullPath.StartsWith(@"\\?\", StringComparison.Ordinal) ||
+            fullPath.StartsWith(@"\\.\", StringComparison.Ordinal))
+            return fullPath;
+
+        // UNC path.
+        if (fullPath.StartsWith(@"\\", StringComparison.Ordinal))
+            return @"\\?\UNC\" + fullPath.Substring(2);
+
+        // Drive-qualified path.
+        return @"\\?\" + fullPath;
+    }
+
     private void WriteAllTextWithRetry(string path, string contents, Encoding encoding)
     {
         const int maxAttempts = 5;
