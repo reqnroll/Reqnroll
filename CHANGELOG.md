@@ -3,9 +3,8 @@
 ## Improvements:
 
 ## Bug fixes:
-* Fix: Upgraded NuGetCommandLine package causes build warnings as errors
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+*Contributors of this release (in alphabetical order):* 
 
 # v3.3.4 - 2026-03-23
 
