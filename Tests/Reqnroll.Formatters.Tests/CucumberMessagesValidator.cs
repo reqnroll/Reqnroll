@@ -403,6 +403,7 @@ public partial class CucumberMessagesValidator
         // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal when comparing instances
         return options
                .ComparingByMembers<Attachment>()
+               .ComparingByMembers<ExternalAttachment>()
                .ComparingByMembers<Background>()
                .ComparingByMembers<Ci>()
                .ComparingByMembers<Comment>()

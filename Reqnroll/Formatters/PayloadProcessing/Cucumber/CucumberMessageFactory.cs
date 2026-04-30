@@ -3,9 +3,12 @@ using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.EnvironmentAccess;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
+using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -19,6 +22,12 @@ namespace Reqnroll.Formatters.PayloadProcessing.Cucumber;
 /// </summary>
 public class CucumberMessageFactory : ICucumberMessageFactory
 {
+    private readonly AttachmentHandlingOption _attachmentHandlingOption;
+
+    public CucumberMessageFactory(IUnitTestRuntimeProvider unitTestRuntimeProvider)
+    {
+        _attachmentHandlingOption = unitTestRuntimeProvider.AttachmentHandlingOption;
+    }
     private Timestamp ToTimestamp(DateTime timestamp)
     {
         return Converters.ToTimestamp(timestamp.ToUniversalTime());
@@ -188,7 +197,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     {
         return new StepMatchArgument(
             new Group(
-                [],
+                null,
                 argument.StartOffset,
                 argument.Value
             ),
@@ -268,6 +277,45 @@ public class CucumberMessageFactory : ICucumberMessageFactory
                                     ToTestStepResult(hookStepExecutionTracker), ToTimestamp(hookStepExecutionTracker.StepFinishedAt));
     }
 
+    public virtual bool TryCreateAttachmentEnvelope(AttachmentTracker tracker, out Envelope attachmentEnvelope)
+    {
+        var attachmentMessage = CreateAttachment(tracker);
+        switch (attachmentMessage)
+        {
+            case Attachment a:
+                attachmentEnvelope = Envelope.Create(a);
+                return true;
+            case ExternalAttachment ea:
+                attachmentEnvelope = Envelope.Create(ea);
+                return true;
+            default:
+                attachmentEnvelope = null;
+                return false;
+        }
+    }
+    public virtual object CreateAttachment(AttachmentTracker tracker)
+    {
+        return _attachmentHandlingOption switch
+        {
+            AttachmentHandlingOption.Embed => ToAttachment(tracker),
+            AttachmentHandlingOption.External => ToExternalAttachment(tracker),
+            AttachmentHandlingOption.None => null,
+            _ => throw new NotImplementedException($"Attachment handling option {_attachmentHandlingOption} is not implemented.")
+        };
+    }
+
+    public virtual ExternalAttachment ToExternalAttachment(AttachmentTracker tracker)
+    {
+        var filePath = tracker.FilePath;
+        return new ExternalAttachment(
+            filePath,
+            FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
+            tracker.TestCaseStartedId,
+            tracker.TestCaseStepId,
+            tracker.TestRunStartedId,
+            Converters.ToTimestamp(tracker.Timestamp));
+    }
+
     public virtual Attachment ToAttachment(AttachmentTracker tracker)
     {
         var filePath = tracker.FilePath;
@@ -316,7 +364,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
         return status switch
         {
             ScenarioExecutionStatus.OK => null,
-            ScenarioExecutionStatus.StepDefinitionPending => exception.Message,
+            ScenarioExecutionStatus.StepDefinitionPending => null,
             ScenarioExecutionStatus.UndefinedStep => exception.Message,
             ScenarioExecutionStatus.BindingError => null,
             ScenarioExecutionStatus.TestError => exception.Message,

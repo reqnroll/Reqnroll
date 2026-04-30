@@ -1,5 +1,6 @@
 using System;
 using Reqnroll.ErrorHandling;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.UnitTestProvider;
 
@@ -33,4 +34,9 @@ public interface IUnitTestRuntimeProvider
     /// <param name="exception">The exception that has been thrown during the step execution.</param>
     /// <returns>The detected <see cref="ScenarioExecutionStatus"/> or <c>null</c> in all other cases.</returns>
     ScenarioExecutionStatus? DetectExecutionStatus(Exception exception);
+
+    /// <summary>
+    /// Gets the <see cref="AttachmentHandlingOption"/> supported by the test execution framework. 
+    /// </summary>
+    AttachmentHandlingOption AttachmentHandlingOption { get; }
 }

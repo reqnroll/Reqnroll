@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Reqnroll;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Reqnroll.Formatters.Tests.Samples.Resources.examples_tables_undefined;
 
@@ -28,7 +27,8 @@ internal class examples_tables_undefined
     [Then("I should have {int} cucumbers")]
     public void ThenIShouldHaveCucumbers(int expectedCount)
     {
-        Assert.AreEqual(expectedCount, _count);
+        if (expectedCount != _count)
+            throw new ApplicationException($"Count: {_count} not equal to ExpectedCount: {expectedCount}");
     }
 
 }

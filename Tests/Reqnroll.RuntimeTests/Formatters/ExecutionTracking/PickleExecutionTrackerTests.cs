@@ -86,13 +86,26 @@ public class PickleExecutionTrackerTests
 
         _mockMessageFactory
             .Setup(m => m.ToAttachment(It.IsAny<AttachmentTracker>()))
-            .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1)));
+            .Returns(CreateFakeAttachmentMessage());
 
         _mockMessageFactory
             .Setup(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()))
             .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1)));
 
+        _mockMessageFactory.
+            Setup(m => m.TryCreateAttachmentEnvelope(It.IsAny<AttachmentTracker>(), out It.Ref<Envelope>.IsAny))
+            .Returns((AttachmentTracker tracker, out Envelope envelope) =>
+            {
+                envelope = Envelope.Create(CreateFakeAttachmentMessage()); 
+                return true; 
+            });
+
         _stepDefinitionsByMethodSignature.TryAdd(_mockHookBinding.Object, "hook-id");
+
+        static Attachment CreateFakeAttachmentMessage()
+        {
+            return new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1));
+        }
     }
 
     private void SetupMockContexts()
@@ -318,7 +331,7 @@ public class PickleExecutionTrackerTests
         // Act
         await tracker.ProcessEvent(attachmentEvent);
         // Assert
-        _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<AttachmentTracker>()), Times.Once);
+        _mockMessageFactory.Verify(m => m.TryCreateAttachmentEnvelope(It.IsAny<AttachmentTracker>(), out It.Ref<Envelope>.IsAny), Times.Once);
     }
 
     [Fact]

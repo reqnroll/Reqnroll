@@ -1,4 +1,5 @@
 using System;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.UnitTestProvider;
 using Xunit;
 
@@ -6,6 +7,8 @@ namespace Reqnroll.xUnit.ReqnrollPlugin;
 
 public class XUnitRuntimeProvider : IUnitTestRuntimeProvider
 {
+    public AttachmentHandlingOption AttachmentHandlingOption => AttachmentHandlingOption.None;
+
     public void TestPending(string message)
     {
         throw new XUnitPendingStepException($"Test pending: {message}");

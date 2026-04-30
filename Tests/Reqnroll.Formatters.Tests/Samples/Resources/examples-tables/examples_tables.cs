@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
 {
@@ -34,8 +33,9 @@ namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
 
         [Then("I should have {int} cucumbers")]
         public void ThenIShouldHaveCucumbers(int expectedCount)
-        { 
-           Assert.AreEqual(expectedCount, _count);
+        {
+            if (!expectedCount.Equals(_count))
+                throw new ApplicationException($"Count: {_count} not equal to ExpectedCount: {expectedCount}");
         }
 
         [Then("each person can eat {int} cucumbers")]
@@ -43,7 +43,8 @@ namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
         {
             var share = Math.Floor((double)_count / (1 + _friends));
 
-            Assert.AreEqual(p0, share);
+            if (p0 != share)
+                throw new ApplicationException($"Incorrect calculated share: {share} not equal to Expected share: {p0}");
         }
     }
 }

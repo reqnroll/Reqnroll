@@ -1,5 +1,6 @@
 ﻿using System;
 using Reqnroll.ErrorHandling;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.UnitTestProvider;
 using TUnit.Core.Exceptions;
 
@@ -10,6 +11,9 @@ namespace Reqnroll.TUnit.ReqnrollPlugin;
 /// </summary>
 public class TUnitRuntimeProvider : IUnitTestRuntimeProvider
 {
+    /// <inheritdoc/>
+    public AttachmentHandlingOption AttachmentHandlingOption => AttachmentHandlingOption.External;
+
     /// <inheritdoc />
     public void TestPending(string message)
     {

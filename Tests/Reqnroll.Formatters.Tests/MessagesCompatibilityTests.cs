@@ -1,3 +1,4 @@
+using Reqnroll.TestProjectGenerator;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -7,6 +8,7 @@ namespace Reqnroll.Formatters.Tests;
 public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 {
     [TestMethod]
+    [DataRow("all-statuses")] 
     [DataRow("ambiguous")]
     [DataRow("backgrounds")]
     [DataRow("cdata")]
@@ -38,8 +40,11 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     // that are not material to the CCK spec (such as IDs don't have to be generated in the same order, timestamps don't have to match, etc.)
     // The rules for what must match and what is allowed to not match are built in to a series of custom FluentAssertion validation rules
     // (located in the CucumberMessagesValidator class)
-    public void CCKScenarios(string testName)
-    { 
+    public void CCKScenarios(string testName, string featureFileSource = "CCK")
+    {
+        // Forcing the use of xUnit3 here as that framework supports embedded attachments which most CCK scenarios assume.
+        _testRunConfiguration.UnitTestProvider = TestProjectGenerator.UnitTestProvider.xUnit3;
+
         var featureFileName = testName.Replace("-", "_");
         ResetCucumberMessages(featureFileName);
         ResetCucumberMessagesHtml(featureFileName);
@@ -48,14 +53,14 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
         CucumberMessagesAddConfigurationFile("reqnroll_withBothFormatters.json");
         MimicAzurePipelinesEnvironment();
-        AddUtilClassWithFileSystemPath();
+        AddUtilClassWithFileSystemPath(featureFileSource);
 
-        AddFeatureFilesFromResources(featureFileName, "Samples", Assembly.GetExecutingAssembly());
+        AddFeatureFilesFromResources(featureFileName, featureFileSource, Assembly.GetExecutingAssembly());
         AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "Samples", Assembly.GetExecutingAssembly());
 
         ExecuteTests();
         var actualResults = GetActualResults(featureFileName).ToArray();
-        var validator = new CucumberMessagesValidator(actualResults, GetExpectedResults(featureFileName).ToArray());
+        var validator = new CucumberMessagesValidator(actualResults, GetExpectedResults(featureFileName, featureFileSource).ToArray());
         validator.ShouldPassBasicStructuralChecks();
         validator.ResultShouldPassAllComparisonTests();
         validator.ResultShouldPassSanityChecks();
@@ -95,9 +100,11 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("global-hooks-beforeall-error")] // Cucumber expects execution to continue after a hook failure
     [DataRow("global-hooks-afterall-error")] // Cucumber expects execution to continue after a hook failure
     [DataRow("global-hooks-attachments")] // Fails b/c we cannot obtain Reqnroll OutputHandler in global hooks
+    [DataRow("hooks-skipped")] // Reqnroll terminates execution on first hook failure; Cucumber expects execution of other hooks continue after a hook failure
     [DataRow("unknown-parameter-type")] // Reqnroll does not provide skeletons for missing Parameter Types
     [DataRow("regular-expression")] // Reqnroll does not support optional binding method arguments
     [DataRow("multiple-features-reversed")] // Reqnroll does not have the concept of specifying execution order via run-time parameter
+    [DataRow("test-run-exception")] // Reqnroll does not support a means of simulating a start-up failure
     // These scenarios are from the CCK, but Reqnroll cannot provide a compliant implementation. This is usually the result of differences in behavior or support of Gherkin features.
     // When these scenarios are run, expect them to fail.
     public void NonCompliantCCKScenarios(string testName)
@@ -128,6 +135,6 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
         _projectsDriver.AddNuGetPackage(plugin, version);
         var testName = $"{pluginName}-{testNameRoot}";
-        CCKScenarios(testName);
+        CCKScenarios(testName, "Samples");
     }
 }

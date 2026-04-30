@@ -1,5 +1,6 @@
 using System;
 using Reqnroll.BoDi;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.MSTest.ReqnrollPlugin;
@@ -7,6 +8,8 @@ namespace Reqnroll.MSTest.ReqnrollPlugin;
 public class MsTestRuntimeProvider(IObjectContainer container) : IUnitTestRuntimeProvider
 {
     private readonly Lazy<IMsTestRuntimeAdapter> _runtimeAdapter = new(container.Resolve<IMsTestRuntimeAdapter>);
+
+    public AttachmentHandlingOption AttachmentHandlingOption =>  AttachmentHandlingOption.External;
 
     public void TestPending(string message)
     {

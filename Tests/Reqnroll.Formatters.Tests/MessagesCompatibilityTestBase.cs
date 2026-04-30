@@ -201,9 +201,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         File.Exists(file).Should().BeTrue(file, $"File {v} should exist");
     }
 
-    protected void AddUtilClassWithFileSystemPath()
+    protected void AddUtilClassWithFileSystemPath(string pathsegment)
     {
-        string location = Path.Combine(AppContext.BaseDirectory, "Samples", "Resources");
+        string location = Path.Combine(AppContext.BaseDirectory, pathsegment, "Resources");
         AddBindingClass($$"""
                           public class FileSystemPath 
                           { 
@@ -212,9 +212,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                           """);
     }
 
-    protected IEnumerable<Envelope> GetExpectedResults(string testName)
+    protected IEnumerable<Envelope> GetExpectedResults(string testName, string source = "CCK")
     {
-        string[] expectedJsonText = GetExpectedJsonText(testName);
+        string[] expectedJsonText = GetExpectedJsonText(testName, source);
 
         foreach (var json in expectedJsonText)
         {
@@ -223,11 +223,11 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         }
     }
 
-    protected string[] GetExpectedJsonText(string testName)
+    protected string[] GetExpectedJsonText(string testName, string source)
     {
         var fileName = testName + "." + testName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
-        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, source, assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         return expectedJsonText;
     }
 
@@ -337,6 +337,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                 TestStepFinished finished => finished.TestCaseStartedId,
                 TestCaseFinished tcFin => tcFin.TestCaseStartedId,
                 Attachment att => att.TestCaseStartedId,
+                ExternalAttachment extAtt => extAtt.TestCaseStartedId,
                 TestRunHookStarted => null,
                 TestRunHookFinished => null,
                 Suggestion suggestion => FindTestCaseStartedFromStepPickleId(suggestion.PickleStepId),
