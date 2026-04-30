@@ -10,9 +10,9 @@ public class BindingFactory(
     : IBindingFactory
 {
     public IHookBinding CreateHookBinding(IBindingMethod bindingMethod, HookType hookType, BindingScope bindingScope,
-        int hookOrder)
+        int hookOrder, string errorMessage = null)
     {
-        return new HookBinding(bindingMethod, hookType, bindingScope, hookOrder);
+        return new HookBinding(bindingMethod, hookType, bindingScope, hookOrder, errorMessage);
     }
 
     public IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(StepDefinitionType stepDefinitionType, IBindingMethod bindingMethod, BindingScope bindingScope,

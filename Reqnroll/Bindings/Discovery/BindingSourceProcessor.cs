@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.PlatformCompatibility;
+using Cucumber.TagExpressions;
 
 namespace Reqnroll.Bindings.Discovery
 {
     public abstract class BindingSourceProcessor : IBindingSourceProcessor
     {
         private readonly IBindingFactory _bindingFactory;
+        private readonly IReqnrollTagExpressionParser _tagExpressionParser;
 
         private BindingSourceType _currentBindingSourceType = null;
         private BindingScope[] _typeScopes = null;
         private readonly List<IStepDefinitionBindingBuilder> _stepDefinitionBindingBuilders = new();
 
-        protected BindingSourceProcessor(IBindingFactory bindingFactory)
+        protected BindingSourceProcessor(IBindingFactory bindingFactory, IReqnrollTagExpressionParser tagExpressionParser)
         {
             _bindingFactory = bindingFactory;
+            _tagExpressionParser = tagExpressionParser;
         }
 
         public bool CanProcessTypeAttribute(string attributeTypeName)
@@ -75,7 +78,7 @@ namespace Reqnroll.Bindings.Discovery
         private IEnumerable<BindingScope> GetScopes(IEnumerable<BindingSourceAttribute> attributes)
         {
             return attributes.Where(attr => attr.AttributeType.TypeEquals(typeof(ScopeAttribute)))
-                .Select(attr => new BindingScope(attr.TryGetAttributeValue<string>("Tag"), attr.TryGetAttributeValue<string>("Feature"), attr.TryGetAttributeValue<string>("Scenario")));
+                .Select(attr => new BindingScope(_tagExpressionParser.Parse(attr.TryGetAttributeValue<string>("Tag")), attr.TryGetAttributeValue<string>("Feature"), attr.TryGetAttributeValue<string>("Scenario")));
         }
 
         private bool IsBindingType(BindingSourceType bindingSourceType)
@@ -156,7 +159,7 @@ namespace Reqnroll.Bindings.Discovery
 
             string[] tags = GetTagsDefinedOnBindingAttribute(hookAttribute);
             if (tags != null)
-                scopes = scopes.Concat(tags.Select(t => new BindingScope(t, null, null)));
+                scopes = scopes.Concat(tags.Select(t => new BindingScope(_tagExpressionParser.Parse(t), null, null)));
 
 
             ApplyForScope(scopes.ToArray(), scope => ProcessHookAttribute(bindingSourceMethod, hookAttribute, scope));
@@ -179,13 +182,15 @@ namespace Reqnroll.Bindings.Discovery
             int order = GetHookOrder(hookAttribute);
 
             var validationResult = ValidateHook(bindingSourceMethod, hookAttribute, hookType);
+            var scopeValidationResult = ValidateBindingScope(scope);
+            validationResult += scopeValidationResult;
             if (!validationResult.IsValid)
             {
                 OnValidationError(validationResult, true);
-                return;
             }
 
-            var hookBinding = _bindingFactory.CreateHookBinding(bindingSourceMethod.BindingMethod, hookType, scope, order);
+            var hookBinding = _bindingFactory.CreateHookBinding(bindingSourceMethod.BindingMethod, hookType, scope, order, 
+                scopeValidationResult.IsValid ? null : scopeValidationResult.CombinedErrorMessages);
 
             ProcessHookBinding(hookBinding);
         }
@@ -250,6 +255,8 @@ namespace Reqnroll.Bindings.Discovery
             var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>(nameof(StepDefinitionBaseAttribute.ExpressionType));
 
             var validationResult = ValidateStepDefinition(bindingSourceMethod, stepDefinitionAttribute);
+            validationResult += ValidateBindingScope(scope);
+
             if (!validationResult.IsValid)
             {
                 OnValidationError(validationResult, false);
@@ -349,6 +356,17 @@ namespace Reqnroll.Bindings.Discovery
             if (!IsScenarioSpecificHook(hookType) && !bindingSourceMethod.IsStatic)
                 result += BindingValidationResult.Error($"The binding methods for before/after feature and before/after test run events must be static: {bindingSourceMethod}");
 
+            return result;
+        }
+
+        protected virtual BindingValidationResult ValidateBindingScope(BindingScope bindingScope) 
+        { 
+            var result = BindingValidationResult.Valid;
+
+            if (bindingScope is { TagExpression: InvalidTagExpression invalidTagExpression })
+            {
+                result += BindingValidationResult.Error($"Invalid scope: {invalidTagExpression}");
+            }
             return result;
         }
 

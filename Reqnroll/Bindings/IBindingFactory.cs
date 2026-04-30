@@ -5,7 +5,7 @@ namespace Reqnroll.Bindings
     public interface IBindingFactory
     {
         IHookBinding CreateHookBinding(IBindingMethod bindingMethod, HookType hookType, BindingScope bindingScope,
-            int hookOrder);
+            int hookOrder, string errorMessage = null);
 
         IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(StepDefinitionType stepDefinitionType, IBindingMethod bindingMethod, BindingScope bindingScope,
             string expressionString, ExpressionType expressionType);

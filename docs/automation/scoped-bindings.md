@@ -6,7 +6,7 @@ In some cases however, it is necessary to restrict when step definitions or hook
 
 You can restrict the execution of scoped bindings by:
 
-- tag
+- tag expression
 - feature (using the feature title)
 - scenario (using the scenario title)
 
@@ -28,6 +28,23 @@ Use the `[Scope]` attribute to define the scope:
 [Scope(Tag = "mytag", Feature = "feature title", Scenario = "scenario title")]
 ```
 
+## Tag expressions
+A tag expression is an infix boolean expression. Below are some examples:
+
+|Expression|Description|
+|----------|-----------|
+|@fast|	Scenarios tagged with @fast|
+|@wip and not @slow|	Scenarios tagged with @wip that aren't also tagged with @slow|
+|@smoke and @fast|	Scenarios tagged with both @smoke and @fast|
+|@gui or @database|	Scenarios tagged with either @gui or @database|
+
+```{note}
+The '@' prefix is required within a tag expression, except for single-term expressions (such as "foo").
+```
+For even more advanced tag expressions you can use parenthesis for clarity, or to change operator precedence:
+
+    (@smoke or @ui) and (not @slow)
+
 ## Scoping Rules
 
 Scope can be defined at the method or class level.
@@ -43,12 +60,12 @@ The following example combines the feature name and the tag scope with "AND":
 
 If multiple `[Scope]` attributes are defined for the same method or class, the attributes are combined with OR, i.e. at least one of the `[Scope]` attributes needs to match.
 
-The following example combines the tag scopes with "OR":
+The following example combines the scopes with "OR":
 
 ```{code-block} csharp
 :caption: Step Definition File
-[Scope(Tag = "thisTag")] [Scope(Tag = "OrThisTag")]
-[Scope(Tag = "thisTag"), Scope(Tag = "OrThisTag")]
+[Scope(Tag = "@thisTag or @thatTag", Feature = "thisFeature")]
+[Scope(Tag = "@anotherTag", Feature="thatFeature")]
 ```
 
 ````{note}
@@ -103,6 +120,7 @@ public void PerformSimpleSearch(string title)
 }
 ```
 
+
 ## Scoping Tips & Tricks
 
 The following example shows a way to "ignore" executing the scenarios marked with `@manual`. However Reqnroll's tracing will still display the steps, so you can work through the manual scenarios by following the steps in the report.
@@ -127,6 +145,11 @@ public class ManualSteps
     {
     }
 }
+```
+
+```{note}
+Can this next section be deleted completely, given that tag expressions can now perform what the example attempts to show?
+If we wish to retain this section, we need a more compelling example.
 ```
 
 ## Beyond Scope

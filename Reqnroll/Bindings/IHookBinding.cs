@@ -4,5 +4,7 @@ namespace Reqnroll.Bindings
     {
         HookType HookType { get; }
         int HookOrder { get; }
+        bool IsValid { get; }
+        string ErrorMessage { get; }
     }
 }
