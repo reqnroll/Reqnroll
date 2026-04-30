@@ -63,6 +63,7 @@ public static class EnvelopeExtensions
     public static readonly Type[] EnvelopeContentTypes =
     [
         typeof(Attachment),
+        typeof(ExternalAttachment),
         typeof(GherkinDocument),
         typeof(Hook),
         typeof(Meta),
@@ -88,6 +89,7 @@ public static class EnvelopeExtensions
     {
         object result = null;
         if (envelope.Attachment != null) { result = envelope.Attachment; }
+        else if (envelope.ExternalAttachment != null) { result = envelope.ExternalAttachment; }
         else if (envelope.GherkinDocument != null) { result = envelope.GherkinDocument; }
         else if (envelope.Hook != null) { result = envelope.Hook; }
         else if (envelope.Meta != null) { result = envelope.Meta; }
@@ -122,6 +124,7 @@ public static class EnvelopeExtensions
         else if (envelope.TestRunHookStarted != null) { result = envelope.TestRunHookStarted.Timestamp; }
         else if (envelope.TestRunHookFinished != null) { result = envelope.TestRunHookFinished.Timestamp; }
         else if (envelope.Attachment != null) { result = envelope.Attachment.Timestamp; }
+        else if (envelope.ExternalAttachment != null) { result = envelope.ExternalAttachment.Timestamp; }
         else throw new ArgumentException($"Envelope of type: {envelope.Content().GetType()} does not contain a timestamp");
         return result;
     }

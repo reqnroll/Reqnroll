@@ -355,6 +355,6 @@ public class FeatureLevelMessagesTests
     #endregion
     private Source Source1 => new("Source1URI", "Feature 1", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
     private GherkinDocument GherkinDocument1 => new("URI1", new Feature(new Location(0,0), new List<Tag>(), "en", "Feature", "gherkin doc", "", new List<FeatureChild>()), new List<Comment>());
-    private Pickle Pickle1 => new("pickleId1", "URI1", "pickle 1", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
-    private Pickle Pickle2 => new("pickleId2", "URI2", "pickle 2", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
+    private Pickle Pickle1 => new("pickleId1", "URI1", new Location(0, 0), "pickle 1", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
+    private Pickle Pickle2 => new("pickleId2", "URI2", new Location(0, 0), "pickle 2", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
 }

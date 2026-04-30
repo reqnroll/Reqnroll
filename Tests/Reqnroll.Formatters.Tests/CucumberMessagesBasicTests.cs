@@ -334,4 +334,46 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
 
         ShouldAllScenariosPass();
     }
+
+    [TestMethod]
+    public void SmokeEmitsExternalAttachmentMessagesWhenConfigured()
+    {
+        ResetCucumberMessages("Smoke reqnroll_externalAttachments_report");
+        EnableCucumberMessages();
+        CucumberMessagesAddConfigurationFile("reqnroll_withExternalAttachments.json");
+        //SetCucumberMessagesOutputFileName("reqnroll_externalAttachments_report");
+        AddFeatureFile("""
+                       Feature: Cucumber Messages Smoke External Attachment Test
+                         Scenario: Attach External File
+                            When I attach an external file
+                       """);
+        AddBindingClass("""
+                        using Reqnroll;
+                        using System;
+                        using System.IO;
+                        namespace CucumberMessages.CompatibilityTests.Smoke
+                        {
+                            [Binding]
+                            internal class ExternalAttachmentSteps(IReqnrollOutputHelper outputHelper)
+                            {
+                                [When("I attach an external file")]
+                                public void WhenIAttachAnExternalFile()
+                                {
+                                    var assembly = typeof(Io.Cucumber.Messages.Types.ExternalAttachment).Assembly;
+                                    var version = assembly.GetName().Version;
+                                    var fileVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+                                    Console.WriteLine($"Cucumber.Messages runtime version: {version}");
+                                    Console.WriteLine($"File version: {fileVersion.FileVersion}");
+                                    Console.WriteLine($"Location: {assembly.Location}");
+                                    outputHelper.AddAttachment("Smoke.png");
+                                }
+                            }
+                        }
+                        """);
+        ExecuteTests();
+        ShouldAllScenariosPass();
+        var actualResults = GetActualResults("Smoke reqnroll_externalAttachments_report").ToList();
+        var exA = actualResults.Where(e => e.ExternalAttachment != null).FirstOrDefault();
+        exA.Should().NotBeNull("Expected actual results to contain an ExternalAttachment Message");
+    }
 }

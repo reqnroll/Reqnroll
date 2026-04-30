@@ -41,7 +41,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-    public override void LaunchInner(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    public override void LaunchInner(IDictionary<string, object> formatterConfiguration, Action<bool, AttachmentHandlingOption> onInitialized)
     {
         var defaultBaseDirectory = ".";
         var configuredPath = ConfiguredOutputFilePath(formatterConfiguration)?.Trim();
@@ -67,7 +67,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
             }
             catch (System.Exception e)
             {
-                onInitialized(false);
+                onInitialized(false, AttachmentHandlingOption.None);
                 Logger.WriteMessage($"Invalid output file path string: {e.Message}. Formatter {Name} will be disabled.");
                 return;
             }
@@ -86,7 +86,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
 
         if (!FileFilter.IsValidFile(outputPath))
         {
-            onInitialized(false);
+            onInitialized(false, AttachmentHandlingOption.None);
             Logger.WriteMessage($"Path of configured formatter output file: {outputPath} is invalid or missing. Formatter {Name} will be disabled.");
             return;
         }
@@ -98,7 +98,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
             }
             catch (System.Exception e)
             {
-                onInitialized(false);
+                onInitialized(false, AttachmentHandlingOption.None);
                 Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {Name}. The formatter will be disabled."
                     + Environment.NewLine
                     + e.ToString());
@@ -162,13 +162,13 @@ public abstract class FileWritingFormatterBase : FormatterBase
         }
     }
 
-    protected virtual void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    protected virtual void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool, AttachmentHandlingOption> onInitialized)
     {
         try
         {
             TargetFileStream = CreateTargetFileStream(outputPath);
             OnTargetFileStreamInitialized(TargetFileStream);
-            onInitialized(true);
+            onInitialized(true, base.AttachmentHandlingOption);
             Logger.WriteMessage($"Formatter {Name} opened file stream.");
         }
         catch (System.Exception e)
@@ -177,7 +177,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
                                  + Environment.NewLine
                                  + e.ToString());
 
-            onInitialized(false);
+            onInitialized(false, AttachmentHandlingOption.None);
         }
     }
 
