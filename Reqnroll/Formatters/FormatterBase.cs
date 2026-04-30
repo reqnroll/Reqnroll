@@ -91,25 +91,23 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
             return;
         }
 
-        await PostedMessages.Writer.WriteAsync(message);
-
-        // If the _publisher sends the TestRunFinished message, then we can safely shut down.
-        if (message.Content() is TestRunFinished)
+        if (!PostedMessages.Writer.TryWrite(message))
         {
-            _logger.WriteMessage($"DEBUG: Formatters.Plugin {Name} has received the TestRunFinished message and is calling CloseAsync");
-            await CloseAsync();
+            Logger.WriteMessage($"Cannot add message {message.Content().GetType().Name} to formatter {Name} - channel is no longer accepting messages.");
+            return;
         }
     }
 
     protected abstract Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken);
 
-    internal async Task CloseAsync()
+    public async Task CloseAsync()
     {
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close called on formatter {Name}; formatter task was launched: {_formatterTask != null}");
 
         if (PostedMessages.Reader.Completion.IsCompleted || _formatterTask!.IsCompleted)
             throw new InvalidOperationException($"Formatter {Name} has invoked Close when it is already in a closed state.");
 
+        Closed = true;
         PostedMessages.Writer.Complete();
 
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the Channel is closed. Awaiting the writing task.");

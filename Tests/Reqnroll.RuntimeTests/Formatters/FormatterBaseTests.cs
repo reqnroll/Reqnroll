@@ -90,14 +90,33 @@ public class FormatterBaseTests
     }
 
     [Fact]
-    public async Task PublishAsync_Writes_Message_And_Closes_On_TestRunFinished()
+    public async Task PublishAsync_Writes_TestRunFinished_Without_Triggering_Shutdown()
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object>());
         _sut.LaunchFormatter(_brokerMock.Object);
         var msg = Envelope.Create(new TestRunFinished("", false, new Timestamp(0, 0), null, ""));
         await _sut.PublishAsync(msg);
+
+        // TestRunFinished is treated like any other message — no implicit shutdown
         _sut.ConsumedMessages.Should().Contain(msg);
+
+        // Formatter is still open; explicit CloseAsync is required
+        await _sut.CloseAsync();
+    }
+
+    [Fact]
+    public async Task PublishAsync_Logs_When_Channel_No_Longer_Accepting()
+    {
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object>());
+        _sut.LaunchFormatter(_brokerMock.Object);
+        await _sut.CloseAsync();
+
+        // Channel is now completed; PublishAsync should log gracefully via TryWrite failure
+        var msg = Envelope.Create(new TestRunStarted(new Timestamp(0, 0), ""));
+        await _sut.PublishAsync(msg);
+        _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains("formatter is closed"))), Times.AtLeastOnce);
     }
 
     [Fact]
