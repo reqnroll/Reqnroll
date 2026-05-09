@@ -25,7 +25,6 @@ Scenario: Should be able to inject ScenarioContext
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithScenarioContext
 		{
 			public StepsWithScenarioContext(ScenarioContext scenarioContext)
@@ -54,7 +53,6 @@ Scenario: The same ScenarioContext should be inject in the same scenario
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithScenarioContext
 		{
 			private readonly ScenarioContext scenarioContext;
@@ -77,7 +75,6 @@ Scenario: The same ScenarioContext should be inject in the same scenario
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class AnotherStepsWithScenarioContext
 		{
 		    private readonly ScenarioContext scenarioContext;
@@ -112,7 +109,6 @@ Scenario: Different scenarios should have their own ScenarioContext injected
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithScenarioContext
 		{
 			private readonly ScenarioContext scenarioContext;
@@ -151,7 +147,6 @@ Scenario: Should be able to inject FeatureContext
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithScenarioContext
 		{
 			public StepsWithScenarioContext(FeatureContext featureContext)
@@ -180,7 +175,6 @@ Scenario: The same FeatureContext should be inject in the scenarios of the same 
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithFeatureContext
 		{
 			private readonly FeatureContext featureContext;
@@ -203,7 +197,6 @@ Scenario: The same FeatureContext should be inject in the scenarios of the same 
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class AnotherStepsWithFeatureContext
 		{
 		    private readonly FeatureContext featureContext;
@@ -243,7 +236,6 @@ Scenario: ScenarioContext can be accessed from Steps base class
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithScenarioContext : Steps
 		{
 			[Given(@"I put something into the context")]
@@ -258,7 +250,6 @@ Scenario: ScenarioContext can be accessed from Steps base class
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class AnotherStepsWithScenarioContext : Steps
 		{
 			[Then(@"something should be found in the context")]
@@ -285,7 +276,6 @@ Scenario: FeatureContext can be accessed from Steps base class
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithFeatureContext : Steps
 		{
 			[Given(@"I put something into the context")]
@@ -300,7 +290,6 @@ Scenario: FeatureContext can be accessed from Steps base class
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class AnotherStepsWithFeatureContext : Steps
 		{
 			[Then(@"something should be found in the context")]
@@ -332,7 +321,6 @@ Scenario: StepContext can be accessed from Steps base class
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class MySteps : Steps
 		{
 			[When(@"I do something")]
@@ -358,7 +346,6 @@ Scenario: StepContext can be accessed from the ScenarioContext
 		using System;
 		using Reqnroll;
 
-		[Binding]
 		public class StepsWithScenarioContext
 		{
 			private readonly ScenarioContext scenarioContext;

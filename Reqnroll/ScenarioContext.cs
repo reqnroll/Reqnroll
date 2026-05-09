@@ -90,8 +90,8 @@ public class ScenarioContext : ReqnrollContext, IScenarioContext
     /// <param name="bindingType">The type of the binding class.</param>
     /// <returns>The binding class instance</returns>
     /// <remarks>
-    /// The binding classes are the classes with the [Binding] attribute, that might
-    /// contain step definitions, hooks or step argument transformations. The method
+    /// The binding classes are the classes with which contain one or more methods decorated with binding attributes.
+    /// This includes step definitions, hooks or step argument transformations. The method
     /// is called when any binding method needs to be called.
     /// </remarks>
     public object GetBindingInstance(Type bindingType)

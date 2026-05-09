@@ -22,8 +22,8 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             //ARRANGE
             var sut = CreateBindingSourceProcessor();
 
-            var bindingSourceType = CreateSyntheticBindingSourceType();
             var bindingSourceMethod = CreateSyntheticStepDefBindingSourceMethod();
+            var bindingSourceType = CreateSyntheticBindingSourceType(bindingSourceMethod);
 
             //ACT
             sut.ProcessType(bindingSourceType).Should().BeTrue();
@@ -62,15 +62,13 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             };
         }
 
-        private BindingSourceType CreateSyntheticBindingSourceType()
+        private BindingSourceType CreateSyntheticBindingSourceType(BindingSourceMethod bindingSourceMethod)
         {
             var bindingSourceType = new BindingSourceType
             {
                 IsClass = true,
-                Attributes = new[]
-                {
-                    CreateBindingSourceAttribute("BindingAttribute", "Reqnroll.BindingAttribute")
-                },
+                Attributes = [],
+                MethodAttributes = bindingSourceMethod?.Attributes ?? []
             };
             return bindingSourceType;
         }
@@ -112,7 +110,7 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             var bindingSourceMethod = CreateBindingSourceMethod(typeof(StepDefClassWithAsyncVoid), nameof(StepDefClassWithAsyncVoid.AsyncVoidStepDef),
                 CreateBindingSourceAttribute("GivenAttribute", "Reqnroll.GivenAttribute").WithValue("an authenticated user"));
 
-            sut.ProcessType(CreateSyntheticBindingSourceType()).Should().BeTrue();
+            sut.ProcessType(CreateSyntheticBindingSourceType(bindingSourceMethod)).Should().BeTrue();
             sut.ProcessMethod(bindingSourceMethod);
             sut.BuildingCompleted();
 
@@ -126,7 +124,9 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
         {
             var sut = CreateBindingSourceProcessor();
 
-            var bindingSourceType = CreateSyntheticBindingSourceType();
+            var bindingSourceMethod = CreateSyntheticStepDefBindingSourceMethod();
+            var bindingSourceType = CreateSyntheticBindingSourceType(bindingSourceMethod);
+
             // make it invalid
             bindingSourceType.IsClass = isClass;
             bindingSourceType.IsGenericTypeDefinition = isGenericTypeDefinition;
@@ -143,10 +143,11 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
         {
             var sut = CreateBindingSourceProcessor();
 
-            var bindingSourceType = CreateSyntheticBindingSourceType();
-            bindingSourceType.IsAbstract = isClassAbstract;
             var bindingSourceMethod = CreateSyntheticStepDefBindingSourceMethod();
             bindingSourceMethod.IsStatic = isMethodStatic;
+
+            var bindingSourceType = CreateSyntheticBindingSourceType(bindingSourceMethod);
+            bindingSourceType.IsAbstract = isClassAbstract;
 
             sut.ProcessType(bindingSourceType).Should().BeTrue();
             sut.ProcessMethod(bindingSourceMethod);
@@ -164,9 +165,10 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
         {
             var sut = CreateBindingSourceProcessor();
 
-            var bindingSourceType = CreateSyntheticBindingSourceType();
             var bindingSourceMethod = CreateSyntheticHookBindingSourceMethod(hookType);
             bindingSourceMethod.IsStatic = false;
+
+            var bindingSourceType = CreateSyntheticBindingSourceType(bindingSourceMethod);
 
             sut.ProcessType(bindingSourceType).Should().BeTrue();
             sut.ProcessMethod(bindingSourceMethod);

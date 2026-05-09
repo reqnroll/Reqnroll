@@ -4,7 +4,6 @@ using Reqnroll;
 
 namespace {namespace}
 {
-    [Binding]
     public class {className}
     {
         private readonly IReqnrollOutputHelper _outputHelper;
