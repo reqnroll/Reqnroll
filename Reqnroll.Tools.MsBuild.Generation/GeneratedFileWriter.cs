@@ -70,6 +70,13 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
         return @"\\?\" + fullPath;
     }
 
+    /// <summary>
+    /// When building a multi-targeted project, the build system may try to write the same file multiple times,
+    /// and this can cause an IOException ("The process cannot access the file because it is being used by another process.").
+    /// See https://github.com/reqnroll/Reqnroll/issues/197
+    /// Once we move to Roslyn-based generation, this problem will go away, but for now, we use a workaround of
+    /// retrying the write operation a few times (the content is anyway the same).
+    /// </summary>
     private void WriteAllTextWithRetry(string path, string contents, Encoding encoding)
     {
         const int maxAttempts = 5;
