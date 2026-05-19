@@ -43,7 +43,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Cucumber.CCK" Version="29.1.4" />
+    <PackageReference Include="Cucumber.CCK" Version="29.2.2" />
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
