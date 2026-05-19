@@ -9,14 +9,14 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
 {
     public void WriteGeneratedFile(string outputPath, string generatedFileContent)
     {
-        var path = NormalizePath(outputPath);
+        var path = ChangePathToSupportLongPaths(outputPath);
         log.LogTaskDiagnosticMessage($"Writing data to {outputPath}");
         WriteFile(path, generatedFileContent);
     }
 
     public void DeleteGeneratedFile(string outputPath)
     {
-        var path = NormalizePath(outputPath);
+        var path = ChangePathToSupportLongPaths(outputPath);
 
         if (!File.Exists(path))
             return;
@@ -43,7 +43,7 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
         WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
     }
 
-    private static string NormalizePath(string path)
+    private static string ChangePathToSupportLongPaths(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             throw new ArgumentException("Path must not be null or empty.", nameof(path));
