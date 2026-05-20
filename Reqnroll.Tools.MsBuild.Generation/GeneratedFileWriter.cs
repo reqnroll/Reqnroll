@@ -9,9 +9,8 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
 {
     public void WriteGeneratedFile(string outputPath, string generatedFileContent)
     {
-        var path = ChangePathToSupportLongPaths(outputPath);
         log.LogTaskDiagnosticMessage($"Writing data to {outputPath}");
-        WriteFile(path, generatedFileContent);
+        WriteFile(outputPath, generatedFileContent);
     }
 
     public void DeleteGeneratedFile(string outputPath)
@@ -35,18 +34,19 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
     private void WriteFile(string filePath, string content)
     {
         string directoryPath = Path.GetDirectoryName(filePath);
-        if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
+        var longDirPath = ChangePathToSupportLongPaths(directoryPath);
+        if (!string.IsNullOrEmpty(longDirPath) && !Directory.Exists(longDirPath))
         {
-            Directory.CreateDirectory(directoryPath);
+            Directory.CreateDirectory(longDirPath);
         }
-
-        WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
+        var longPath = ChangePathToSupportLongPaths(filePath);
+        WriteAllTextWithRetry(longPath, content, Encoding.UTF8);
     }
 
     private static string ChangePathToSupportLongPaths(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
-            throw new ArgumentException("Path must not be null or empty.", nameof(path));
+            return path;
 
         string fullPath = Path.GetFullPath(path);
 
@@ -62,11 +62,11 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
             fullPath.StartsWith(@"\\.\", StringComparison.Ordinal))
             return fullPath;
 
-        // UNC path.
+        // UNC longDirPath.
         if (fullPath.StartsWith(@"\\", StringComparison.Ordinal))
             return @"\\?\UNC\" + fullPath.Substring(2);
 
-        // Drive-qualified path.
+        // Drive-qualified longDirPath.
         return @"\\?\" + fullPath;
     }
 
