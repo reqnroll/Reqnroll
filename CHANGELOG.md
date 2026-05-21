@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Reqnroll.SpecFlowCompatibility 3.3.4 package is not published (#1068)
+
+*Contributors of this release (in alphabetical order):* @304NotModified
 
 # v3.3.4 - 2026-03-23
 
