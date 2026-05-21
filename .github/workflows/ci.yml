@@ -3,12 +3,12 @@ name: CI
 on:
   push:
     branches: 
-      - 'main'
+      - 'product-lines/v3'
     paths-ignore:
       - README.md
       - CHANGELOG.md
   pull_request:
-    branches: [ "main" ]
+    branches: [ "product-lines/v3" ]
   workflow_dispatch:
     inputs:
       deploy_packages:
@@ -261,9 +261,9 @@ jobs:
         
         # Determine excluded rules based on branch
         $excludedRules = @()
-        if ("${{ github.ref }}" -ne "refs/heads/main") {
+        if ("${{ github.ref }}" -ne "refs/heads/product-lines/v3") {
           $excludedRules += "AssembliesMustBeOptimized"
-          Write-Output "::notice::Assembly optimization validation skipped for non-main branch"
+          Write-Output "::notice::Assembly optimization validation skipped for non-target branch"
         }
         
         foreach ($package in $packages) {
@@ -542,7 +542,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, validate-packages, component-tests, specs, system-tests-windows, system-tests-linux]
     environment: production_environment
-    if: github.ref == 'refs/heads/main' && needs.build.outputs.deploy_packages == 'true'
+    if: github.ref == 'refs/heads/product-lines/v3' && needs.build.outputs.deploy_packages == 'true'
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
