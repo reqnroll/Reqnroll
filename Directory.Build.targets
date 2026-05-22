@@ -142,6 +142,7 @@ if (Directory.Exists(TmpDirectory))
     <ItemGroup>
       <TfmSpecificDebugSymbolsFile
         Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent)"
+        TargetFramework="$(TargetFramework)"
         Condition="'%(Extension)' == '.pdb'"/>
     </ItemGroup>
 
