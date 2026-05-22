@@ -140,6 +140,7 @@ if (Directory.Exists(TmpDirectory))
   <!-- Included referenced project PDBs as part of the symbols package. -->
   <Target Name="CollectProjectReferenceDebugSymbolsForPack" DependsOnTargets="$(CollectProjectReferenceDebugSymbolsForPackDependsOn)">
     <ItemGroup>
+      <!-- Include symbols for PDB files in _ProjectReferenceCopyLocalPathsForPackAsComponent -->
       <TfmSpecificDebugSymbolsFile
         Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent)"
         TargetFramework="$(TargetFramework)"
@@ -147,6 +148,7 @@ if (Directory.Exists(TmpDirectory))
     </ItemGroup>
 
     <ItemGroup>
+      <!-- Include related PDB symbols for DLL files in _ProjectReferenceCopyLocalPathsForPackAsComponent -->
       <_TfmSpecificDebugSymbolsCandidate
         Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent->'%(RootDir)%(Directory)%(Filename).pdb')"
         Condition="'%(Extension)' != '.pdb'"/>
