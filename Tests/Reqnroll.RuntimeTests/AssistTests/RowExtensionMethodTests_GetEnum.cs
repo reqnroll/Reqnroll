@@ -67,6 +67,17 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void GetEnum_should_throw_when_the_value_is_not_defined_and_no_default_is_specified()
+        {
+            var table = new Table("Sex");
+            table.AddRow("Male");
+
+            Action act = () => table.Rows.First().GetEnum<Person>("SomethingThatDoesNotExist");
+
+            act.Should().Throw<IndexOutOfRangeException>();
+        }
+
+        [Fact]
         public void GetDiscreteEnum_should_return_enum_of_my_specified_type()
         {
             var table = new Table("Header Not Representing Property Of Any Class");

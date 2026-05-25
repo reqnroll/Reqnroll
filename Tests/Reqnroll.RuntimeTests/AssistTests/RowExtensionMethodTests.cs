@@ -309,6 +309,17 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void GetChar_should_throw_when_the_value_is_not_defined_and_no_default_is_specified()
+        {
+            var table = new Table("Character");
+            table.AddRow("M");
+
+            Action act = () => table.Rows.First().GetChar("SomethingThatDoesNotExist");
+
+            act.Should().Throw<IndexOutOfRangeException>();
+        }
+
+        [Fact]
         public void GetDouble_should_return_MinValue_when_the_value_is_empty()
         {
             var table = new Table("Amount");
