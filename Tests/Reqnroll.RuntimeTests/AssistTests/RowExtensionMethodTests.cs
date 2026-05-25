@@ -36,6 +36,15 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void GetString_should_return_the_specified_default_if_the_value_is_not_defined()
+        {
+            var table = new Table("Name");
+            table.AddRow("John Galt");
+            table.Rows.First()
+                .GetString("SomethingThatDoesNotExist", "Anonymous").Should().Be("Anonymous");
+        }
+
+        [Fact]
         public void GetInt_should_return_the_int_from_the_row()
         {
             var table = new Table("Count");
@@ -54,12 +63,39 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void GetInt_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Count");
+            table.AddRow("4");
+            table.Rows.First()
+                .GetInt32("SomethingThatDoesNotExist", 42).Should().Be(42);
+        }
+
+        [Fact]
         public void GetInt_should_return_MinValue_when_the_value_is_empty()
         {
             var table = new Table("Count");
             table.AddRow("");
             table.Rows.First()
                 .GetInt32("Count").Should().Be(int.MinValue);
+        }
+
+        [Fact]
+        public void GetInt64_should_return_the_long_from_the_row()
+        {
+            var table = new Table("Count");
+            table.AddRow("922337203685477580");
+            table.Rows.First()
+                .GetInt64("Count").Should().Be(922337203685477580L);
+        }
+
+        [Fact]
+        public void GetInt64_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Count");
+            table.AddRow("4");
+            table.Rows.First()
+                .GetInt64("SomethingThatDoesNotExist", 42L).Should().Be(42L);
         }
 
         [Fact]
@@ -78,6 +114,15 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("4.01");
             table.Rows.First()
                 .GetDecimal("SomethingThatDoesNotExist").Should().Be(decimal.MinValue);
+        }
+
+        [Fact]
+        public void GetDecimal_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Amount");
+            table.AddRow("4.01");
+            table.Rows.First()
+                .GetDecimal("SomethingThatDoesNotExist", 12.34M).Should().Be(12.34M);
         }
 
         [Fact]
@@ -105,6 +150,16 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("4/28/2009 21:02:03");
             table.Rows.First()
                 .GetDateTime("SomethingThatDoesNotExist").Should().Be(DateTime.MinValue);
+        }
+
+        [Fact]
+        public void GetDateTime_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Birthdate");
+            table.AddRow("4/28/2009 21:02:03");
+            var defaultValue = new DateTime(2024, 12, 31, 8, 30, 0);
+            table.Rows.First()
+                .GetDateTime("SomethingThatDoesNotExist", defaultValue).Should().Be(defaultValue);
         }
 
         [Fact]
@@ -200,6 +255,15 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void GetBool_returns_the_specified_default_when_the_id_is_not_defined()
+        {
+            var table = new Table("IsNeat");
+            table.AddRow("false");
+            table.Rows.First()
+                .GetBoolean("SomethingThatDoesNotExist", true).Should().BeTrue();
+        }
+
+        [Fact]
         public void GetDouble_should_return_the_double_from_the_row()
         {
             var table = new Table("Amount");
@@ -227,6 +291,24 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void GetDouble_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Amount");
+            table.AddRow("4.01");
+            table.Rows.First()
+                .GetDouble("SomethingThatDoesNotExist", 12.34D).Should().Be(12.34D);
+        }
+
+        [Fact]
+        public void GetChar_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Character");
+            table.AddRow("M");
+            table.Rows.First()
+                .GetChar("SomethingThatDoesNotExist", 'X').Should().Be('X');
+        }
+
+        [Fact]
         public void GetDouble_should_return_MinValue_when_the_value_is_empty()
         {
             var table = new Table("Amount");
@@ -251,6 +333,16 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("285B31CC-C5C2-4630-A1C5-EE7431717C3F");
             table.Rows.First()
                 .GetGuid("SomethingThatDoesNotExist").Should().Be(new Guid());
+        }
+
+        [Fact]
+        public void GetGuid_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Guid");
+            table.AddRow("285B31CC-C5C2-4630-A1C5-EE7431717C3F");
+            var defaultValue = new Guid("11111111-1111-1111-1111-111111111111");
+            table.Rows.First()
+                .GetGuid("SomethingThatDoesNotExist", defaultValue).Should().Be(defaultValue);
         }
 
         [Fact]
@@ -287,6 +379,15 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow(11.11F.ToString());
             table.Rows.First()
                 .GetSingle("SomethingThatDoesNotExist").Should().Be(Single.MinValue);
+        }
+
+        [Fact]
+        public void GetSingle_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Amount");
+            table.AddRow(11.11F.ToString());
+            table.Rows.First()
+                .GetSingle("SomethingThatDoesNotExist", 12.34F).Should().Be(12.34F);
         }
 
         [Fact]
@@ -333,6 +434,16 @@ namespace Reqnroll.RuntimeTests.AssistTests
             Action act = () => firstRow.GetEnumValue<Sex>("SomethingThatDoesNotExist");
 
             act.Should().Throw<IndexOutOfRangeException>();
+        }
+
+        [Fact]
+        public void GetEnumValue_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Enum");
+            table.AddRow("Female");
+            var firstRow = table.Rows.First();
+
+            firstRow.GetEnumValue<Sex>("SomethingThatDoesNotExist", Sex.UnknownSex).Should().Be(Sex.UnknownSex);
         }
 
 		[Fact]

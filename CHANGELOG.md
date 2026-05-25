@@ -2,6 +2,7 @@
 
 ## Improvements:
 * Updated Cucumber dependencies to: Gherkin v39.1.0, Cucumber.Messages v32.0.1 and Cucumber.HtmlFormatter v23.1.0. Formatters.Tests modified by adopting use of Cucumber/CCK (v29.2.2). (#984)
+* Assist: Added optional default value parameters to `DataTableRow.GetXxx()` helpers for missing columns. (#1073)
 
 ## Bug fixes:
 * Fix: GenerateFeatureFileCodeBehindTask fails with misleading DirectoryNotFoundException when ndjson output path exceeds Windows MAX_PATH (260)
