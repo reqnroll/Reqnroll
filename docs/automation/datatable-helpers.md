@@ -10,7 +10,7 @@ When  helper methods expect a generic type (usually denoted as `<T>` in the meth
 
 ## `DataTableRow.GetXxx()` helpers
 
-Reqnroll also provides `DataTableRow.GetXxx()` extension methods for reading typed values directly from a row.
+Reqnroll also provides `DataTableRow.GetXxx()` extension methods for reading typed values directly from a row. For enum properties, `GetEnum<T>()` uses the owning model type (`T`) together with the column name to resolve the enum type.
 
 ```{code-block} csharp
 :caption: Step Definition File
