@@ -15,7 +15,7 @@ namespace Reqnroll.Assist
 
         public static int GetInt32(this DataTableRow row, string id, int? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue ?? int.MinValue;
 
             return TheValueIsNotEmpty(row, id)
@@ -25,7 +25,7 @@ namespace Reqnroll.Assist
 
         public static long GetInt64(this DataTableRow row, string id, long? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue ?? long.MinValue;
 
             return TheValueIsNotEmpty(row, id)
@@ -35,7 +35,7 @@ namespace Reqnroll.Assist
 
         public static decimal GetDecimal(this DataTableRow row, string id, decimal? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue ?? decimal.MinValue;
 
             return TheValueIsNotEmpty(row, id)
@@ -45,7 +45,7 @@ namespace Reqnroll.Assist
 
         public static DateTime GetDateTime(this DataTableRow row, string id, DateTime? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue ?? DateTime.MinValue;
 
             return TheValueIsNotEmpty(row, id)
@@ -55,7 +55,7 @@ namespace Reqnroll.Assist
 
         public static bool GetBoolean(this DataTableRow row, string id, bool? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
             {
                 if (defaultValue.HasValue)
                     return defaultValue.Value;
@@ -73,7 +73,7 @@ namespace Reqnroll.Assist
 
         public static double GetDouble(this DataTableRow row, string id, double? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue ?? double.MinValue;
 
             return TheValueIsNotEmpty(row, id)
@@ -83,7 +83,7 @@ namespace Reqnroll.Assist
 
         public static float GetSingle(this DataTableRow row, string id, float? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue ?? float.MinValue;
 
             return TheValueIsNotEmpty(row, id)
@@ -110,7 +110,7 @@ namespace Reqnroll.Assist
 
         public static T GetDiscreteEnum<T>(this DataTableRow row, string id, T defaultValue) where T : struct, IConvertible
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue;
 
             var value = row[id].Replace(" ", string.Empty);
@@ -174,7 +174,7 @@ namespace Reqnroll.Assist
 
         public static Guid GetGuid(this DataTableRow row, string id, Guid? defaultValue = null)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 return defaultValue ?? new Guid();
 
             return TheValueIsNotEmpty(row, id)
@@ -189,19 +189,19 @@ namespace Reqnroll.Assist
 
         private static bool TheValueIsNotEmpty(DataTableRow row, string id)
         {
-            return string.IsNullOrEmpty(row[id]) == false;
+            return !string.IsNullOrEmpty(row[id]);
         }
 
         private static void AssertThatThisIsAnAcceptableBoolValue(DataTableRow row, string id)
         {
             var acceptedValues = new[] { "true", "false" };
-            if (acceptedValues.Contains(row[id], StringComparer.OrdinalIgnoreCase) == false)
+            if (!acceptedValues.Contains(row[id], StringComparer.OrdinalIgnoreCase))
                 throw new InvalidCastException($"You must use 'true' or 'false' when setting bools for {id}");
         }
 
         private static void AssertThatAValueWithThisIdExistsInThisRow(DataTableRow row, string id)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 throw new InvalidOperationException($"{id} could not be found in the row.");
         }
 
