@@ -12,6 +12,22 @@ When  helper methods expect a generic type (usually denoted as `<T>` in the meth
 
 Reqnroll also provides `DataTableRow.GetXxx()` extension methods for reading typed values directly from a row. For enum properties, `GetEnum<T>()` uses the owning model type (`T`) together with the column name to resolve the enum type.
 
+The available row helper methods are:
+
+- `GetString()`
+- `GetInt32()`
+- `GetInt64()`
+- `GetDecimal()`
+- `GetDateTime()`
+- `GetBoolean()`
+- `GetDouble()`
+- `GetSingle()`
+- `GetChar()`
+- `GetDiscreteEnum<T>()`
+- `GetEnumValue<TEnum>()`
+- `GetEnum<T>()`
+- `GetGuid()`
+
 ```{code-block} csharp
 :caption: Step Definition File
 [Given(@"the account row is available")]
@@ -27,6 +43,10 @@ public void GivenTheAccountRowIsAvailable(DataTable table)
 ```
 
 The optional `defaultValue` parameter is used only when the requested column is missing from the row. If you omit the parameter, the existing helper-specific fallback behavior is preserved. Empty cells continue to behave as before, so supplying a default does not change how blank values are interpreted.
+
+```{note}
+Optional `defaultValue` parameters for these helpers were introduced in Reqnroll v4.
+```
 
 ## `CreateInstance<T>`
 
