@@ -1,12 +1,10 @@
+using System;
 using System.IO;
 using System.Text;
 using Reqnroll.Utils;
 
 namespace Reqnroll.Tools.MsBuild.Generation;
 
-/// <summary>
-/// This class is going to be obsolete once we implement MsBuild level up-to-date checks.
-/// </summary>
 public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
 {
     public void WriteGeneratedFile(string outputPath, string generatedFileContent)
@@ -17,13 +15,15 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
 
     public void DeleteGeneratedFile(string outputPath)
     {
-        if (!File.Exists(outputPath))
+        var path = ChangePathToSupportLongPaths(outputPath);
+
+        if (!File.Exists(path))
             return;
 
         log.LogTaskDiagnosticMessage($"Deleting {outputPath}");
         try
         {
-            File.Delete(outputPath);
+            File.Delete(path);
         }
         catch (IOException ex)
         {
@@ -34,12 +34,40 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
     private void WriteFile(string filePath, string content)
     {
         string directoryPath = Path.GetDirectoryName(filePath);
-        if (directoryPath != null && !Directory.Exists(directoryPath))
+        var longDirPath = ChangePathToSupportLongPaths(directoryPath);
+        if (!string.IsNullOrEmpty(longDirPath) && !Directory.Exists(longDirPath))
         {
-            Directory.CreateDirectory(directoryPath);
+            Directory.CreateDirectory(longDirPath);
+        }
+        var longPath = ChangePathToSupportLongPaths(filePath);
+        WriteAllTextWithRetry(longPath, content, Encoding.UTF8);
+    }
+
+    private static string ChangePathToSupportLongPaths(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return path;
+
+        string fullPath = Path.GetFullPath(path);
+
+        // Cross-platform: only apply extended syntax on Windows.
+        if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+                System.Runtime.InteropServices.OSPlatform.Windows))
+        {
+            return fullPath;
         }
 
-        WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
+        // Already device/extended syntax.
+        if (fullPath.StartsWith(@"\\?\", StringComparison.Ordinal) ||
+            fullPath.StartsWith(@"\\.\", StringComparison.Ordinal))
+            return fullPath;
+
+        // UNC longDirPath.
+        if (fullPath.StartsWith(@"\\", StringComparison.Ordinal))
+            return @"\\?\UNC\" + fullPath.Substring(2);
+
+        // Drive-qualified longDirPath.
+        return @"\\?\" + fullPath;
     }
 
     /// <summary>

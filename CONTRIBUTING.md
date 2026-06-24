@@ -76,6 +76,8 @@ In order to craft an excellent pull request:
 
    **IMPORTANT**: Making changes in `main` is not enabled. You should always keep your local `main` in sync with upstream `main` and make your changes in topic branches.
 
+   **Patching earlier product lines**: If you need to patch an older product line (for example patching v3 while current development is already v4), use the `product-lines/*` branches, e.g. `product-lines/v3`, as your base branch. In this case, when opening the pull request, make sure to set that product-line branch as the PR target branch (not `main`).
+
 5. Commit your changes in logical chunks. Keep your commit messages organized, with a short description in the first line and more detailed information on the following lines. Before submitting to review, feel free to use Git's [interactive rebase](https://docs.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
 
 6. Newly added tests should pass and be green, same applies to unit tests:

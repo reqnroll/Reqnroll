@@ -65,3 +65,12 @@ To release such a preview release, the following steps has to be done:
 1. Make sure everything is OK. You can even download the packages to be published for a smoke test if necessary. 
 1. If everything is fine, approve the deployment job.
 1. The job will publish the packages, tag the current commit and create a new commit with the updated version number and changelog header.
+
+## Creating a product line after a release
+
+If you start a new product line after a release (for example when `main` moves to v4 and v3 maintenance continues in `product-lines/v3`), complete the following steps on the new product-line branch:
+
+1. Create the product-line branch (for example `product-lines/v3`) from the appropriate release point.
+1. Update `.github/workflows/ci.yml` in that product-line branch to replace `main` references with the product-line branch name (push/PR triggers and branch-gated conditions).
+
+This is required to keep CI and PR validation active for the product line.
