@@ -10,11 +10,15 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// Tracks the information needed for a Cucumber Messages "test case step", that is a step with binding information.
 /// The test case step needs to be built upon the first execution attempt of a pickle.
 /// </summary>
-public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTracker parentTracker)
-    : StepTrackerBase(testStepId)
+public class TestStepTracker(string testStepId, string pickleStepId, int occurrence, TestCaseTracker parentTracker)
+    : StepTrackerBase(testStepId, occurrence)
 {
     public TestCaseTracker ParentTracker { get; } = parentTracker;
     public string PickleStepId { get; } = pickleStepId;
+
+    // Guards the one-time capture of binding details. The same ledger entry is reused across
+    // retry attempts; capturing more than once would append duplicate argument lists.
+    private bool _bindingDetailsCaptured;
 
     // Indicates whether the step was successfully bound to a Step Definition.
     public bool IsBound { get; private set; }
@@ -27,13 +31,14 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
 
     public bool IsAmbiguous { get; private set; }
 
-    public void ProcessEvent(StepStartedEvent stepStartedEvent)
-    {
-    }
-
-    // Once the StepFinishedAt event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method
+    // Once the StepFinishedAt event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method.
+    // This is idempotent: only the first attempt that runs the step to completion captures the binding details.
     public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
     {
+        if (_bindingDetailsCaptured)
+            return;
+        _bindingDetailsCaptured = true;
+
         DetectBindingStatus(stepFinishedEvent, out var isBound, out bool isAmbiguous, out List<string> stepDefinitionIds, out var bindingMatches);
         IsBound = isBound;
         IsAmbiguous = isAmbiguous;
