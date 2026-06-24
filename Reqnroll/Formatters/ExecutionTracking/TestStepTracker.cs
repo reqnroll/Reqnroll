@@ -37,9 +37,9 @@ public class TestStepTracker(string testStepId, string pickleStepId, int occurre
     {
         if (_bindingDetailsCaptured)
             return;
-        _bindingDetailsCaptured = true;
 
         DetectBindingStatus(stepFinishedEvent, out var isBound, out bool isAmbiguous, out List<string> stepDefinitionIds, out var bindingMatches);
+        _bindingDetailsCaptured = true;
         IsBound = isBound;
         IsAmbiguous = isAmbiguous;
         StepDefinitionIds = stepDefinitionIds;
