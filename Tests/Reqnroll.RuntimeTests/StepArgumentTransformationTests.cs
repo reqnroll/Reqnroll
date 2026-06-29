@@ -93,7 +93,7 @@ namespace Reqnroll.RuntimeTests
             var scenarioContext = new ScenarioContext(new ObjectContainer(), null, null, new TestObjectResolver());
             contextManagerStub.Setup(cm => cm.ScenarioContext).Returns(scenarioContext);
 
-            bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(stepTransformations);
+            bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(() => stepTransformations.OrderBy(s => s.Order));
         }
 
         private static IStepArgumentTransformationBinding CreateStepTransformationBinding(string regexString, IBindingMethod transformMethod)
