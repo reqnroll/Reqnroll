@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
@@ -25,7 +26,7 @@ namespace Reqnroll.RuntimeTests
         {
             Mock<IBindingRegistry> bindingRegistryStub = new Mock<IBindingRegistry>();
             _stepTransformations = new List<IStepArgumentTransformationBinding>();
-            bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(_stepTransformations);
+            bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(() => _stepTransformations.OrderBy(s => s.Order));
             _testTracer = new Mock<ITestTracer>();
 
             _stepArgumentTypeConverter = new StepArgumentTypeConverter(_testTracer.Object, bindingRegistryStub.Object, new Mock<IContextManager>().Object, methodBindingInvokerStub.Object);
@@ -160,6 +161,41 @@ namespace Reqnroll.RuntimeTests
             await _stepArgumentTypeConverter.ConvertAsync("1", typeToConvertTo, _enUSCulture);
             
             _testTracer.Verify(c => c.TraceWarning(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ShouldUseLowestOrderTransformationWhenMultipleMatch()
+        {
+            var methodInfo = typeof(TestClass).GetMethod(nameof(TestClass.StringToIntConverter));
+
+            // Create transformations in reverse order to ensure sorting is needed
+            var highOrderBinding = new StepArgumentTransformationBinding(@"1", new RuntimeBindingMethod(methodInfo), order: 100);
+            var lowOrderBinding = new StepArgumentTransformationBinding(@"1", new RuntimeBindingMethod(methodInfo), order: 5);
+
+            _stepTransformations.Add(highOrderBinding);
+            _stepTransformations.Add(lowOrderBinding);
+
+            // Track which binding is called
+            var invokedBindings = new List<IBinding>();
+            
+            var mockInvoker = new Mock<IAsyncBindingInvoker>();
+            mockInvoker
+                .Setup(i => i.InvokeBindingAsync(It.IsAny<IBinding>(), It.IsAny<IContextManager>(), It.IsAny<object[]>(), It.IsAny<ITestTracer>(), It.IsAny<DurationHolder>()))
+                .Callback<IBinding, IContextManager, object[], ITestTracer, DurationHolder>((binding, _, __, ___, ____) => invokedBindings.Add(binding))
+                .ReturnsAsync(42);
+
+            var mockBindingRegistry = new Mock<IBindingRegistry>();
+            mockBindingRegistry.Setup(br => br.GetStepTransformations()).Returns(() => _stepTransformations.OrderBy(s => s.Order).ToList());
+            
+            var converter = new StepArgumentTypeConverter(_testTracer.Object, mockBindingRegistry.Object, new Mock<IContextManager>().Object, mockInvoker.Object);
+
+            var typeToConvertTo = new RuntimeBindingType(typeof(int));
+            var result = await converter.ConvertAsync("1", typeToConvertTo, _enUSCulture);
+
+            // Verify that only the low-order transformation was invoked
+            invokedBindings.Should().ContainSingle();
+            (invokedBindings[0] as IStepArgumentTransformationBinding).Order.Should().Be(5);
+            result.Should().Be(42);
         }
 
         [TypeConverter(typeof(TessClassTypeConverter))]
