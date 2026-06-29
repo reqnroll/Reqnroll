@@ -181,7 +181,7 @@ namespace Reqnroll.RuntimeTests
             var mockInvoker = new Mock<IAsyncBindingInvoker>();
             mockInvoker
                 .Setup(i => i.InvokeBindingAsync(It.IsAny<IBinding>(), It.IsAny<IContextManager>(), It.IsAny<object[]>(), It.IsAny<ITestTracer>(), It.IsAny<DurationHolder>()))
-                .Callback<IBinding, IContextManager, object[], ITestTracer, DurationHolder>((binding, _, __, ___, ____) => invokedBindings.Add(binding))
+                .Callback<IBinding, IContextManager, object[], ITestTracer, DurationHolder>((binding, _, _, _, _) => invokedBindings.Add(binding))
                 .ReturnsAsync(42);
 
             var mockBindingRegistry = new Mock<IBindingRegistry>();
@@ -194,7 +194,8 @@ namespace Reqnroll.RuntimeTests
 
             // Verify that only the low-order transformation was invoked
             invokedBindings.Should().ContainSingle();
-            (invokedBindings[0] as IStepArgumentTransformationBinding).Order.Should().Be(5);
+            invokedBindings[0].Should().BeOfType<IStepArgumentTransformationBinding>();
+            invokedBindings[0].As<IStepArgumentTransformationBinding>().Order.Should().Be(5);
             result.Should().Be(42);
         }
 
