@@ -57,7 +57,8 @@ namespace Reqnroll.RuntimeTests.Bindings
 
             var result = sut.GetStepTransformations();
 
-            result.Should().BeEquivalentTo(new List<StepArgumentTransformationBinding> { sat1, sat2, sat3, sat4 });
+            // Expected order: sat3 (order 1), sat4 (order 2), sat1 (order 10000), sat2 (order 10000)
+            result.Should().BeEquivalentTo(new List<StepArgumentTransformationBinding> { sat3, sat4, sat1, sat2 });
         }
     }
 }
