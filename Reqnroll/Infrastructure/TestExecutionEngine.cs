@@ -6,6 +6,7 @@ using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
+using Reqnroll.Infrastructure.FeatureLifecycle;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
@@ -40,7 +41,12 @@ namespace Reqnroll.Infrastructure
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
         private readonly ITestPendingMessageFactory _testPendingMessageFactory;
         private readonly ITestUndefinedMessageFactory _testUndefinedMessageFactory;
+        private readonly IFeatureLifecycleManager _featureLifecycleManager;
         private readonly object _testRunnerEndExecutedLock = new();
+
+        // Tracks the current feature lifecycle state for this test thread (scenario-parallel mode only)
+        private FeatureLifecycleState _currentFeatureLifecycleState;
+        private FeatureInfo _currentFeatureInfo;
 
         private bool _testRunnerEndExecuted = false;
         private bool _testRunnerStartExecuted = false;
@@ -64,7 +70,8 @@ namespace Reqnroll.Infrastructure
             ITestPendingMessageFactory testPendingMessageFactory,
             ITestUndefinedMessageFactory testUndefinedMessageFactory,
             ITestObjectResolver testObjectResolver,
-            ITestRunContext testRunContext)
+            ITestRunContext testRunContext,
+            IFeatureLifecycleManager featureLifecycleManager)
         {
             _errorProvider = errorProvider;
             _bindingInvoker = bindingInvoker;
@@ -85,6 +92,7 @@ namespace Reqnroll.Infrastructure
             _testThreadExecutionEventPublisher = testThreadExecutionEventPublisher;
             _testPendingMessageFactory = testPendingMessageFactory;
             _testUndefinedMessageFactory = testUndefinedMessageFactory;
+            _featureLifecycleManager = featureLifecycleManager;
         }
 
         public FeatureContext FeatureContext => _contextManager.FeatureContext;
@@ -142,6 +150,12 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
         {
+            if (_reqnrollConfiguration.ParallelizationScope == ParallelizationScope.Scenario)
+            {
+                await OnFeatureStartScenarioParallelAsync(featureInfo);
+                return;
+            }
+
             _contextManager.InitializeFeatureContext(featureInfo);
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new FeatureStartedEvent(FeatureContext));
@@ -160,8 +174,54 @@ namespace Reqnroll.Infrastructure
             }
         }
 
+        private async Task OnFeatureStartScenarioParallelAsync(FeatureInfo featureInfo)
+        {
+            // Track featureInfo so cleanup can always find it (even if FeatureContext is null after error)
+            _currentFeatureInfo = featureInfo;
+
+            // In scenario-parallel mode, feature lifecycle is ref-counted.
+            // BeforeFeature hooks execute exactly once (first scenario in).
+            var state = await _featureLifecycleManager.AcquireFeatureAsync(featureInfo, async (lifecycleState) =>
+            {
+                // This callback runs only on the winning thread — under the init lock.
+                _contextManager.InitializeFeatureContext(featureInfo);
+                await _testThreadExecutionEventPublisher.PublishEventAsync(new FeatureStartedEvent(FeatureContext));
+                try
+                {
+                    await FireEventsAsync(HookType.BeforeFeature);
+                }
+                catch (Exception e)
+                {
+                    _contextManager.FeatureContext.BeforeFeatureHookError = e;
+                    // Store the context even on failure so AfterFeature can access it
+                    lifecycleState.SharedFeatureContext = _contextManager.FeatureContext;
+                    lifecycleState.SharedFeatureContainer = _contextManager.FeatureContext.FeatureContainer;
+                    throw;
+                }
+                // Store the shared state INSIDE the lock — before other threads can read it
+                lifecycleState.SharedFeatureContext = _contextManager.FeatureContext;
+                lifecycleState.SharedFeatureContainer = _contextManager.FeatureContext.FeatureContainer;
+            });
+
+            _currentFeatureLifecycleState = state;
+
+            // Non-winning threads: point to the shared FeatureContext from the winning thread
+            if (!ReferenceEquals(_contextManager.FeatureContext, state.SharedFeatureContext))
+            {
+                if (_contextManager is not ContextManager concreteContextManager)
+                    throw new ReqnrollException("Scenario-level parallelism requires the default ContextManager implementation. Custom IContextManager implementations are not supported with ParallelizationScope.Scenario.");
+                concreteContextManager.SetSharedFeatureContext(state.SharedFeatureContext, state.SharedFeatureContainer);
+            }
+        }
+
         public virtual async Task OnFeatureEndAsync()
         {
+            if (_reqnrollConfiguration.ParallelizationScope == ParallelizationScope.Scenario)
+            {
+                await OnFeatureEndScenarioParallelAsync();
+                return;
+            }
+
             try
             {
                 await FireEventsAsync(HookType.AfterFeature);
@@ -179,6 +239,51 @@ namespace Reqnroll.Infrastructure
 
                 _contextManager.CleanupFeatureContext();
             }
+        }
+
+        private async Task OnFeatureEndScenarioParallelAsync()
+        {
+            // In scenario-parallel mode, AfterFeature hooks execute only when the last scenario leaves.
+            // Use _currentFeatureInfo (always set) rather than FeatureContext?.FeatureInfo (may be null on error path)
+            var featureInfo = _currentFeatureInfo;
+            if (featureInfo == null)
+                return;
+
+            var state = _currentFeatureLifecycleState;
+            _currentFeatureLifecycleState = null;
+            _currentFeatureInfo = null;
+
+            // Cleanup this thread's reference to the feature context
+            if (_contextManager.FeatureContext != null)
+                _contextManager.CleanupFeatureContext();
+
+            if (state == null)
+                return;
+
+            await _featureLifecycleManager.ReleaseFeatureAsync(featureInfo, async () =>
+            {
+                // This runs only for the last scenario — fire AfterFeature hooks.
+                // Use the SHARED feature context (contains state from BeforeFeature hooks).
+                if (_contextManager is not ContextManager concreteContextManager)
+                    throw new ReqnrollException("Scenario-level parallelism requires the default ContextManager implementation. Custom IContextManager implementations are not supported with ParallelizationScope.Scenario.");
+                concreteContextManager.SetSharedFeatureContext(state.SharedFeatureContext, state.SharedFeatureContainer);
+                try
+                {
+                    await FireEventsAsync(HookType.AfterFeature);
+                }
+                finally
+                {
+                    if (_reqnrollConfiguration.TraceTimings)
+                    {
+                        state.SharedFeatureContext.Stopwatch.Stop();
+                        var duration = state.SharedFeatureContext.Stopwatch.Elapsed;
+                        _testTracer.TraceDuration(duration, "Feature: " + state.SharedFeatureContext.FeatureInfo.Title);
+                    }
+
+                    await _testThreadExecutionEventPublisher.PublishEventAsync(new FeatureFinishedEvent(FeatureContext));
+                    _contextManager.CleanupFeatureContext();
+                }
+            });
         }
 
         public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)

@@ -1,4 +1,5 @@
 using Reqnroll.BoDi;
+using Reqnroll.Configuration;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
@@ -36,10 +37,18 @@ public class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     protected internal const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
     protected internal const string COLLECTION_ATTRIBUTE = "Xunit.CollectionAttribute";
 
-    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
+    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution | UnitTestGeneratorTraits.ScenarioLevelParallelism;
 
     public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
     {
+        // In scenario-parallel mode, skip the IClassFixture pattern entirely.
+        if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+            && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+        {
+            generationContext.TestClass.BaseTypes.Add(_objectCodeTypeReference);
+            return;
+        }
+
         _currentFixtureDataTypeDeclaration = _codeDomHelper.CreateGeneratedTypeDeclaration("FixtureData");
 
         // have to add the explicit object base class because of VB.NET
@@ -112,6 +121,13 @@ public class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
 
+        // In scenario-parallel mode, skip fixture initialization
+        if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+            && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+        {
+            return;
+        }
+
         // ValueTask IAsyncLifetime.InitializeAsync() { <fixtureSetupMethod>(); }
         var initializeMethod = new CodeMemberMethod
         {
@@ -142,6 +158,13 @@ public class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     {
         // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
+
+        // In scenario-parallel mode, skip fixture cleanup
+        if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+            && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+        {
+            return;
+        }
 
         // ValueTask IAsyncDisposable.DisposeAsync() { <fixtureTearDownMethod>(); }
         var disposeMethod = new CodeMemberMethod

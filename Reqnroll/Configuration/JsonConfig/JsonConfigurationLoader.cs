@@ -32,6 +32,7 @@ namespace Reqnroll.Configuration.JsonConfig
             var addNonParallelizableMarkerForTags = reqnrollConfiguration.AddNonParallelizableMarkerForTags;
             bool disableFriendlyTestNames = reqnrollConfiguration.DisableFriendlyTestNames;
             var obsoleteBehavior = reqnrollConfiguration.ObsoleteBehavior;
+            var parallelizationScope = reqnrollConfiguration.ParallelizationScope;
 
             if (jsonConfig.Language != null)
             {
@@ -59,6 +60,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 missingOrPendingStepsOutcome = jsonConfig.Runtime.MissingOrPendingStepsOutcome;
                 stopAtFirstError = jsonConfig.Runtime.StopAtFirstError;
                 obsoleteBehavior = jsonConfig.Runtime.ObsoleteBehavior;
+                parallelizationScope = jsonConfig.Runtime.ParallelizationScope;
 
                 if (jsonConfig.Runtime.Dependencies != null)
                 {
@@ -124,7 +126,8 @@ namespace Reqnroll.Configuration.JsonConfig
                 addNonParallelizableMarkerForTags,
                 disableFriendlyTestNames,
                 obsoleteBehavior,
-                coloredOutput
+                coloredOutput,
+                parallelizationScope
             )
             {
                 ConfigSourceText = jsonContent

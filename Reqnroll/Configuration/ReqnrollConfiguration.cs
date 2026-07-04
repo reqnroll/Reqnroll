@@ -33,7 +33,8 @@ namespace Reqnroll.Configuration
             string[] addNonParallelizableMarkerForTags,
             bool disableFriendlyTestNames,
             ObsoleteBehavior obsoleteBehavior,
-            bool coloredOutput
+            bool coloredOutput,
+            ParallelizationScope parallelizationScope = ParallelizationScope.Feature
         )
         {
             ConfigSource = configSource;
@@ -54,6 +55,7 @@ namespace Reqnroll.Configuration
             DisableFriendlyTestNames = disableFriendlyTestNames;
             ObsoleteBehavior = obsoleteBehavior;
             ColoredOutput = coloredOutput;
+            ParallelizationScope = parallelizationScope;
         }
 
         public ConfigSource ConfigSource { get; set; }
@@ -70,6 +72,7 @@ namespace Reqnroll.Configuration
         public bool StopAtFirstError { get; set; }
         public MissingOrPendingStepsOutcome MissingOrPendingStepsOutcome { get; set; }
         public ObsoleteBehavior ObsoleteBehavior { get; set; }
+        public ParallelizationScope ParallelizationScope { get; set; }
 
         //generator settings
         public bool AllowDebugGeneratedFiles { get; set; }

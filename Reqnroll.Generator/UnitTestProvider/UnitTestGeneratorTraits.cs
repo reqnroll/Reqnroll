@@ -7,6 +7,7 @@ namespace Reqnroll.Generator.UnitTestProvider
     {
         None = 0,
         RowTests = 1,
-        ParallelExecution = 2
+        ParallelExecution = 2,
+        ScenarioLevelParallelism = 4
     }
 }

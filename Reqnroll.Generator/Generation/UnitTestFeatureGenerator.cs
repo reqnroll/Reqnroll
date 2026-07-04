@@ -156,6 +156,19 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
         _linePragmaHandler.AddLinePragmaInitial(generationContext.TestClass, generationContext.Document.SourceFilePath, generationContext.FeatureFileInput?.CodeBehindFilePath);
 
+        // Store parallelization scope in CustomData for providers to access
+        generationContext.CustomData[nameof(ParallelizationScope)] = _reqnrollConfiguration.ParallelizationScope;
+
+        // Warn if scenario-level parallelism is requested but the provider doesn't declare support
+        if (_reqnrollConfiguration.ParallelizationScope == ParallelizationScope.Scenario
+            && !_testGeneratorProvider.GetTraits().HasFlag(UnitTestGeneratorTraits.ScenarioLevelParallelism))
+        {
+            generationContext.GenerationWarnings.Add(
+                $"The test provider '{_testGeneratorProvider.GetType().Name}' does not declare support for scenario-level parallelism. " +
+                "The generated code may not execute scenarios in parallel within a feature. " +
+                "Consider using a supported provider or reverting to 'Feature' parallelization scope.");
+        }
+
         _testGeneratorProvider.SetTestClass(generationContext, generationContext.Feature.Name, generationContext.Feature.Description);
 
         _decoratorRegistry.DecorateTestClass(generationContext, out var featureCategories);
@@ -289,6 +302,11 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassInitializeMethod);
 
         _testGeneratorProvider.SetTestClassInitializeMethod(generationContext);
+
+        // In scenario-parallel mode, the class-level feature setup is a no-op.
+        // Each test method handles its own feature lifecycle via the FeatureLifecycleManager.
+        if (_reqnrollConfiguration.ParallelizationScope == ParallelizationScope.Scenario)
+            return;
     }
 
     private void SetupTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -297,6 +315,16 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
         testClassCleanupMethod.Attributes = MemberAttributes.Public;
         testClassCleanupMethod.Name = GeneratorConstants.TESTCLASS_CLEANUP_NAME;
+
+        _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
+
+        // In scenario-parallel mode, the class-level feature teardown is a no-op.
+        // Each test method handles its own feature lifecycle via the FeatureLifecycleManager.
+        if (_reqnrollConfiguration.ParallelizationScope == ParallelizationScope.Scenario)
+        {
+            _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);
+            return;
+        }
 
         // Make sure that OnFeatureEndAsync is called on all associated TestRunners.
         // await global::Reqnroll.TestRunnerManager.ReleaseFeatureAsync(featureInfo);
@@ -308,8 +336,6 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(releaseFeature);
 
         testClassCleanupMethod.Statements.Add(releaseFeature);
-
-        _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
 
         _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);
     }
@@ -517,13 +543,36 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         // testRunner = null;
         var unassignTestRunnerInstance = new CodeAssignStatement(testRunnerField, new CodePrimitiveExpression(null));
 
-        // add ReleaseTestRunner to the finally block of OnScenarioEndAsync 
-        testCleanupMethod.Statements.Add(
-            new CodeTryCatchFinallyStatement(
-                [onScenarioEndCallStatement],
-                [],
-                [releaseTestRunnerCallStatement, unassignTestRunnerInstance]
-            ));
+        // In scenario-parallel mode, each test must also end its feature reference
+        // so the FeatureLifecycleManager can track when all scenarios are done.
+        if (_reqnrollConfiguration.ParallelizationScope == ParallelizationScope.Scenario)
+        {
+            // await testRunner.OnFeatureEndAsync();
+            var onFeatureEndCallExpression = new CodeMethodInvokeExpression(
+                testRunnerField,
+                nameof(ITestRunner.OnFeatureEndAsync));
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureEndCallExpression);
+            var onFeatureEndCallStatement = new CodeExpressionStatement(onFeatureEndCallExpression);
+
+            // try { await testRunner.OnScenarioEndAsync(); await testRunner.OnFeatureEndAsync(); }
+            // finally { ReleaseTestRunner(testRunner); testRunner = null; }
+            testCleanupMethod.Statements.Add(
+                new CodeTryCatchFinallyStatement(
+                    [onScenarioEndCallStatement, onFeatureEndCallStatement],
+                    [],
+                    [releaseTestRunnerCallStatement, unassignTestRunnerInstance]
+                ));
+        }
+        else
+        {
+            // add ReleaseTestRunner to the finally block of OnScenarioEndAsync 
+            testCleanupMethod.Statements.Add(
+                new CodeTryCatchFinallyStatement(
+                    [onScenarioEndCallStatement],
+                    [],
+                    [releaseTestRunnerCallStatement, unassignTestRunnerInstance]
+                ));
+        }
     }
 
     private void SetupScenarioInitializeMethod(TestClassGenerationContext generationContext)

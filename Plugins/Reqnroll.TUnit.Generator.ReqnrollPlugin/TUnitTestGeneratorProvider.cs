@@ -1,4 +1,5 @@
 ﻿using Reqnroll.BoDi;
+using Reqnroll.Configuration;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
@@ -44,7 +45,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
 
     public UnitTestGeneratorTraits GetTraits()
     {
-        return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
+        return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution | UnitTestGeneratorTraits.ScenarioLevelParallelism;
     }
 
     public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
@@ -95,6 +96,14 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
 
     public void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
     {
+        // In scenario-parallel mode, skip class-level Before hook — feature lifecycle is per-scenario
+        if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+            && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+        {
+            generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
+            return;
+        }
+
         // For class-level initialization, use [Before(Class)].
         CodeDomHelper.AddAttribute(
             generationContext.TestClassInitializeMethod,
@@ -108,6 +117,14 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
 
     public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
     {
+        // In scenario-parallel mode, skip class-level After hook — feature lifecycle is per-scenario
+        if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+            && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+        {
+            generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
+            return;
+        }
+
         // For class-level cleanup, use [After(Class)].
         CodeDomHelper.AddAttribute(
             generationContext.TestClassCleanupMethod,

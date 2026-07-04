@@ -1,27 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
 
-  /*
-
-  Changelog:
-
-  3.2
-  - Added 'AsyncCucumberExpressionAttribute' and 'AsyncRegexAttribute' to the trace/stepDefinitionSkeletonStyle values.
-
-  3.1
-  - Added generator/disableFriendlyTestNames
-
-  3.0
-  - Added formatters
- 
-  1.1
-  - Added ide/bindingDiscovery
-
-  1.0
-  - Initial Reqnroll configuration schema
-  
-  */
-
   "type": "object",
   "additionalProperties": true,
   "properties": {
@@ -81,18 +60,24 @@
           "description": "Determines how Reqnroll behaves if a step binding is not implemented or pending.",
           "type": "string",
           "default": "Pending",
-          "enum": [ "Pending", "Inconclusive", "Ignore", "Error" ]
+          "enum": ["Pending", "Inconclusive", "Ignore", "Error"]
         },
         "obsoleteBehavior": {
           "description": "Determines how Reqnroll behaves if a step binding is marked with [Obsolete] attribute.",
           "type": "string",
           "default": "Warn",
-          "enum": [ "None", "Warn", "Pending", "Error" ]
+          "enum": ["None", "Warn", "Pending", "Error"]
         },
         "stopAtFirstError": {
           "description": "Determines whether the execution should stop when encountering the first error, or whether it should attempt to try and match subsequent steps (in order to detect missing steps).",
           "type": "boolean",
           "default": false
+        },
+        "parallelizationScope": {
+          "description": "Defines the granularity of parallel test execution. 'Feature' (default) runs features in parallel with scenarios within a feature running sequentially. 'Scenario' runs all scenarios in parallel independently, with BeforeFeature/AfterFeature hooks executing once per feature using reference counting.",
+          "type": "string",
+          "default": "Feature",
+          "enum": ["Feature", "Scenario"]
         }
       }
     },
@@ -105,7 +90,15 @@
           "description": "Specifies the default step definition style.",
           "type": "string",
           "default": "CucumberExpressionAttribute",
-          "enum": [ "AsyncCucumberExpressionAttribute", "AsyncRegexAttribute", "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
+          "enum": [
+            "AsyncCucumberExpressionAttribute",
+            "AsyncRegexAttribute",
+            "CucumberExpressionAttribute",
+            "RegexAttribute",
+            "MethodNameUnderscores",
+            "MethodNamePascalCase",
+            "MethodNameRegex"
+          ]
         },
         "coloredOutput": {
           "description": "Determine whether Reqnroll should color the test result output.",
@@ -207,7 +200,12 @@
           "description": "The list of the Reqnroll-related project traits. The possible traits are: 'MsBuildGeneration', 'XUnitAdapter', 'DesignTimeFeatureFileGeneration', e.g. '[\"XUnitAdapter\"]'. (Default: [detect from the installed NuGet packages])",
           "type": "array",
           "items": {
-            "enum": [ "None", "MsBuildGeneration", "XUnitAdapter", "DesignTimeFeatureFileGeneration" ]
+            "enum": [
+              "None",
+              "MsBuildGeneration",
+              "XUnitAdapter",
+              "DesignTimeFeatureFileGeneration"
+            ]
           }
         }
       }
@@ -235,7 +233,7 @@
                 "type": "string"
               }
             },
-            "required": [ "tagPattern", "urlTemplate" ]
+            "required": ["tagPattern", "urlTemplate"]
           }
         }
       }

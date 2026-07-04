@@ -21,6 +21,7 @@ using Reqnroll.Formatters.Message;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Infrastructure.FeatureLifecycle;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 using Reqnroll.TestFramework;
@@ -41,6 +42,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<DefaultRuntimeConfigurationProvider, IRuntimeConfigurationProvider>();
 
             container.RegisterTypeAs<TestRunnerManager, ITestRunnerManager>();
+            container.RegisterTypeAs<FeatureLifecycleManager, IFeatureLifecycleManager>();
 
             container.RegisterTypeAs<StepFormatter, IStepFormatter>();
             container.RegisterTypeAs<TestTracer, ITestTracer>();

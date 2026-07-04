@@ -28,7 +28,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public override UnitTestGeneratorTraits GetTraits()
         {
-            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
+            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution | UnitTestGeneratorTraits.ScenarioLevelParallelism;
         }
 
         public override void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)

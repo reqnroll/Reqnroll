@@ -10,6 +10,7 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
+using Reqnroll.Infrastructure.FeatureLifecycle;
 using Reqnroll.Plugins;
 using Reqnroll.TestFramework;
 using Reqnroll.Tracing;
@@ -182,7 +183,8 @@ public partial class TestExecutionEngineTests
             _testPendingMessageFactory,
             _testUndefinedMessageFactory,
             _testObjectResolverMock.Object,
-            _testRunContext);
+            _testRunContext,
+            new Mock<IFeatureLifecycleManager>().Object);
     }
 
     private Mock<IStepDefinitionBinding> RegisterStepDefinition()

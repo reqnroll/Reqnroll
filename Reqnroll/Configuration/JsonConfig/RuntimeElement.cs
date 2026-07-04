@@ -14,6 +14,9 @@ namespace Reqnroll.Configuration.JsonConfig
         [JsonPropertyName("obsoleteBehavior")]
         public ObsoleteBehavior ObsoleteBehavior { get; set; } = ConfigDefaults.ObsoleteBehavior;
 
+        [JsonPropertyName("parallelizationScope")]
+        public ParallelizationScope ParallelizationScope { get; set; } = ConfigDefaults.ParallelizationScope;
+
         [JsonPropertyName("dependencies")]
         public List<Dependency> Dependencies { get; set; }
     }

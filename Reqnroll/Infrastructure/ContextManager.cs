@@ -164,6 +164,15 @@ public class ContextManager : IContextManager, IDisposable
 #pragma warning restore 618
     }
 
+    /// <summary>
+    /// Sets the feature context to a shared instance (for scenario-level parallelism).
+    /// Non-winning threads use this to point to the FeatureContext created by the BeforeFeature thread.
+    /// </summary>
+    internal void SetSharedFeatureContext(FeatureContext sharedContext, BoDi.IObjectContainer sharedFeatureContainer)
+    {
+        _featureContextManager.Init(sharedContext, sharedFeatureContainer);
+    }
+
     public void CleanupFeatureContext()
     {
         _featureContextManager.Cleanup();

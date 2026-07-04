@@ -2,6 +2,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.BoDi;
 using System.Text.RegularExpressions;
@@ -47,7 +48,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual UnitTestGeneratorTraits GetTraits()
         {
-            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
+            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution | UnitTestGeneratorTraits.ScenarioLevelParallelism;
         }
 
         protected virtual CodeTypeReference CreateFixtureInterface(TestClassGenerationContext generationContext, CodeTypeReference fixtureDataType)
@@ -268,6 +269,15 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
+            // In scenario-parallel mode, skip the IClassFixture pattern entirely.
+            // Each test handles its own feature lifecycle; no shared fixture needed.
+            if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+                && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+            {
+                generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
+                return;
+            }
+
             // xUnit uses IUseFixture<T> on the class
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
 
@@ -302,6 +312,14 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
+            // In scenario-parallel mode, skip fixture teardown — lifecycle is per-scenario
+            if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+                && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+            {
+                generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
+                return;
+            }
+
             // xUnit uses IUseFixture<T> on the class
 
             generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;

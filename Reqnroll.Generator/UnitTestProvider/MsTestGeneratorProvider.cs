@@ -1,6 +1,7 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.BoDi;
 using System.Diagnostics.CodeAnalysis;
@@ -109,6 +110,11 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
+            // In scenario-parallel mode, skip ClassInitialize — feature lifecycle is per-scenario
+            if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+                && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+                return;
+
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
 
             generationContext.TestClassInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(
@@ -119,6 +125,11 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
+            // In scenario-parallel mode, skip ClassCleanup — feature lifecycle is per-scenario
+            if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+                && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+                return;
+
             generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
             // [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior.EndOfClass)]
             var attribute = CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR);

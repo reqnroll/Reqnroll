@@ -23,6 +23,7 @@ namespace Reqnroll.Configuration
 
         public const ObsoleteBehavior ObsoleteBehavior = Configuration.ObsoleteBehavior.Warn;
         public const bool ColoredOutput = false;
+        public const ParallelizationScope ParallelizationScope = Configuration.ParallelizationScope.Feature;
 
         public const bool AllowDebugGeneratedFiles = false;
         public const bool AllowRowTests = true;

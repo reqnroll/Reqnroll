@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Reqnroll.BoDi;
+using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 
 namespace Reqnroll.Generator.UnitTestProvider
@@ -13,6 +14,9 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string TESTFIXTURESETUP_ATTR_NUNIT3 = "NUnit.Framework.OneTimeSetUpAttribute";
         protected internal const string TESTFIXTURETEARDOWN_ATTR_NUNIT3 = "NUnit.Framework.OneTimeTearDownAttribute";
         protected internal const string NONPARALLELIZABLE_ATTR = "NUnit.Framework.NonParallelizableAttribute";
+        protected internal const string PARALLELIZABLE_ATTR = "NUnit.Framework.ParallelizableAttribute";
+        protected internal const string PARALLELSCOPE_CLASS = "NUnit.Framework.ParallelScope";
+        protected internal const string PARALLELSCOPE_SELF = "Self";
         protected internal const string TESTFIXTURE_ATTR = "NUnit.Framework.TestFixtureAttribute";
         protected internal const string FIXTURELIFECYCLE_ATTR = "NUnit.Framework.FixtureLifeCycleAttribute";
         protected internal const string LIFECYCLE_CLASS = "NUnit.Framework.LifeCycle";
@@ -39,7 +43,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual UnitTestGeneratorTraits GetTraits()
         {
-            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
+            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution | UnitTestGeneratorTraits.ScenarioLevelParallelism;
         }
 
         public virtual void SetTestClassIgnore(TestClassGenerationContext generationContext)
@@ -54,12 +58,22 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
+            // In scenario-parallel mode, skip OneTimeSetUp — feature lifecycle is per-scenario
+            if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+                && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+                return;
+
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
             CodeDomHelper.AddAttribute(generationContext.TestClassInitializeMethod, TESTFIXTURESETUP_ATTR_NUNIT3);
         }
 
         public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
+            // In scenario-parallel mode, skip OneTimeTearDown — feature lifecycle is per-scenario
+            if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj)
+                && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+                return;
+
             generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
             CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR_NUNIT3);
         }
@@ -81,6 +95,15 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClass, FIXTURELIFECYCLE_ATTR, 
                 new CodeAttributeArgument(
                     new CodeSnippetExpression(CodeDomHelper.GetGlobalizedName($"{LIFECYCLE_CLASS}.{LIFECYCLE_INSTANCEPERTESTCASE}"))));
+
+            // In scenario-parallel mode, mark the fixture as parallelizable at method level
+            if (generationContext.CustomData.TryGetValue(nameof(ParallelizationScope), out var scopeObj) 
+                && scopeObj is ParallelizationScope scope && scope == ParallelizationScope.Scenario)
+            {
+                CodeDomHelper.AddAttribute(generationContext.TestClass, PARALLELIZABLE_ATTR,
+                    new CodeAttributeArgument(
+                        new CodeSnippetExpression(CodeDomHelper.GetGlobalizedName($"{PARALLELSCOPE_CLASS}.{PARALLELSCOPE_SELF}"))));
+            }
         }
 
         public void SetTestClassCategories(TestClassGenerationContext generationContext, IEnumerable<string> featureCategories)

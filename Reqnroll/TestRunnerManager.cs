@@ -114,6 +114,10 @@ public class TestRunnerManager : ITestRunnerManager
 
     public virtual async Task EndFeatureForAvailableTestRunnersAsync(FeatureInfo featureInfo)
     {
+        // In scenario-parallel mode, feature lifecycle is managed by FeatureLifecycleManager
+        if (_reqnrollConfiguration.ParallelizationScope == Configuration.ParallelizationScope.Scenario)
+            return;
+
         var items = _availableTestWorkerContainers.ToArray();
         foreach (var item in items)
         {
@@ -254,6 +258,12 @@ public class TestRunnerManager : ITestRunnerManager
 
     protected virtual ITestRunner GetOrCreateTestRunnerInstance(FeatureInfo featureHint = null)
     {
+        if (_reqnrollConfiguration.ParallelizationScope == Configuration.ParallelizationScope.Scenario)
+        {
+            // In scenario-parallel mode: no feature affinity, any available runner will do
+            return GetOrCreateTestRunnerWithoutAffinity();
+        }
+
         if (TryGetTestRunnerFromAvailableTestWorkerContainers(featureHint, out var testThreadContainer))
         {
             // We found an available test runner. Select it to prevent a new test thread context from being created.
@@ -268,6 +278,33 @@ public class TestRunnerManager : ITestRunnerManager
         }
 
         if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, new TestWorkerContainerHint(featureHint, null)))
+            throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} is already in usage");
+
+        return testThreadContainer.Resolve<ITestRunner>();
+    }
+
+    private ITestRunner GetOrCreateTestRunnerWithoutAffinity()
+    {
+        // Try to grab any available container without feature affinity preference
+        var items = _availableTestWorkerContainers.ToArray();
+        foreach (var item in items)
+        {
+            if (_availableTestWorkerContainers.TryRemove(item.Key, out _))
+            {
+                var container = item.Key;
+                if (!_usedTestWorkerContainers.TryAdd(container, new TestWorkerContainerHint(null, null)))
+                    continue;
+                return container.Resolve<ITestRunner>();
+            }
+        }
+
+        // No available container — create a new one
+        var testThreadContainer = _containerBuilder.CreateTestThreadContainer(_globalContainer);
+        var id = Interlocked.Increment(ref _nextTestWorkerContainerId);
+        var testThreadContainerInfo = new TestThreadContainerInfo(id.ToString(CultureInfo.InvariantCulture));
+        testThreadContainer.RegisterInstanceAs(testThreadContainerInfo);
+
+        if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, new TestWorkerContainerHint(null, null)))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} is already in usage");
 
         return testThreadContainer.Resolve<ITestRunner>();
@@ -504,6 +541,26 @@ public class TestRunnerManager : ITestRunnerManager
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);
         await testRunnerManager.EndFeatureForAvailableTestRunnersAsync(featureInfo);
+    }
+
+    /// <summary>
+    /// Acquires a feature reference for scenario-level parallelism.
+    /// BeforeFeature hooks execute exactly once (first scenario in).
+    /// Called by generated code when ParallelizationScope is Scenario.
+    /// </summary>
+    public static async Task EnsureFeatureStartedAsync(FeatureInfo featureInfo, ITestRunner testRunner)
+    {
+        await testRunner.OnFeatureStartAsync(featureInfo);
+    }
+
+    /// <summary>
+    /// Releases a feature reference for scenario-level parallelism.
+    /// AfterFeature hooks execute exactly once (last scenario out).
+    /// Called by generated code when ParallelizationScope is Scenario.
+    /// </summary>
+    public static async Task ReleaseFeatureReferenceAsync(FeatureInfo featureInfo, ITestRunner testRunner)
+    {
+        await testRunner.OnFeatureEndAsync();
     }
 
     internal static async Task ResetAsync()
