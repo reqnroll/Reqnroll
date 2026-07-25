@@ -8,7 +8,7 @@ Determining the ideal level of isolation for your automated tests is a tradeoff.
 
 | Isolation level | Description | Runner support |
 | --------------- | ----------- | -------------- |
-| Thread | Test threads run as threads in the same process and application domain. Only the thread-local state is isolated. | NUnit, MsTest, xUnit |
+| Thread | Test threads run as threads in the same process and application domain. Only the thread-local state is isolated. | NUnit, MsTest, xUnit, TUnit |
 | Process | Test threads run in separate processes. | VSTest per test assembly |
 | Agent | Test threads run on multiple agents. | E.g. VSTest task |
 
@@ -19,7 +19,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 | Scheduling unit  | Description          | Runner support       |
 | ---------------- | -------------------- | -------------------- |
-| Scenario         | Scenarios can run in parallel with each other (also from different features) | NUnit, MsTest     |
+| Scenario         | Scenarios can run in parallel with each other (also from different features) | NUnit, MsTest, TUnit |
 | Feature          | Features can run in parallel with each other. Scenarios from the same feature are running on the same test thread. | NUnit, MsTest, xUnit |
 | Test assembly    | Different test assemblies can run in parallel with each other | e.g. VSTest |
 
@@ -36,7 +36,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 ### Requirements
 
-* You have to use a test runner that supports in-process parallel execution (NUnit and MsTest supports scenario-level, xUnit supports feature-level)
+* You have to use a test runner that supports in-process parallel execution (NUnit, MsTest and TUnit supports scenario-level, xUnit supports feature-level)
 * You have to ensure that your code does not conflict on static state.
 * You must not use the static context properties of Reqnroll `ScenarioContext.Current`, `FeatureContext.Current` or `ScenarioStepContext.Current` (see further information below).
 * You have to configure the test runner to execute the Reqnroll features in parallel with each other (see configuration details below).
@@ -94,6 +94,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 By default xUnit runs all Reqnroll features [in parallel](https://xunit.net/docs/running-tests-in-parallel) with each other. No additional configuration is necessary.
 
+### TUnit Configuration
+
+By default [TUnit runs all tests in parallel](https://tunit.dev/docs/tutorial-extras/parallelism) with each other. No additional configuration is necessary.
+
+To disable parallel execution for the entire test project, set an assembly-level attribute:
+
+```{code-block} csharp
+:caption: C# file for disabling parallel execution
+
+[assembly: TUnit.Core.NotInParallel]
+```
+
 ### Thread-safe ScenarioContext, FeatureContext and ScenarioStepContext
 
 When using parallel execution accessing the obsolete `ScenarioContext.Current`, `FeatureContext.Current` or `ScenarioStepContext.Current` static properties is not allowed.  Accessing these static properties during parallel execution throws a `ReqnrollException`.
@@ -114,6 +126,8 @@ public class ReqnrollNonParallelizableFeaturesCollectionDefinition
 {
 }
 ```
+
+For TUnit, the `[NotInParallel]` attribute is applied to the generated test class or test method to exclude specific features or scenarios from parallel execution. This is handled automatically by the Reqnroll TUnit plugin when the `addNonParallelizableMarkerForTags` option is configured.
 
 ## Running Reqnroll scenarios in parallel with process isolation
 
