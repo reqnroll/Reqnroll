@@ -36,7 +36,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 ### Requirements
 
-* You have to use a test runner that supports in-process parallel execution (NUnit and MsTest supports scenario-level, xUnit supports feature-level, TUnit supports scenario-level)
+* You have to use a test runner that supports in-process parallel execution (NUnit, MsTest and TUnit supports scenario-level, xUnit supports feature-level)
 * You have to ensure that your code does not conflict on static state.
 * You must not use the static context properties of Reqnroll `ScenarioContext.Current`, `FeatureContext.Current` or `ScenarioStepContext.Current` (see further information below).
 * You have to configure the test runner to execute the Reqnroll features in parallel with each other (see configuration details below).
