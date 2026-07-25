@@ -42,7 +42,9 @@ public void GivenTheAccountRowIsAvailable(DataTable table)
 }
 ```
 
-The optional `defaultValue` parameter is used only when the requested column is missing from the row. If you omit the parameter, the existing helper-specific fallback behavior is preserved. Empty cells continue to behave as before, so supplying a default does not change how blank values are interpreted.
+The optional `defaultValue` parameter is used only when the requested column is missing from the row.
+
+If the column exists but the cell is blank, the helpers keep their existing behavior for blank values. In other words, `defaultValue` is a fallback for missing columns, not for empty cells.
 
 ```{note}
 Optional `defaultValue` parameters for these helpers were introduced in Reqnroll v4.
