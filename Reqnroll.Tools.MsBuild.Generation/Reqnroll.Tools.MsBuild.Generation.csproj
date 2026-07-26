@@ -34,14 +34,10 @@
 
     <ItemGroup>
       <!-- Remove system assemblies. -->
-      <ReferenceCopyLocalPaths
-        Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
       
       <!-- Remove Visual Studio assemblies. -->
-      <ReferenceCopyLocalPaths
-        Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
       
       <!-- Remove netstandard -->
       <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'netstandard'" />
@@ -51,21 +47,13 @@
   </Target>
 
   <!-- Include runtime assemblies in the package. -->
-  <Target
-    Name="CollectRedistributableAssemblies"
-    AfterTargets="CoreCompile"
-    DependsOnTargets="ResolveRequiredReferences">
+  <Target Name="CollectRedistributableAssemblies" AfterTargets="CoreCompile" DependsOnTargets="ResolveRequiredReferences">
     
     <ItemGroup>
-      <BuildOutputInPackage 
-        Include="@(ReferenceCopyLocalPaths)"
-        TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)"/>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)" TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
 
       <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
-      <BuildOutputInPackage
-        Include="$(ProjectDepsFilePath)"
-        TargetPath="$(ProjectDepsFileName)"
-        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'"/>
+      <BuildOutputInPackage Include="$(ProjectDepsFilePath)" TargetPath="$(ProjectDepsFileName)" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'" />
     </ItemGroup>
   </Target>
 
