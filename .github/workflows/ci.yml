@@ -558,9 +558,14 @@ jobs:
       with:
         name: packages-v${{ needs.build.outputs.product_full_version }}
         path: release_packages
+    - name: NuGet login
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USER }}
     - name: Deploy NuGet packages
       env:
-        NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}      
+        NUGET_PUBLISH_KEY: ${{steps.login.outputs.NUGET_API_KEY}}
       shell: pwsh
       run: |
         Write-Output "Deploying v${{ needs.build.outputs.product_full_version }} (v${{ needs.build.outputs.product_main_version }}) packages to nuget.org"
