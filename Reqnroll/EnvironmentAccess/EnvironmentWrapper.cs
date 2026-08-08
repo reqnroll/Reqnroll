@@ -11,14 +11,16 @@ public class EnvironmentWrapper : IEnvironmentWrapper
 {
     public bool IsEnvironmentVariableSet(string name)
     {
-        return Environment.GetEnvironmentVariables().Contains(name);
+        return Environment.GetEnvironmentVariable(name) is not null;
     }
 
     public IResult<string> GetEnvironmentVariable(string name)
     {
-        if (IsEnvironmentVariableSet(name))
+        var variable = Environment.GetEnvironmentVariable(name);
+
+        if (variable is not null)
         {
-            return Result<string>.Success(Environment.GetEnvironmentVariable(name));
+            return Result<string>.Success(variable);
         }
 
         return Result<string>.Failure($"Environment variable {name} not set");

@@ -6,11 +6,13 @@ using Reqnroll.Bindings.Reflection;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.Diagnostics.Analytics;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Reqnroll.Plugins;
+using Reqnroll.RuntimeTests.Diagnostics;
 using Reqnroll.TestFramework;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
@@ -56,6 +58,8 @@ public partial class TestExecutionEngineTests
     private readonly Mock<ITestThreadExecutionEventPublisher> _testThreadExecutionEventPublisher;
     private readonly Mock<IStepArgumentTypeConverter> _stepArgumentTypeConverterMock;
     private readonly Mock<IUnitTestRuntimeProvider> _unitTestRuntimeProviderStub;
+    private readonly IAnalyticsContext _analyticsContext;
+    private readonly TestLogger<TestExecutionEngine> _analyticsLogger;
 
     private readonly List<IHookBinding> _beforeScenarioEvents;
     private readonly List<IHookBinding> _afterScenarioEvents;
@@ -92,6 +96,9 @@ public partial class TestExecutionEngineTests
         _featureContainer = new ObjectContainer(_testThreadContainer);
         _scenarioContainer = new ObjectContainer(_featureContainer);
         _testRunContext = new DefaultTestRunContext(_globalContainer, new Mock<ITestRunSettingsProvider>().Object);
+
+        _analyticsContext = new AnalyticsContext();
+        _analyticsLogger = new TestLogger<TestExecutionEngine>();
 
         _beforeScenarioEvents = new List<IHookBinding>();
         _afterScenarioEvents = new List<IHookBinding>();
@@ -182,7 +189,9 @@ public partial class TestExecutionEngineTests
             _testPendingMessageFactory,
             _testUndefinedMessageFactory,
             _testObjectResolverMock.Object,
-            _testRunContext);
+            _testRunContext,
+            _analyticsContext,
+            _analyticsLogger);
     }
 
     private Mock<IStepDefinitionBinding> RegisterStepDefinition()

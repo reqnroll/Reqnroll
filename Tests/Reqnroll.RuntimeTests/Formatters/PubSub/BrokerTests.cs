@@ -6,6 +6,7 @@ using Xunit;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Formatters;
+using Reqnroll.Diagnostics.Analytics;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub;
 
@@ -16,6 +17,7 @@ public class CucumberMessageBrokerTests
     private readonly Mock<ICucumberMessageFormatter> _formatterMock1;
     private readonly Mock<ICucumberMessageFormatter> _formatterMock2;
     private readonly CucumberMessageBroker _sut;
+    private readonly AnalyticsContext _analyticsContext;
 
     public CucumberMessageBrokerTests()
     {
@@ -24,8 +26,13 @@ public class CucumberMessageBrokerTests
         _formatterMock1.Setup(s => s.Name).Returns("formatter1");
         _formatterMock2 = new Mock<ICucumberMessageFormatter>();
         _formatterMock2.Setup(s => s.Name).Returns("formatter2");
+        _analyticsContext = new AnalyticsContext();
         // Initialize the system under test (SUT)
-        _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "formatter1", _formatterMock1.Object}, { "formatter2", _formatterMock2.Object} }, null);
+        _sut = new CucumberMessageBroker(
+            _logMock.Object,
+            new Dictionary<string, ICucumberMessageFormatter> { { "formatter1", _formatterMock1.Object }, { "formatter2", _formatterMock2.Object } },
+            null,
+            _analyticsContext);
     }
 
     [Fact]
@@ -51,7 +58,7 @@ public class CucumberMessageBrokerTests
     {
         var log = new Mock<IFormatterLog>();
 
-        var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>(), null);
+        var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>(), null, _analyticsContext);
 
         // Act
         var result = sut.IsEnabled;

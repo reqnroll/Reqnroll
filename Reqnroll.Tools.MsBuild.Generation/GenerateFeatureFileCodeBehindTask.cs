@@ -1,5 +1,6 @@
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Microsoft.Extensions.Logging;
 using Reqnroll.CommonModels;
 using Reqnroll.Generator;
 using Reqnroll.Utils;
@@ -43,6 +44,7 @@ public class GenerateFeatureFileCodeBehindTask : Task
 
     public override bool Execute()
     {
+#nullable enable
         if (LaunchDebugger) Debugger.Launch();
 
         var generateFeatureFileCodeBehindTaskContainerBuilder = new GenerateFeatureFileCodeBehindTaskContainerBuilder();
@@ -62,6 +64,17 @@ public class GenerateFeatureFileCodeBehindTask : Task
         var dependencyCustomizations = DependencyCustomizations ?? new NullGenerateFeatureFileCodeBehindTaskDependencyCustomizations();
 
         using var taskRootContainer = generateFeatureFileCodeBehindTaskContainerBuilder.BuildRootContainer(Log, reqnrollProjectInfo, msbuildInformationProvider, dependencyCustomizations);
+
+        var telemetryLog = taskRootContainer.Resolve<ILogger<GenerateFeatureFileCodeBehindTask>>();
+
+        // Initiate a scope to include useful information in all telemetry logs for the task execution.
+        using var telemetryLogScope = telemetryLog.BeginScope(new Dictionary<string, object>
+        {
+            ["reqnroll.generator.project_guid"] = ProjectGuid,
+            ["reqnroll.generator.target_frameworks"] = TargetFrameworks,
+            ["reqnroll.generator.target_framework"] = TargetFramework
+        });
+
         var assemblyResolveLoggerFactory = taskRootContainer.Resolve<IAssemblyResolveLoggerFactory>();
 
         using (assemblyResolveLoggerFactory.Build())

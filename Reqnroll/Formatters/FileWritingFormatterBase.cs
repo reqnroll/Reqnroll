@@ -53,7 +53,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
         {
             // Use safe fallback
             outputPath = Path.Combine(defaultBaseDirectory, _defaultFileName);
-            baseDirectory = Path.GetDirectoryName(outputPath);
+            baseDirectory = Path.GetDirectoryName(outputPath)!;
         }
         else
         {
@@ -63,7 +63,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
             try
             {
                 fileName = Path.GetFileName(configuredPath);
-                baseDirectory = Path.GetDirectoryName(configuredPath);
+                baseDirectory = Path.GetDirectoryName(configuredPath)!;
             }
             catch (System.Exception e)
             {

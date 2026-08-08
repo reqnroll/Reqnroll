@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
@@ -22,12 +22,14 @@
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Cucumber.Messages" Version="32.3.1" />
     <PackageReference Include="Cucumber.HtmlFormatter" Version="23.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="10.0.10" />
     <PackageReference Include="OpenTelemetry" Version="1.15.3" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
     <!-- System.Runtime.Loader is used for .NET (not .NET Framework) based frameworks only. 
          From .NET, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
          We need 'PrivateAssets="all"' to avoid shipping it with the package and causing conflicts with the runtime. -->
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" PrivateAssets="all" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Text.Json" Version="10.0.10" />
     <PackageReference Include="System.Threading.Channels" Version="9.0.6" />
   </ItemGroup>
 
@@ -55,7 +57,7 @@
 
   <ItemGroup>
     <!-- Include the readme and changelog files. -->
-    <None Update="PackageReadme.md" Pack="true" PackagePath="README.md" />
+    <None Include="README.md" Pack="true" PackagePath="" />
     <None Include="../CHANGELOG.md" Pack="true" PackagePath="" />
 
     <!-- Include the third-party license files. -->

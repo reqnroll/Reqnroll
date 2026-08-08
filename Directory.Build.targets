@@ -88,6 +88,8 @@ if (Directory.Exists(TmpDirectory))
     DependsOnTargets="ResolveReferences"
     Returns="_ProjectReferenceCopyLocalPathsForPackAsComponent">
 
+    <Message Importance="High" Text="RCL: %(ReferenceCopyLocalPaths.Identity) %(ReferenceCopyLocalPaths.Extension)" />
+    
     <ItemGroup>
       <_ReferenceCopyLocalProjects
         Include="@(ReferenceCopyLocalPaths -> '%(ProjectReferenceOriginalItemSpec)')"

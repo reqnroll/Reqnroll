@@ -1,4 +1,5 @@
 using Gherkin.CucumberMessages;
+using Microsoft.Extensions.Logging;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
 using Reqnroll.Analytics.UserId;
@@ -9,6 +10,7 @@ using Reqnroll.Bindings.Provider;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.Diagnostics.Analytics;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
@@ -106,6 +108,10 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<HttpClientWrapper, HttpClientWrapper>();
             container.RegisterTypeAs<AnalyticsEventProvider, IAnalyticsEventProvider>();
             container.RegisterTypeAs<AnalyticsRuntimeTelemetryService, IAnalyticsRuntimeTelemetryService>();
+
+            container.RegisterTypeAs<TelemetryHost, ITelemetryHost>();
+            container.RegisterFactoryAs(container => container.Resolve<ITelemetryHost>().CreateLogger<TestExecutionEngine>());
+            container.RegisterTypeAs<AnalyticsContext, IAnalyticsContext>();
 
             container.RegisterTypeAs<ReqnrollJsonLocator, IReqnrollJsonLocator>();
 

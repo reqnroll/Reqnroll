@@ -1,8 +1,10 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.Analytics;
+using Reqnroll.Diagnostics.Analytics;
 using Reqnroll.Formatters.RuntimeSupport;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,16 +25,22 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     private int _numberOfFormattersInitialized = 0;
     private readonly IFormatterLog _logger;
     private readonly IAnalyticsRuntimeTelemetryService _telemetryService;
+    private readonly IAnalyticsContext _analyticsContext;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
     private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeFormatters = new();
 
 
-    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters, IAnalyticsRuntimeTelemetryService telemetryService)
+    public CucumberMessageBroker(
+        IFormatterLog formatterLog,
+        IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters,
+        IAnalyticsRuntimeTelemetryService telemetryService,
+        IAnalyticsContext analyticsContext)
     {
         _logger = formatterLog;
         _telemetryService = telemetryService;
+        _analyticsContext = analyticsContext;
         _registeredFormatters.AddRange(containerRegisteredFormatters.Values);
     }
 
@@ -64,6 +72,11 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         {
             SendTelemetryEvents();
             _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
+
+            // Include the list of formatters in the current execution context.
+            _analyticsContext.ExecutionAttributes.Add(
+                "service.output.formatters",
+                _activeFormatters.Select(formatter => formatter.Key).ToArray());
         }
     }
 

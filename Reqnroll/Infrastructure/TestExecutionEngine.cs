@@ -1,8 +1,12 @@
+#nullable enable
+
+using Microsoft.Extensions.Logging;
 using Reqnroll.Analytics;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.Diagnostics.Analytics;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
@@ -40,6 +44,8 @@ namespace Reqnroll.Infrastructure
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
         private readonly ITestPendingMessageFactory _testPendingMessageFactory;
         private readonly ITestUndefinedMessageFactory _testUndefinedMessageFactory;
+        private readonly IAnalyticsContext _analyticsContext;
+        private readonly ILogger<TestExecutionEngine> _telemetryLogger;
         private readonly object _testRunnerEndExecutedLock = new();
 
         private bool _testRunnerEndExecuted = false;
@@ -64,7 +70,9 @@ namespace Reqnroll.Infrastructure
             ITestPendingMessageFactory testPendingMessageFactory,
             ITestUndefinedMessageFactory testUndefinedMessageFactory,
             ITestObjectResolver testObjectResolver,
-            ITestRunContext testRunContext)
+            ITestRunContext testRunContext,
+            IAnalyticsContext analyticsContext,
+            ILogger<TestExecutionEngine> telemetryLogger)
         {
             _errorProvider = errorProvider;
             _bindingInvoker = bindingInvoker;
@@ -79,12 +87,14 @@ namespace Reqnroll.Infrastructure
             _stepDefinitionMatchService = stepDefinitionMatchService;
             _testObjectResolver = testObjectResolver;
             _testRunContext = testRunContext;
+            _analyticsContext = analyticsContext;
             _obsoleteStepHandler = obsoleteStepHandler;
             _telemetryService = telemetryService;
             _runtimePluginTestExecutionLifecycleEventEmitter = runtimePluginTestExecutionLifecycleEventEmitter;
             _testThreadExecutionEventPublisher = testThreadExecutionEventPublisher;
             _testPendingMessageFactory = testPendingMessageFactory;
             _testUndefinedMessageFactory = testUndefinedMessageFactory;
+            _telemetryLogger = telemetryLogger;
         }
 
         public FeatureContext FeatureContext => _contextManager.FeatureContext;
@@ -138,6 +148,8 @@ namespace Reqnroll.Infrastructure
             {
                 await _testThreadExecutionEventPublisher.PublishEventAsync(new TestRunFinishedEvent());
             }
+
+            _telemetryLogger.LogReqnrollExecutionCompleted(_analyticsContext.ExecutionAttributes);
         }
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
@@ -344,7 +356,7 @@ namespace Reqnroll.Infrastructure
             // The only problem could be if the same method is decorated with hook attributes using different order,
             // but in this case it is anyway impossible to tell the right ordering.
             var uniqueMatchingHooks = matchingHooks.GroupBy(hookBinding => hookBinding.Method).Select(g => g.First());
-            Exception hookException = null;
+            Exception? hookException = null;
             try
             {
                 //Note: if a (user-)hook throws an exception the subsequent hooks of the same type are not executed
@@ -395,7 +407,7 @@ namespace Reqnroll.Infrastructure
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new HookBindingStartedEvent(hookBinding, _contextManager));
             var durationHolder = new DurationHolder();
-            Exception exceptionThrown = null;
+            Exception? exceptionThrown = null;
             try
             {
                 await invoker.InvokeBindingAsync(hookBinding, _contextManager, arguments, _testTracer, durationHolder);
@@ -471,14 +483,14 @@ namespace Reqnroll.Infrastructure
             }
         }
 
-        private object[] ResolveArguments(IHookBinding hookBinding, IObjectContainer currentContainer)
+        private object?[]? ResolveArguments(IHookBinding hookBinding, IObjectContainer currentContainer)
         {
             if (hookBinding.Method == null || !hookBinding.Method.Parameters.Any())
                 return null;
             return hookBinding.Method.Parameters.Select(p => ResolveArgument(currentContainer, p)).ToArray();
         }
 
-        private object ResolveArgument(IObjectContainer container, IBindingParameter parameter)
+        private object? ResolveArgument(IObjectContainer container, IBindingParameter parameter)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (parameter == null) throw new ArgumentNullException(nameof(parameter));
@@ -507,7 +519,7 @@ namespace Reqnroll.Infrastructure
 
             bool isStepSkippedBecauseOfPreviousErrors = contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.OK;
             var stepStatus = isStepSkippedBecauseOfPreviousErrors ? ScenarioExecutionStatus.Skipped : ScenarioExecutionStatus.OK;
-            Exception stepException = null;
+            Exception? stepException = null;
 
             bool onStepStartHookExecuted = false;
 
@@ -545,9 +557,9 @@ namespace Reqnroll.Infrastructure
                 return HandleStepExecutionExceptions(action);
             }
 
-            BindingMatch match = null;
-            object[] arguments = null;
-            List<BindingMatch> candidatingMatches = null;
+            BindingMatch? match = null;
+            object[]? arguments = null;
+            List<BindingMatch>? candidatingMatches = null;
             var durationHolder = new DurationHolder();
 
             // 1. Find matching step
@@ -572,7 +584,7 @@ namespace Reqnroll.Infrastructure
                     // - BindingException when the step definition is invalid (e.g. too many parameters)
                     // - BindingException when the invoked step argument transformation is invalid
                     // - Any other exception (e.g. FormatException) when the step arguments cannot be converted
-                    arguments = await GetExecuteArgumentsAsync(match);
+                    arguments = await GetExecuteArgumentsAsync(match!);
                 });
 
             // 3. Handle obsolete step definitions
@@ -613,7 +625,7 @@ namespace Reqnroll.Infrastructure
                 await HandleStepExecutionExceptions(
                     async () =>
                     {
-                        await ExecuteStepMatchAsync(match, arguments, durationHolder);
+                        await ExecuteStepMatchAsync(match!, arguments!, durationHolder);
                     });
             }
             else if (stepStatus == ScenarioExecutionStatus.Skipped &&
@@ -624,7 +636,7 @@ namespace Reqnroll.Infrastructure
             }
 
             // 7. Trace result & set scenario execution status
-            TraceStepExecutionResult(stepStatus, stepException, durationHolder.Duration, match, arguments, isStepSkippedBecauseOfPreviousErrors, stepInstance, candidatingMatches);
+            TraceStepExecutionResult(stepStatus, stepException, durationHolder.Duration, match!, arguments!, isStepSkippedBecauseOfPreviousErrors, stepInstance, candidatingMatches!);
             if (stepStatus != ScenarioExecutionStatus.OK)
                 UpdateStatusOnStepFailure(stepStatus, stepException);
 
@@ -652,7 +664,7 @@ namespace Reqnroll.Infrastructure
 
         private void TraceStepExecutionResult(
             ScenarioExecutionStatus status,
-            Exception exception,
+            Exception? exception,
             TimeSpan duration,
             BindingMatch match,
             object[] arguments,
@@ -690,7 +702,7 @@ namespace Reqnroll.Infrastructure
             }
         }
 
-        private void UpdateStatusOnStepFailure(ScenarioExecutionStatus stepStatus, Exception exception)
+        private void UpdateStatusOnStepFailure(ScenarioExecutionStatus stepStatus, Exception? exception)
         {
             _contextManager.StepContext.Status = stepStatus;
             _contextManager.StepContext.StepError = exception;

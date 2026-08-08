@@ -24,7 +24,8 @@ public class ReqnrollLogger : ILogger
 
     public static ILogger CreateLogger(IReqnrollOutputHelper outputHelper) => new ReqnrollLogger(outputHelper, new LoggerExternalScopeProvider(), string.Empty);
     
-    public static ILogger<T> CreateLogger<T>(IReqnrollOutputHelper outputHelper) => new ReqnrollLogger<T>(outputHelper, new LoggerExternalScopeProvider());
+    public static ILogger<T> CreateLogger<T>(IReqnrollOutputHelper outputHelper) where T : notnull => 
+        new ReqnrollLogger<T>(outputHelper, new LoggerExternalScopeProvider());
 
     public ReqnrollLogger(IReqnrollOutputHelper outputHelper, LoggerExternalScopeProvider scopeProvider, string? categoryName, bool appendScope)
         : this(outputHelper, scopeProvider, categoryName, options: new ReqnrollLoggerOptions { IncludeScopes = appendScope })
@@ -41,11 +42,7 @@ public class ReqnrollLogger : ILogger
 
     public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
 
-#if NET8_0
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => _scopeProvider.Push(state);
-#else
-    public IDisposable BeginScope<TState>(TState state) => _scopeProvider.Push(state);
-#endif
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {

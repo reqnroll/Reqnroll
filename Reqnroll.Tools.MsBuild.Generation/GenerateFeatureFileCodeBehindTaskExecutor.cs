@@ -8,6 +8,7 @@ using Microsoft.Build.Utilities;
 using Reqnroll.CommonModels;
 using Reqnroll.Utils;
 using Task = System.Threading.Tasks.Task;
+using Microsoft.Extensions.Logging;
 
 namespace Reqnroll.Tools.MsBuild.Generation;
 
@@ -19,6 +20,7 @@ public class GenerateFeatureFileCodeBehindTaskExecutor(
     WrappedGeneratorContainerBuilder wrappedGeneratorContainerBuilder,
     IObjectContainer rootObjectContainer,
     IMSBuildTaskAnalyticsTransmitter msbuildTaskAnalyticsTransmitter,
+    ILogger<GenerateFeatureFileCodeBehindTask> analyticsLogger,
     IExceptionTaskLogger exceptionTaskLogger)
     : IGenerateFeatureFileCodeBehindTaskExecutor
 {
@@ -59,6 +61,7 @@ public class GenerateFeatureFileCodeBehindTaskExecutor(
         }
         finally
         {
+            analyticsLogger.LogGenerateFeatureFilesCompleted();
             processInfoDumper.DumpLoadedAssemblies();
         }
     }

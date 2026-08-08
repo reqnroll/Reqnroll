@@ -6,6 +6,9 @@ using Reqnroll.Analytics.UserId;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Generator.Project;
+using Microsoft.Extensions.Logging;
+using System.ComponentModel;
+using Reqnroll.Diagnostics.Analytics;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
@@ -49,6 +52,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
             objectContainer.RegisterTypeAs<ConfigurationLoader, IConfigurationLoader>();
             objectContainer.RegisterTypeAs<ProjectReader, IReqnrollProjectReader>();
             objectContainer.RegisterTypeAs<ReqnrollJsonLocator, IReqnrollJsonLocator>();
+
+            // diagnostics
+            objectContainer.RegisterTypeAs<TelemetryHost, ITelemetryHost>();
+            objectContainer.RegisterFactoryAs(
+                () => objectContainer.Resolve<ITelemetryHost>().CreateLogger<GenerateFeatureFileCodeBehindTask>());
 
             dependencyCustomizations.CustomizeTaskContainerDependencies(objectContainer);
 
