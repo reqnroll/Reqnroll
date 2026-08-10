@@ -33,7 +33,7 @@ All contributors are welcome! For more information see the [Contribution guideli
 
 * [Spec Solutions](https://www.specsolutions.eu/)
 * [Info Support](https://www.infosupport.com/)
-* [TestMu AI (formerly LambdaTest)](https://www.testmuai.com/)
+* [TestMu AI (formerly LambdaTest)](https://www.testmuai.com/?utm_medium=sponsor&utm_source=reqnroll)
 
 See all sponsors and information about sponsorship on the [Sponsorship page](https://reqnroll.net/sponsorship) of our website.
 
