@@ -58,6 +58,26 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void GetEnum_should_return_the_specified_default_when_the_value_is_not_defined()
+        {
+            var table = new Table("Sex");
+            table.AddRow("Male");
+
+            table.Rows.First().GetEnum<Person>("SomethingThatDoesNotExist", Sex.UnknownSex).Should().Be(Sex.UnknownSex);
+        }
+
+        [Fact]
+        public void GetEnum_should_throw_when_the_value_is_not_defined_and_no_default_is_specified()
+        {
+            var table = new Table("Sex");
+            table.AddRow("Male");
+
+            Action act = () => table.Rows.First().GetEnum<Person>("SomethingThatDoesNotExist");
+
+            act.Should().Throw<IndexOutOfRangeException>();
+        }
+
+        [Fact]
         public void GetDiscreteEnum_should_return_enum_of_my_specified_type()
         {
             var table = new Table("Header Not Representing Property Of Any Class");
@@ -97,6 +117,17 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("NotDefined");
 
             var discreteEnum = table.Rows[0].GetDiscreteEnum("Header Not Representing Property Of Any Class", Colors.Green);
+
+            discreteEnum.Should().Be(Colors.Green);
+        }
+
+        [Fact]
+        public void GetDiscreteEnum_should_return_default_enum_if_value_is_not_defined_in_the_row()
+        {
+            var table = new Table("Header Not Representing Property Of Any Class");
+            table.AddRow("Red");
+
+            var discreteEnum = table.Rows[0].GetDiscreteEnum("AnotherHeader", Colors.Green);
 
             discreteEnum.Should().Be(Colors.Green);
         }

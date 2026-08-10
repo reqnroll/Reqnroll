@@ -6,68 +6,97 @@ namespace Reqnroll.Assist
 {
     public static class RowExtensionMethods
     {
-        public static string GetString(this DataTableRow row, string id)
+        public static string GetString(this DataTableRow row, string id, string defaultValue = null)
         {
             return AValueWithThisIdExists(row, id)
                        ? row[id]
-                       : null;
+                       : defaultValue;
         }
 
-        public static int GetInt32(this DataTableRow row, string id)
+        public static int GetInt32(this DataTableRow row, string id, int? defaultValue = null)
         {
-            return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue ?? int.MinValue;
+
+            return TheValueIsNotEmpty(row, id)
                        ? Convert.ToInt32(row[id])
                        : int.MinValue;
         }
 
-        public static long GetInt64(this DataTableRow row, string id)
+        public static long GetInt64(this DataTableRow row, string id, long? defaultValue = null)
         {
-            return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue ?? long.MinValue;
+
+            return TheValueIsNotEmpty(row, id)
                        ? Convert.ToInt64(row[id])
                        : long.MinValue;
         }
 
-        public static decimal GetDecimal(this DataTableRow row, string id)
+        public static decimal GetDecimal(this DataTableRow row, string id, decimal? defaultValue = null)
         {
-            return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue ?? decimal.MinValue;
+
+            return TheValueIsNotEmpty(row, id)
                        ? Convert.ToDecimal(row[id])
                        : decimal.MinValue;
         }
 
-        public static DateTime GetDateTime(this DataTableRow row, string id)
+        public static DateTime GetDateTime(this DataTableRow row, string id, DateTime? defaultValue = null)
         {
-            return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue ?? DateTime.MinValue;
+
+            return TheValueIsNotEmpty(row, id)
                        ? Convert.ToDateTime(row[id])
                        : DateTime.MinValue;
         }
 
-        public static bool GetBoolean(this DataTableRow row, string id)
+        public static bool GetBoolean(this DataTableRow row, string id, bool? defaultValue = null)
         {
+            if (!AValueWithThisIdExists(row, id))
+            {
+                if (defaultValue.HasValue)
+                    return defaultValue.Value;
+
+                AssertThatAValueWithThisIdExistsInThisRow(row, id);
+            }
+
             if (TheBooleanValueIsEmpty(row, id))
                 return false;
 
-            AssertThatTheRequestIsValid(row, id);
+            AssertThatThisIsAnAcceptableBoolValue(row, id);
 
             return string.Equals(row[id], "true", StringComparison.OrdinalIgnoreCase);
         }
 
-        public static double GetDouble(this DataTableRow row, string id)
+        public static double GetDouble(this DataTableRow row, string id, double? defaultValue = null)
         {
-            return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue ?? double.MinValue;
+
+            return TheValueIsNotEmpty(row, id)
                        ? Convert.ToDouble(row[id])
                        : double.MinValue;
         }
 
-        public static float GetSingle(this DataTableRow row, string id)
+        public static float GetSingle(this DataTableRow row, string id, float? defaultValue = null)
         {
-            return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue ?? float.MinValue;
+
+            return TheValueIsNotEmpty(row, id)
                 ? Convert.ToSingle(row[id])
                 : float.MinValue;
         }
 
-        public static char GetChar(this DataTableRow row, string id)
+        public static char GetChar(this DataTableRow row, string id, char? defaultValue = null)
         {
-            return Convert.ToChar(row[id]);
+            if (AValueWithThisIdExists(row, id))
+                return Convert.ToChar(row[id]);
+
+            return defaultValue ?? Convert.ToChar(row[id]);
         }
 
         public static T GetDiscreteEnum<T>(this DataTableRow row, string id) where T : struct, IConvertible
@@ -81,18 +110,27 @@ namespace Reqnroll.Assist
 
         public static T GetDiscreteEnum<T>(this DataTableRow row, string id, T defaultValue) where T : struct, IConvertible
         {
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue;
+
             var value = row[id].Replace(" ", string.Empty);
             return Enum.TryParse(value, true, out T @enum) ? @enum : defaultValue;
         }
 
-        public static TEnum GetEnumValue<TEnum>(this DataTableRow row, string id)
+        public static TEnum GetEnumValue<TEnum>(this DataTableRow row, string id, TEnum? defaultValue = null) where TEnum : struct
         {
-            return (TEnum)Enum.Parse(typeof(TEnum), row[id]);
+            if (AValueWithThisIdExists(row, id))
+                return (TEnum)Enum.Parse(typeof(TEnum), row[id]);
+
+            return defaultValue ?? (TEnum)Enum.Parse(typeof(TEnum), row[id]);
         }
 
-        public static Enum GetEnum<T>(this DataTableRow row, string id) where T : class
+        public static Enum GetEnum<T>(this DataTableRow row, string id, Enum defaultValue = null) where T : class
         {
-            return GetTheEnumValue<T>(row[id], id);
+            if (AValueWithThisIdExists(row, id))
+                return GetTheEnumValue<T>(row[id], id);
+
+            return defaultValue ?? GetTheEnumValue<T>(row[id], id);
         }
 
         private static Enum GetTheEnumValue<T>(string rowValue, string propertyName) where T : class
@@ -134,9 +172,12 @@ namespace Reqnroll.Assist
         }
 
 
-        public static Guid GetGuid(this DataTableRow row, string id)
+        public static Guid GetGuid(this DataTableRow row, string id, Guid? defaultValue = null)
         {
-            return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
+            if (!AValueWithThisIdExists(row, id))
+                return defaultValue ?? new Guid();
+
+            return TheValueIsNotEmpty(row, id)
                        ? new Guid(row[id])
                        : new Guid();
         }
@@ -148,25 +189,19 @@ namespace Reqnroll.Assist
 
         private static bool TheValueIsNotEmpty(DataTableRow row, string id)
         {
-            return string.IsNullOrEmpty(row[id]) == false;
-        }
-
-        private static void AssertThatTheRequestIsValid(DataTableRow row, string id)
-        {
-            AssertThatAValueWithThisIdExistsInThisRow(row, id);
-            AssertThatThisIsAnAcceptableBoolValue(row, id);
+            return !string.IsNullOrEmpty(row[id]);
         }
 
         private static void AssertThatThisIsAnAcceptableBoolValue(DataTableRow row, string id)
         {
             var acceptedValues = new[] { "true", "false" };
-            if (acceptedValues.Contains(row[id], StringComparer.OrdinalIgnoreCase) == false)
+            if (!acceptedValues.Contains(row[id], StringComparer.OrdinalIgnoreCase))
                 throw new InvalidCastException($"You must use 'true' or 'false' when setting bools for {id}");
         }
 
         private static void AssertThatAValueWithThisIdExistsInThisRow(DataTableRow row, string id)
         {
-            if (AValueWithThisIdExists(row, id) == false)
+            if (!AValueWithThisIdExists(row, id))
                 throw new InvalidOperationException($"{id} could not be found in the row.");
         }
 
