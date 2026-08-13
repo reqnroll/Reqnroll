@@ -2,9 +2,9 @@
 
 /// <summary>
 /// Tracks the information needed for a Cucumber Messages "hook step", that is a hook with binding information.
-/// The hook step needs to be built upon the first execution attempt of a pickle.
+/// Hook step ledger entries are created lazily across execution attempts and are keyed by (hookId, occurrence).
 /// </summary>
-public class HookStepTracker(string testStepId, string hookId) : StepTrackerBase(testStepId)
+public class HookStepTracker(string testStepId, string hookId, int occurrence) : StepTrackerBase(testStepId, occurrence)
 {
     public string HookId { get; } = hookId;
 }

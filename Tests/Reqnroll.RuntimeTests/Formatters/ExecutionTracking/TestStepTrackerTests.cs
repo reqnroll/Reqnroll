@@ -55,13 +55,13 @@ public class TestStepTrackerTests
         stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
         stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
 
-        _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker));
+        _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", 1, _testCaseTracker));
         _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
             new Dictionary<IBinding, string> { { stepBindingMock.Object, "stepPickleId" } });
                 
         var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
 
-        var def = new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker);
+        var def = new TestStepTracker("stepDefId", "stepPickleId", 1, _testCaseTracker);
 
         // Act
         def.ProcessEvent(evt);
@@ -103,13 +103,13 @@ public class TestStepTrackerTests
         stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
         stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
 
-        _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker));
+        _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", 1, _testCaseTracker));
         _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
             new Dictionary<IBinding, string> { { stepBindingMock.Object, "stepPickleId" } });
 
         var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
 
-        var def = new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker);
+        var def = new TestStepTracker("stepDefId", "stepPickleId", 1, _testCaseTracker);
 
         // Act
         def.ProcessEvent(evt);
@@ -152,7 +152,7 @@ public class TestStepTrackerTests
 
         var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
 
-        var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker);
+        var def = new TestStepTracker("stepDefId", "pickleStepId", 1, _testCaseTracker);
 
         // Act
         def.ProcessEvent(evt);
@@ -208,13 +208,13 @@ public class TestStepTrackerTests
 
         //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
         //    .Returns("ambiguousPattern");
-        _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", _testCaseTracker));
+        _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", 1, _testCaseTracker));
         _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
             new Dictionary<IBinding, string> { { stepBindingMock.Object, "pickleStepId" } });
 
         var evt = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
 
-        var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker);
+        var def = new TestStepTracker("stepDefId", "pickleStepId", 1, _testCaseTracker);
 
         // Act
         def.ProcessEvent(evt);

@@ -10,7 +10,6 @@ public class TestCaseExecutionTrackerFactory(IIdGenerator idGenerator, ICucumber
         IPickleExecutionTracker parentTracker,
         int attemptId,
         string testCaseId,
-        TestCaseTracker testCaseTracker,
         IMessagePublisher picklePublisher = null)
     {
         return new TestCaseExecutionTracker(
@@ -18,7 +17,6 @@ public class TestCaseExecutionTrackerFactory(IIdGenerator idGenerator, ICucumber
             attemptId,
             idGenerator.GetNewId(),
             testCaseId,
-            testCaseTracker,
             messageFactory,
             picklePublisher ?? publisher,
             stepTrackerFactory);
