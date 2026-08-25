@@ -196,10 +196,10 @@ namespace Reqnroll.Generator.Generation
                         new CodeAssignStatement(
                             tagsExpression,
                             new CodeMethodInvokeExpression(
-                                new CodeTypeReferenceExpression(typeof(Enumerable)),
+                                new CodeTypeReferenceExpression(new CodeTypeReference(typeof(Enumerable), CodeTypeReferenceOptions.GlobalReference)),
                                 "ToArray",
                                 new CodeMethodInvokeExpression(
-                                    new CodeTypeReferenceExpression(typeof(Enumerable)),
+                                    new CodeTypeReferenceExpression(new CodeTypeReference(typeof(Enumerable), CodeTypeReferenceOptions.GlobalReference)),
                                     "Concat",
                                     tagsExpression,
                                     additionalTagsExpression)))));
