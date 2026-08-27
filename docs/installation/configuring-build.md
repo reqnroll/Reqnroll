@@ -46,3 +46,16 @@ The `Import` statement is there to make sure any `Directory.Build.props` files a
 You can find more details about build customization at https://learn.microsoft.com/en-us/visualstudio/msbuild/customize-by-directory?view=vs-2022
 
 You are welcome to consult Microsoft documentation (or your favorite AI) for other ways to pass build variables to the build.
+
+## Task factory used to run the code generation task
+The code generation performed by `Reqnroll.Tools.MsBuild.Generation` runs as an MSBuild task, and MSBuild loads the task assembly using a *task factory*. Which task factory is used can be controlled with the `ReqnrollGenerationTaskFactory` build variable. By default:
+- On Windows, `TaskHostFactory` is used. This runs the task in a separate process, which prevents Visual Studio from locking the task assembly file (e.g. during a build while the IDE is open) and avoids problems with nested or parallel MSBuild invocations (e.g. builds that themselves invoke MSBuild, or multiple projects building in parallel) trying to load the same assembly into the same process at the same time. See the [MSBuild documentation on task factories](https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-configure-targets-and-tasks?view=vs-2022#task-factories) for more details.
+- On other operating systems (e.g. Linux, macOS), `AssemblyTaskFactory` is used instead, since `TaskHostFactory` is not supported on all platforms (see [#152](https://github.com/reqnroll/Reqnroll/issues/152)). `AssemblyTaskFactory` loads the task assembly directly into the MSBuild process.
+
+You can override this default by setting `ReqnrollGenerationTaskFactory` explicitly, e.g. to force the use of `AssemblyTaskFactory` on Windows too:
+```xml
+<PropertyGroup>
+  <ReqnrollGenerationTaskFactory>AssemblyTaskFactory</ReqnrollGenerationTaskFactory>
+</PropertyGroup>
+```
+This can be useful if you are experiencing issues with `TaskHostFactory` (e.g. it not being available or behaving unexpectedly) and want to fall back to loading the task assembly directly in the MSBuild process instead.
