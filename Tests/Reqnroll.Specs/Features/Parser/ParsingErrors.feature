@@ -159,3 +159,23 @@ Scenario: Duplicated background
 		| line | error             |
 		| 6    | got 'Background:' |
 
+Scenario: Table without trailing delimiter on any row
+	# This test demonstrates issue #964: when all rows are missing the trailing pipe delimiter,
+	# the parser silently ignores the last column instead of reporting an error.
+	# Expected behavior: should report an error or warning about missing trailing delimiter
+	# Actual behavior: no error is reported, and the last column is silently ignored
+	Given there is a Gherkin file as
+	"""
+		Feature: Table without trailing delimiter
+
+		Scenario: Table without trailing delimiter
+			Given a table
+				| EffectiveDate | InterestRate
+				| 1999-01-01    | 10.00
+	"""
+	When the file is parsed
+	Then no parsing error is reported
+	And the parsed table has only the following columns
+		| column        |
+		| EffectiveDate |
+
