@@ -255,53 +255,100 @@ jobs:
       shell: pwsh
       run: |
         Write-Output "Validating NuGet packages..."
+
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+        function Get-NupkgId {
+          param([string]$Path)
+          $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
+          try {
+            $entry = $zip.Entries | Where-Object { $_.FullName -like '*.nuspec' -and -not $_.FullName.Contains('/') } | Select-Object -First 1
+            if ($null -eq $entry) { throw "No .nuspec entry found in '$Path'." }
+            $stream = $entry.Open()
+            try {
+              $reader = New-Object System.IO.StreamReader($stream)
+              [xml]$xml = $reader.ReadToEnd()
+              $reader.Dispose()
+            } finally {
+              $stream.Dispose()
+            }
+          } finally {
+            $zip.Dispose()
+          }
+          $id = $xml.package.metadata.id
+          if ([string]::IsNullOrEmpty($id)) { throw "Package ID not found in .nuspec of '$Path'." }
+          return $id
+        }
+
+        # Per-package rule overrides: key = NuGet package ID, value = rules to exclude for that package.
+        # Add a new entry here whenever a new package is introduced in the repository.
+        $packageRuleOverrides = [ordered]@{
+          'Reqnroll'                                          = @('AuthorMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.Assist.Dynamic'                           = @('AssembliesMustBeOptimized', 'ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.Autofac'                                  = @('ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.CustomPlugin'                             = @('ReadmeMustBeSet', 'Symbols', 'XmlDocumentationMustBePresent')
+          'Reqnroll.ExternalData'                             = @('ReadmeMustBeSet')
+          'Reqnroll.Generator'                                = @('XmlDocumentationMustBePresent')
+          'Reqnroll.Microsoft.Extensions.DependencyInjection' = @('ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.MSTest'                                   = @('ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.NUnit'                                    = @('ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.Templates.DotNet'                         = @('ReadmeMustBeSet')
+          'Reqnroll.Tools.MsBuild.Generation'                 = @('AssembliesMustBeOptimized', 'ReadmeMustBeSet')
+          'Reqnroll.TUnit'                                    = @()
+          'Reqnroll.Verify'                                   = @('AssembliesMustBeOptimized', 'ReadmeMustBeSet', 'Symbols', 'XmlDocumentationMustBePresent')
+          'Reqnroll.Windsor'                                  = @('ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.xUnit'                                    = @('ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+          'Reqnroll.xunit.v3'                                 = @('ReadmeMustBeSet', 'XmlDocumentationMustBePresent')
+        }
+
+        # Rules excluded for all packages on non-main branches (e.g. debug builds in PRs)
+        $globalExcludedRules = @()
+        if ('${{ github.ref }}' -ne 'refs/heads/main') {
+          $globalExcludedRules += 'AssembliesMustBeOptimized'
+          Write-Output '::notice::Assembly optimization validation skipped for non-main branch'
+        }
+
         $packages = Get-ChildItem "GeneratedNuGetPackages/${{ needs.build.outputs.product_configuration }}/*.nupkg" -Exclude "*.snupkg"
         $errorCount = 0
-        $totalPackages = $packages.Count
-        
-        # Determine excluded rules based on branch
-        $excludedRules = @()
-        if ("${{ github.ref }}" -ne "refs/heads/main") {
-          $excludedRules += "AssembliesMustBeOptimized"
-          Write-Output "::notice::Assembly optimization validation skipped for non-main branch"
-        }
-        
+
         foreach ($package in $packages) {
-          Write-Output "Validating package: $($package.Name)"
-          try {
-            # Build validation command with conditional exclusions
-            $validationArgs = @($package.FullName)
-            if ($excludedRules.Count -gt 0) {
-              $validationArgs += "--excluded-rules"
-              $validationArgs += ($excludedRules -join ",")
-            }
-            
-            # Run validation
-            $validationResult = & meziantou.validate-nuget-package @validationArgs
-            $exitCode = $LASTEXITCODE
-            
-            if ($exitCode -eq 0) {
-              Write-Output "✅ $($package.Name) passed validation"
-            } else {
-              Write-Output "::warning title=Package Validation Issues::$($package.Name) has validation issues"
-              Write-Output $validationResult
-              # For now, we'll log warnings but not fail the build to allow gradual improvement
-              # This can be changed to fail the build once all validation issues are resolved
-              Write-Output "::notice::Package validation issues detected but not failing build (gradual improvement mode)"
-            }
-          } catch {
-            Write-Output "::error title=Package Validation Error::Error validating $($package.Name): $_"
+          $packageId = Get-NupkgId -Path $package.FullName
+          Write-Output "--- Validating: $packageId ($($package.Name)) ---"
+
+          if (-not $packageRuleOverrides.Contains($packageId)) {
+            Write-Output "::error title=Unknown Package::Package '$packageId' is not registered in `$packageRuleOverrides."
+            Write-Output "::error::To register it, add an entry to the hashtable in the 'Validate NuGet packages' step:"
+            Write-Output "::error::  '$packageId' = @()               # no exclusions"
+            Write-Output "::error::  '$packageId' = @('RuleName')     # with exclusions"
+            $errorCount++
+            continue
+          }
+
+          $excluded = ($globalExcludedRules + $packageRuleOverrides[$packageId]) | Select-Object -Unique
+          $validationArgs = @($package.FullName)
+          if ($excluded.Count -gt 0) {
+            $validationArgs += '--excluded-rules'
+            $validationArgs += ($excluded -join ',')
+            Write-Output "  Excluded rules: $($excluded -join ', ')"
+          }
+
+          $validationResult = & meziantou.validate-nuget-package @validationArgs 2>&1
+          $exitCode = $LASTEXITCODE
+
+          if ($exitCode -eq 0) {
+            Write-Output "  ✅ Passed"
+          } else {
+            Write-Output "::error title=Validation Failed [$packageId]::$($package.Name) failed validation (exit $exitCode)"
+            $validationResult | ForEach-Object { Write-Output "  $_" }
             $errorCount++
           }
         }
-        
+
         if ($errorCount -gt 0) {
-          Write-Output "::error title=Package Validation Failed::$errorCount package(s) had validation errors"
+          Write-Output "::error title=Package Validation Failed::$errorCount package(s) failed validation."
           exit 1
-        } else {
-          Write-Output "✅ Validation completed for $totalPackages packages"
-          exit 0
         }
+        Write-Output "✅ All $($packages.Count) packages passed validation."
 
   component-tests:
     runs-on: ubuntu-latest
