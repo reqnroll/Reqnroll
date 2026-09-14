@@ -10,6 +10,10 @@ namespace Reqnroll.Assist.ValueRetrievers
     {
         private MethodInfo toListMethodInfo;
 
+        public ListValueRetriever(Service service) : base(service)
+        {
+        }
+        
         public override bool CanRetrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType)
         {
             if (!propertyType.IsGenericType)

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
+using Reqnroll.Assist;
 using Reqnroll.Assist.ValueRetrievers;
 using Xunit;
 
@@ -73,9 +74,10 @@ namespace Reqnroll.RuntimeTests.AssistTests.ValueRetrieverTests
         [MemberData(nameof(CanRetrieveData))]
         public void Can_retrieve_value_enumeration_properties(Type valueType)
         {
+            var service = new Service();
             foreach (var propertyType in BuildPropertyTypes(valueType))
             {
-                var retriever = CreateTestee();
+                var retriever = CreateTestee(service);
 
                 var actual = retriever.CanRetrieve(new KeyValuePair<string, string>(), null, propertyType);
 
@@ -105,9 +107,10 @@ namespace Reqnroll.RuntimeTests.AssistTests.ValueRetrieverTests
 
         private void TestRetrieve(Type valueType, string fieldValue, IEnumerable expectedValues)
         {
+            var service = new Service();
             foreach (var propertyType in BuildPropertyTypes(valueType))
             {
-                var retriever = CreateTestee();
+                var retriever = CreateTestee(service);
 
                 var resultObject = retriever.Retrieve(new KeyValuePair<string, string>(FieldName, fieldValue), null, propertyType);
 
@@ -116,7 +119,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.ValueRetrieverTests
             }
         }
 
-        protected abstract EnumerableValueRetriever CreateTestee();
+        protected abstract EnumerableValueRetriever CreateTestee(Service service);
         
         protected abstract IEnumerable<Type> BuildPropertyTypes(Type valueType);
     }

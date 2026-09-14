@@ -1,4 +1,5 @@
 using Gherkin.CucumberMessages;
+using Reqnroll.Assist;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
 using Reqnroll.Analytics.UserId;
@@ -157,6 +158,8 @@ namespace Reqnroll.Infrastructure
 
         public void RegisterScenarioContainerDefaults(ObjectContainer scenarioContainer)
         {
+            scenarioContainer.RegisterFactoryAs<Service>(c => new Service(c));
+            scenarioContainer.RegisterTypeAs<TableHelpers, TableHelpers>();
         }
     }
 }

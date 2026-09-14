@@ -6,7 +6,7 @@ namespace Reqnroll.Assist
     #nullable enable
     internal sealed class ReqnrollDefaultValueRetrieverList : ServiceComponentList<IValueRetriever>
     {
-        public ReqnrollDefaultValueRetrieverList()
+        public ReqnrollDefaultValueRetrieverList(Service service)
             : base(new List<IValueRetriever> {
                 // Sorted by likelihood
                 new StringValueRetriever(),
@@ -19,8 +19,8 @@ namespace Reqnroll.Assist
                 new TimeSpanValueRetriever(),
                 new GuidValueRetriever(),
                 new EnumValueRetriever(),
-                new ListValueRetriever(),
-                new ArrayValueRetriever(),
+                new ListValueRetriever(service),
+                new ArrayValueRetriever(service),
                 new ByteValueRetriever(),
                 new SByteValueRetriever(),
                 new UIntValueRetriever(),
