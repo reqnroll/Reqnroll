@@ -37,6 +37,7 @@ public class TestStepExecutionTrackerTests
         _testCaseExecutionTrackerStub = CreateTestCaseExecutionTracker();
 
         _pickleExecutionTrackerMock.SetupGet(t => t.TestCaseTracker).Returns(_testCaseTrackerStub);
+        _pickleExecutionTrackerMock.SetupGet(t => t.IdGenerator).Returns(_idGeneratorMock.Object);
 
         // Setup mocked objects for tests
         _testStepExecutionTrackerSut = new TestStepExecutionTracker(
@@ -48,7 +49,7 @@ public class TestStepExecutionTrackerTests
     }
 
     private TestCaseExecutionTracker CreateTestCaseExecutionTracker(int attemptId = 0) =>
-        new(_pickleExecutionTrackerMock.Object, attemptId, "testCaseStartedId", "testCaseId", _testCaseTrackerStub, _messageFactoryMock.Object, _publisherMock.Object, _stepTrackerFactoryMock.Object);
+        new(_pickleExecutionTrackerMock.Object, attemptId, "testCaseStartedId", "testCaseId", _messageFactoryMock.Object, _publisherMock.Object, _stepTrackerFactoryMock.Object);
 
     [Fact]
     public async Task TestStepTracker_GenerateFrom_StepStartedEvent_PublishesOneEnvelope()
@@ -152,7 +153,7 @@ public class TestStepExecutionTrackerTests
 
         var stepFinishedEvent = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
 
-        var definitionStub = new TestStepTracker("stepId", "stepPickleId", null);
+        var definitionStub = new TestStepTracker("stepId", "stepPickleId", 1, null);
         _testStepExecutionTrackerSut.StepTracker = definitionStub;
 
         _pickleExecutionTrackerMock.SetupGet(t => t.AttemptCount).Returns(0); // First attempt
@@ -198,7 +199,7 @@ public class TestStepExecutionTrackerTests
             .Setup(f => f.ToSuggestion(_testStepExecutionTrackerSut, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IIdGenerator>()))
             .Returns(suggestion);
 
-        var definitionStub = new TestStepTracker("testStepId", "undefinedPickleId", null);
+        var definitionStub = new TestStepTracker("testStepId", "undefinedPickleId", 1, null);
         _testStepExecutionTrackerSut.StepTracker = definitionStub;
 
         _pickleExecutionTrackerMock.SetupGet(t => t.AttemptCount).Returns(0);

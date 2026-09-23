@@ -17,22 +17,23 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
     {
         StepStartedAt = stepStartedEvent.Timestamp;
 
-        // if this is the first time to execute this step for this test, generate the properties needed to Generate the TestStep Message (stored in a TestStepTracker)
-        if (ParentTracker.IsFirstAttempt)
-        {
-            TestCaseTracker.ProcessEvent(stepStartedEvent);
-        }
+        // Resolve (or, on first sight across all attempts, create) the ledger entry for this step.
+        // We cannot trust AttemptCount here: an earlier attempt may have aborted before reaching this
+        // step, so the entry might not yet exist even though this is not the first attempt.
+        var pickleStepId = stepStartedEvent.StepContext.StepInfo.PickleStepId;
+        var occurrence = ParentTracker.NextOccurrence(StepKind.TestStep, pickleStepId);
+        StepTracker = TestCaseTracker.GetOrCreateTestStepTracker(pickleStepId, occurrence);
 
-        StepTracker = TestCaseTracker.GetTestStepTrackerByPickleId(stepStartedEvent.StepContext.StepInfo.PickleStepId);
         await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepStarted(this)));
     }
 
     public async Task ProcessEvent(StepFinishedEvent stepFinishedEvent)
     {
-        if (ParentTracker.IsFirstAttempt)
+        // Reuse the ledger entry resolved at StepStarted; capture of binding details is idempotent
+        // (guarded inside TestStepTracker) so re-execution on a retry does not duplicate it.
+        if (StepTracker is TestStepTracker testStepTracker)
         {
-            var testStepTracker = TestCaseTracker.GetTestStepTrackerByPickleId(stepFinishedEvent.StepContext.StepInfo.PickleStepId);
-            testStepTracker?.ProcessEvent(stepFinishedEvent);
+            testStepTracker.ProcessEvent(stepFinishedEvent);
         }
 
         StepFinishedAt = stepFinishedEvent.Timestamp;

@@ -8,6 +8,5 @@ public interface ITestCaseExecutionTrackerFactory
         IPickleExecutionTracker parentTracker,
         int attemptId,
         string testCaseId,
-        TestCaseTracker testCaseTracker,
         IMessagePublisher picklePublisher);
 }
