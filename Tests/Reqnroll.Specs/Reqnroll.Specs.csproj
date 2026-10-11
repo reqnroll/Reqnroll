@@ -36,6 +36,14 @@
   </ItemGroup>
    
   <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Analyzers\Reqnroll.Analyzers.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Reqnroll.StepBindingSourceGenerator\Reqnroll.StepBindingSourceGenerator.csproj">
+      <OutputItemType>Analyzer</OutputItemType>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj">
       <AdditionalTargets>GenerateAssemblyHookTemplates</AdditionalTargets>
     </ProjectReference>
@@ -45,6 +53,15 @@
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    
+    <ProjectReference
+      Include="..\..\Reqnroll.Analyzers\Reqnroll.Analyzers.csproj"
+      ReferenceOutputAssembly="false"
+      OutputItemType="Analyzer" />
+    <ProjectReference
+      Include="..\..\Reqnroll.StepBindingSourceGenerator\Reqnroll.StepBindingSourceGenerator.csproj"
+      ReferenceOutputAssembly="false"
+      OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>
