@@ -18,7 +18,7 @@ You can get a deeper understanding of Reqnroll by looking at sample and demo app
   - [@ZsoltDunai](https://github.com/ZsoltDunai)
   - Sample PlayWright test project that shows how to setup Reqnroll and PlayWright with modern principles.
 * - [ReqNRollPlayWright](https://github.com/rohitsaraswat7865/Reqnroll_Playwright_CSharp)
-  - 1.0.0
+  - 3.3.4
   - [@RohitSaraswat](https://github.com/rohitsaraswat7865/)
   - A comprehensive automation framework using Playwright and Reqnroll for end-to-end testing of web applications.
 ```
