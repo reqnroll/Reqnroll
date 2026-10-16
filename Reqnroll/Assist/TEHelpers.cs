@@ -13,19 +13,19 @@ namespace Reqnroll.Assist
         private static readonly Regex invalidPropertyNameRegex = new Regex(InvalidPropertyNamePattern, RegexOptions.Compiled);
         private const string InvalidPropertyNamePattern = @"[^\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Nd}_]";
 
-        internal static T CreateInstanceAndInitializeWithValuesFromTheTable<T>(Table table, InstanceCreationOptions creationOptions)
+        internal static T CreateInstanceAndInitializeWithValuesFromTheTable<T>(Service service, Table table, InstanceCreationOptions creationOptions)
         {
             var instance = (T)Activator.CreateInstance(typeof(T));
-            LoadInstanceWithKeyValuePairs(table, instance, creationOptions);
+            LoadInstanceWithKeyValuePairs(service, table, instance, creationOptions);
             return instance;
         }
 
-        internal static T ConstructInstanceWithValuesFromTheTable<T>(Table table, InstanceCreationOptions creationOptions)
+        internal static T ConstructInstanceWithValuesFromTheTable<T>(Service service, Table table, InstanceCreationOptions creationOptions)
         {
             creationOptions ??= new InstanceCreationOptions();
             creationOptions.AssumeInstanceIsAlreadyCreated = false;
 
-            var (memberHandlers, constructorInfo) = GetMembersThatNeedToBeSet(table, typeof(T), creationOptions);
+            var (memberHandlers, constructorInfo) = GetMembersThatNeedToBeSet(service, table, typeof(T), creationOptions);
 
             VerifyAllColumn(table, creationOptions, memberHandlers.Select(m => m.MemberName));
 
@@ -36,13 +36,13 @@ namespace Reqnroll.Assist
             {
                 var parameter = parameters[i];
                 var matchingHandler = memberHandlers.FirstOrDefault(memberHandler => memberHandler.MatchesParameter(parameter));
-                parameterValues[i] = matchingHandler?.GetValue() ?? (parameter.HasDefaultValue ? parameter.DefaultValue : null);
+                parameterValues[i] = matchingHandler?.GetValue(service) ?? (parameter.HasDefaultValue ? parameter.DefaultValue : null);
                 
                 memberHandlers.Remove(matchingHandler);
             }
 
             var instance = (T)constructorInfo.Invoke(parameterValues);
-            memberHandlers.ForEach(x => x.Setter(instance, x.GetValue()));
+            memberHandlers.ForEach(x => x.Setter(instance, x.GetValue(service)));
             
             return instance;
         }
@@ -55,10 +55,10 @@ namespace Reqnroll.Assist
         internal static bool IsMemberMatchingToColumnName(MemberInfo member, string columnName)
         {
             return member.Name.MatchesThisColumnName(columnName)
-                || IsMatchingAlias(member, columnName);
+                   || IsMatchingAlias(member, columnName);
         }
 
-        private static bool MatchesThisColumnName(this string propertyName, string columnName)
+        internal static bool MatchesThisColumnName(this string propertyName, string columnName)
         {
             var normalizedColumnName = NormalizePropertyNameToMatchAgainstAColumnName(RemoveAllCharactersThatAreNotValidInAPropertyName(columnName));
             var normalizedPropertyName = NormalizePropertyNameToMatchAgainstAColumnName(propertyName);
@@ -79,17 +79,17 @@ namespace Reqnroll.Assist
             return name.Replace("_", string.Empty).ToIdentifier();
         }
 
-        internal static void LoadInstanceWithKeyValuePairs(Table table, object instance, InstanceCreationOptions creationOptions)
+        internal static void LoadInstanceWithKeyValuePairs(Service service, Table table, object instance, InstanceCreationOptions creationOptions)
         {
             creationOptions ??= new InstanceCreationOptions();
             creationOptions.AssumeInstanceIsAlreadyCreated = true;
 
-            var (memberHandlers, _) = GetMembersThatNeedToBeSet(table, instance.GetType(), creationOptions);
+            var (memberHandlers, _) = GetMembersThatNeedToBeSet(service, table, instance.GetType(), creationOptions);
             var memberNames = memberHandlers.Select(h => h.MemberName);
 
             VerifyAllColumn(table, creationOptions, memberNames);
 
-            memberHandlers.ForEach(x => x.Setter(instance, x.GetValue()));
+            memberHandlers.ForEach(x => x.Setter(instance, x.GetValue(service)));
         }
 
         private static void VerifyAllColumn(Table table, InstanceCreationOptions creationOptions, IEnumerable<string> memberNames)
@@ -107,7 +107,7 @@ namespace Reqnroll.Assist
             }
         }
 
-        private static (List<MemberHandler>, ConstructorInfo) GetMembersThatNeedToBeSet(Table table, Type type, InstanceCreationOptions creationOptions)
+        private static (List<MemberHandler>, ConstructorInfo) GetMembersThatNeedToBeSet(Service service, Table table, Type type, InstanceCreationOptions creationOptions)
         {
             if (creationOptions is null)
             {
@@ -116,14 +116,15 @@ namespace Reqnroll.Assist
 
             var properties = (from property in type.GetProperties()
                               from row in table.Rows
-                              where TheseTypesMatch(type, property.PropertyType, row)
+                              where TheseTypesMatch(service, type, property.PropertyType, row)
                                     && IsMemberMatchingToColumnName(property, row.Id())
-                              select new MemberHandler { Type = type, Row = row, MemberName = property.Name, PropertyType = property.PropertyType, Setter = (i, v) => property.SetValue(i, v, null) }).ToList();
+                              select new MemberHandler { Type = type, Row = row, MemberName = property.Name, PropertyType = property.PropertyType, Setter = (i, v) => property.SetValue(i, v, null) })
+                .ToList();
 
             var fieldInfos = type.GetFields();
             var fields = (from field in fieldInfos
                           from row in table.Rows
-                          where TheseTypesMatch(type, field.FieldType, row)
+                          where TheseTypesMatch(service, type, field.FieldType, row)
                                 && IsMemberMatchingToColumnName(field, row.Id())
                           select new MemberHandler { Type = type, Row = row, MemberName = field.Name, PropertyType = field.FieldType, Setter = (i, v) => field.SetValue(i, v) }).ToList();
 
@@ -147,16 +148,17 @@ namespace Reqnroll.Assist
                         var field = fieldInfos[index];
                         var row = table.Rows[index];
 
-                        if (TheseTypesMatch(type, field.FieldType, row))
+                        if (TheseTypesMatch(service, type, field.FieldType, row))
                         {
-                            memberHandlers.Add(new MemberHandler
-                            {
-                                Type = type,
-                                Row = row,
-                                MemberName = field.Name,
-                                PropertyType = field.FieldType,
-                                Setter = (i, v) => field.SetValue(i, v)
-                            });
+                            memberHandlers.Add(
+                                new MemberHandler
+                                {
+                                    Type = type,
+                                    Row = row,
+                                    MemberName = field.Name,
+                                    PropertyType = field.FieldType,
+                                    Setter = (i, v) => field.SetValue(i, v)
+                                });
                         }
                     }
                 }
@@ -206,7 +208,7 @@ namespace Reqnroll.Assist
 
                     var matchingHandlers = (from parameter in unresolvedParameters
                                             from row in table.Rows
-                                            where parameter.Name.MatchesThisColumnName(row.Id()) && TheseTypesMatch(type, parameter.ParameterType, row)
+                                            where parameter.Name.MatchesThisColumnName(row.Id()) && TheseTypesMatch(service, type, parameter.ParameterType, row)
                                             select new MemberHandler
                                             {
                                                 Type = type,
@@ -250,22 +252,26 @@ namespace Reqnroll.Assist
             return aliases.Any(a => a.Aliases.Any(al => Regex.Match(id, al).Success));
         }
 
-        private static bool TheseTypesMatch(Type targetType, Type memberType, DataTableRow row)
+        private static bool TheseTypesMatch(Service service, Type targetType, Type memberType, DataTableRow row)
         {
-            return Service.Instance.GetValueRetrieverFor(row, targetType, memberType) != null;
+            return service.GetValueRetrieverFor(row, targetType, memberType) != null;
         }
 
         internal class MemberHandler
         {
             public DataTableRow Row { get; set; }
+
             public string MemberName { get; set; }
+
             public Action<object, object> Setter { get; set; }
+
             public Type Type { get; set; }
+
             public Type PropertyType { get; set; }
 
-            public object GetValue()
+            public object GetValue(Service service)
             {
-                var valueRetriever = Service.Instance.GetValueRetrieverFor(Row, Type, PropertyType);
+                var valueRetriever = service.GetValueRetrieverFor(Row, Type, PropertyType);
                 if (valueRetriever is null)
                 {
                     throw new InvalidOperationException($"Unable to resolve value retriever for member {MemberName}");
@@ -289,8 +295,7 @@ namespace Reqnroll.Assist
 
         private static bool ThisIsAVerticalTable(Table table, Type type)
         {
-            if (TheHeaderIsTheOldFieldValuePair(table))
-                return true;
+            if (TheHeaderIsTheOldFieldValuePair(table)) return true;
             return (table.Rows.Count() != 1) || (table.Header.Count == 2 && TheFirstRowValueIsTheNameOfAProperty(table, type));
         }
 
@@ -308,11 +313,9 @@ namespace Reqnroll.Assist
 
         private static bool IsValueTupleType(Type type, bool checkBaseTypes = false)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
+            if (type == null) throw new ArgumentNullException(nameof(type));
 
-            if (type == typeof(Tuple))
-                return true;
+            if (type == typeof(Tuple)) return true;
 
             while (type != null)
             {
@@ -334,8 +337,7 @@ namespace Reqnroll.Assist
                         return true;
                 }
 
-                if (!checkBaseTypes)
-                    break;
+                if (!checkBaseTypes) break;
 
                 type = type.BaseType;
             }

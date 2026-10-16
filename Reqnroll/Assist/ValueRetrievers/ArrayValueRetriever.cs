@@ -6,6 +6,10 @@ namespace Reqnroll.Assist.ValueRetrievers
 {
     public class ArrayValueRetriever : EnumerableValueRetriever
     {
+        public ArrayValueRetriever(Service service) : base(service)
+        {
+        }
+
         public override bool CanRetrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType)
         {
             return propertyType.IsArray;
@@ -24,6 +28,7 @@ namespace Reqnroll.Assist.ValueRetrievers
             {
                 typedArray.SetValue(value, i++);
             }
+
             return typedArray;
         }
     }

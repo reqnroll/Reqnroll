@@ -8,12 +8,14 @@ namespace Reqnroll.Assist
     {
         private const int MatchNotFound = -1;
         private readonly Table table;
+        private readonly TableHelpers _tableHelpers;
         private List<TableDifferenceItem<T>> extraOrNonMatchingActualItems;
         private readonly ITableDiffExceptionBuilder<T> tableDiffExceptionBuilder;
 
-        public SetComparer(Table table)
+        public SetComparer(Table table, TableHelpers tableHelpers)
         {
             this.table = table;
+            _tableHelpers = tableHelpers;
             tableDiffExceptionBuilder = BuildTheTableDiffExceptionBuilder();
         }
 
@@ -40,8 +42,7 @@ namespace Reqnroll.Assist
         {
             AssertThatAllColumnsInTheTableMatchToPropertiesOnTheType();
 
-            if (ThereAreNoResultsAndNoExpectedResults(set))
-                return;
+            if (ThereAreNoResultsAndNoExpectedResults(set)) return;
 
             var expectedItemsNotFoundInTheData = GetExpectedItemsNotFoundInTheData(set, sequentialEquality);
 
@@ -64,8 +65,7 @@ namespace Reqnroll.Assist
 
         private void AssertThatTheItemsMatchTheExpectedResults(IEnumerable<int> listOfMissingItems)
         {
-            if (ExpectedItemsCouldNotBeFound(listOfMissingItems))
-                ThrowAnErrorDetailingWhichItemsAreMissing(listOfMissingItems);
+            if (ExpectedItemsCouldNotBeFound(listOfMissingItems)) ThrowAnErrorDetailingWhichItemsAreMissing(listOfMissingItems);
         }
 
         private IEnumerable<int> GetListOfExpectedItemsThatCouldNotBeFoundOrderInsensitive(IEnumerable<T> set)
@@ -103,14 +103,14 @@ namespace Reqnroll.Assist
             for (var index = 0; index < Math.Min(actualItems.Count, table.Rows.Count()); index++)
             {
                 var instanceTable = pivotTable.GetInstanceTable(index);
-                if (!ThisItemIsAMatch(instanceTable, actualItems[index]))
-                    listOfMissingItems.Add(index + 1);
+                if (!ThisItemIsAMatch(instanceTable, actualItems[index])) listOfMissingItems.Add(index + 1);
             }
 
             extraOrNonMatchingActualItems =
-                listOfMissingItems.Select(index => new TableDifferenceItem<T>(actualItems[index-1], index)).Concat(
-                actualItems.Skip(table.RowCount).Select(i => new TableDifferenceItem<T>(i)))
-                .ToList();
+                listOfMissingItems.Select(index => new TableDifferenceItem<T>(actualItems[index - 1], index))
+                                  .Concat(
+                                      actualItems.Skip(table.RowCount).Select(i => new TableDifferenceItem<T>(i)))
+                                  .ToList();
 
             var extraTableItems = table.Rows.Count() - actualItems.Count;
             if (extraTableItems > 0)
@@ -140,24 +140,25 @@ namespace Reqnroll.Assist
             actualItems.RemoveAt(matchIndex);
         }
 
-        private static int GetTheIndexOfTheMatchingItem(Table expectedItem,
-                                                        IList<T> actualItems)
+        private int GetTheIndexOfTheMatchingItem(
+            Table expectedItem,
+            IList<T> actualItems)
         {
             for (var actualItemIndex = 0; actualItemIndex < actualItems.Count; actualItemIndex++)
             {
                 var actualItem = actualItems[actualItemIndex];
 
-                if (ThisItemIsAMatch(expectedItem, actualItem))
-                    return actualItemIndex;
+                if (ThisItemIsAMatch(expectedItem, actualItem)) return actualItemIndex;
             }
+
             return MatchNotFound;
         }
 
-        private static bool ThisItemIsAMatch(Table expectedItem, T actualItem)
+        private bool ThisItemIsAMatch(Table expectedItem, T actualItem)
         {
             try
             {
-                return expectedItem.IsEquivalentToInstance(actualItem);
+                return _tableHelpers.IsEquivalentToInstance(expectedItem, actualItem);
             }
             catch
             {
@@ -175,13 +176,12 @@ namespace Reqnroll.Assist
             var propertyInfos = typeof(T).GetProperties();
             var propertiesThatDoNotExist
                 = table.Header
-                    .Where(
-                        columnHeader => !propertyInfos.Any(
-                                property => TEHelpers.IsMemberMatchingToColumnName(property, columnHeader)))
-                    .ToList();
+                       .Where(
+                           columnHeader => !propertyInfos.Any(
+                               property => TEHelpers.IsMemberMatchingToColumnName(property, columnHeader)))
+                       .ToList();
 
-            if (propertiesThatDoNotExist.Any())
-                throw new ComparisonException($@"The following fields do not exist:{Environment.NewLine}{string.Join(Environment.NewLine, propertiesThatDoNotExist)}");
+            if (propertiesThatDoNotExist.Any()) throw new ComparisonException($@"The following fields do not exist:{Environment.NewLine}{string.Join(Environment.NewLine, propertiesThatDoNotExist)}");
         }
     }
 }

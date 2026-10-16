@@ -9,14 +9,14 @@ namespace Reqnroll.Assist
         private readonly IEnumerable<T> collection;
         private readonly IEnumerable<string> properties;
 
-        public EnumerableProjection(Table table, IEnumerable<T> collection = null)
+        public EnumerableProjection(TableHelpers tableHelpers, Table table, IEnumerable<T> collection = null)
         {
             if (table == null && collection == null)
                 throw new ArgumentNullException(nameof(table), "Either table or projectCollection must be specified");
 
             if (table != null)
                 properties = table.Header;
-            this.collection = collection ?? table.CreateSet<T>();
+            this.collection = collection ?? tableHelpers.CreateSet<T>(table);
         }
 
         public IEnumerator<Projection<T>> GetEnumerator()

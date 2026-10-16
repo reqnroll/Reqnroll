@@ -5,107 +5,68 @@ using Reqnroll.Assist;
 // ReSharper disable once CheckNamespace
 namespace Reqnroll
 {
-    public static class TableHelperExtensionMethods
+    public static class TableExtensionMethods
     {
+        private static TableHelpers DefaultTableHelpers => new TableHelpers(Service.Instance);
+
         public static T CreateInstance<T>(this Table table)
         {
-            return CreateInstance<T>(table, (InstanceCreationOptions)null);
+            return DefaultTableHelpers.CreateInstance<T>(table);
         }
 
         public static T CreateInstance<T>(this Table table, InstanceCreationOptions creationOptions)
         {
-            var instanceTable = TEHelpers.GetTheProperInstanceTable(table, typeof(T));
-            return TEHelpers.ThisTypeHasADefaultConstructor<T>()
-                       ? TEHelpers.CreateInstanceAndInitializeWithValuesFromTheTable<T>(instanceTable, creationOptions)
-                       : TEHelpers.ConstructInstanceWithValuesFromTheTable<T>(instanceTable, creationOptions);
+            return DefaultTableHelpers.CreateInstance<T>(table, creationOptions);
         }
 
         public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance)
         {
-            return CreateInstance(table, methodToCreateTheInstance, null);
+            return DefaultTableHelpers.CreateInstance(table, methodToCreateTheInstance);
         }
 
         public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance, InstanceCreationOptions creationOptions)
         {
-            var instance = methodToCreateTheInstance();
-            table.FillInstance(instance, creationOptions);
-            return instance;
+            return DefaultTableHelpers.CreateInstance(table, methodToCreateTheInstance, creationOptions);
         }
 
         public static void FillInstance(this Table table, object instance)
         {
-            FillInstance(table, instance, null);
+            DefaultTableHelpers.FillInstance(table, instance);
         }
 
         public static void FillInstance(this Table table, object instance, InstanceCreationOptions creationOptions)
         {
-            var instanceTable = TEHelpers.GetTheProperInstanceTable(table, instance.GetType());
-            TEHelpers.LoadInstanceWithKeyValuePairs(instanceTable, instance, creationOptions);
+            DefaultTableHelpers.FillInstance(table, instance, creationOptions);
         }
 
         public static IEnumerable<T> CreateSet<T>(this Table table)
         {
-            return CreateSet<T>(table, (InstanceCreationOptions)null);
+            return DefaultTableHelpers.CreateSet<T>(table);
         }
 
         public static IEnumerable<T> CreateSet<T>(this Table table, InstanceCreationOptions creationOptions)
         {
-            int count = table.Rows.Count;
-
-            var list = new List<T>(count);
-
-
-            var pivotTable = new PivotTable(table);
-            for (var index = 0; index < count; index++)
-            {
-                var instance = pivotTable.GetInstanceTable(index).CreateInstance<T>(creationOptions);
-                list.Add(instance);
-            }
-
-            return list;
+            return DefaultTableHelpers.CreateSet<T>(table, creationOptions);
         }
 
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<T> methodToCreateEachInstance)
         {
-            return CreateSet(table, methodToCreateEachInstance, null);
+            return DefaultTableHelpers.CreateSet(table, methodToCreateEachInstance);
         }
 
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
         {
-            int count = table.Rows.Count;
-            var list = new List<T>(count);
-
-            var pivotTable = new PivotTable(table);
-            for (var index = 0; index < count; index++)
-            {
-                var instance = methodToCreateEachInstance();
-                pivotTable.GetInstanceTable(index).FillInstance(instance, creationOptions);
-                list.Add(instance);
-            }
-
-            return list;
+            return DefaultTableHelpers.CreateSet(table, methodToCreateEachInstance, creationOptions);
         }
 
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance)
         {
-            return CreateSet(table, methodToCreateEachInstance, null);
+            return DefaultTableHelpers.CreateSet(table, methodToCreateEachInstance);
         }
 
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
         {
-            int count = table.Rows.Count;
-            var list = new List<T>(count);
-
-            var pivotTable = new PivotTable(table);
-            for (var index = 0; index < count; index++)
-            {
-                var row = table.Rows[index];
-                var instance = methodToCreateEachInstance(row);
-                pivotTable.GetInstanceTable(index).FillInstance(instance, creationOptions);
-                list.Add(instance);
-            }
-
-            return list;
+            return DefaultTableHelpers.CreateSet(table, methodToCreateEachInstance, creationOptions);
         }
     }
 }

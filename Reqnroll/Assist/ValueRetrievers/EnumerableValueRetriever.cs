@@ -7,7 +7,13 @@ namespace Reqnroll.Assist.ValueRetrievers
 {
     public abstract class EnumerableValueRetriever : IValueRetriever
     {
+        private readonly Service _service;
         private static readonly char[] Separators = { ',', ';' };
+
+        public EnumerableValueRetriever(Service service)
+        {
+            _service = service;
+        }
 
         public abstract bool CanRetrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType);
 
@@ -48,17 +54,9 @@ namespace Reqnroll.Assist.ValueRetrievers
 
         protected abstract object BuildInstance(int count, IEnumerable values, Type valueType);
 
-        private static IValueRetriever GetValueRetriever(KeyValuePair<string, string> keyValuePair, Type targetType, Type valueType)
+        private IValueRetriever GetValueRetriever(KeyValuePair<string, string> keyValuePair, Type targetType, Type valueType)
         {
-            foreach (var retriever in Service.Instance.ValueRetrievers)
-            {
-                if (retriever.CanRetrieve(keyValuePair, targetType, valueType))
-                {
-                    return retriever;
-                }
-            }
-
-            return null;
+            return _service.GetValueRetrieverFor(keyValuePair, targetType, valueType);
         }
     }
 }

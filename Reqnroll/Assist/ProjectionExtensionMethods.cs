@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Reqnroll.Assist
@@ -6,22 +7,26 @@ namespace Reqnroll.Assist
     {
         public static IEnumerable<Projection<T>> ToProjection<T>(this IEnumerable<T> collection, Table table = null)
         {
-            return new EnumerableProjection<T>(table, collection);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table, collection);
         }
 
         public static IEnumerable<Projection<T>> ToProjection<T>(this Table table)
         {
-            return new EnumerableProjection<T>(table);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table);
         }
 
         public static IEnumerable<Projection<T>> ToProjectionOfSet<T>(this Table table, IEnumerable<T> collection)
         {
-            return new EnumerableProjection<T>(table);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table);
         }
 
         public static IEnumerable<Projection<T>> ToProjectionOfInstance<T>(this Table table, T instance)
         {
-            return new EnumerableProjection<T>(table);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table);
         }
     }
 }
