@@ -2,7 +2,7 @@
 hide-toc: true
 ---
 
-# Reqnroll IDE Support (Preview)
+# IDE Support (Preview)
 
 The Reqnroll team now provides **Reqnroll IDE Support** for all three major
 IDEs used by Reqnroll developers — **Visual Studio**, **Visual Studio

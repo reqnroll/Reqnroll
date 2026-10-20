@@ -62,6 +62,7 @@ extend/index
 
 integrations/index
 ide-integrations/index
+ide-support/index
 ```
 
 ```{toctree}

@@ -8,5 +8,4 @@ This part contains details of the following topics.
 visual-studio/index
 rider/index
 vscode/index
-ide-support/index
 ```
