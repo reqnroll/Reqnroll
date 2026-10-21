@@ -74,6 +74,19 @@ work as expected with the Reqnroll extension active.
 ````{tab-item} Rider
 :sync: rider
 
+```{admonition} Temporary installation from disk
+:class: warning
+
+The Rider plugin is not yet available in the JetBrains Marketplace due to technical issues. Until it is
+available, install it from disk:
+
+1. Download the `Reqnroll.IdeSupport.Rider.<version>.zip` file from the
+   [latest GitHub release](https://github.com/reqnroll/Reqnroll.IdeSupport/releases/tag/v2026.1.1494).
+2. Start Rider.
+3. Select **Configure → Plugins**.
+4. From the settings (gear) icon context menu, select **Install Plugin from Disk** and browse to the downloaded ZIP file.
+```
+
 1. In Rider, go to **Settings → Plugins → Marketplace**.
 2. Search for **"Reqnroll Extension (Preview)"** and install the plugin.
 3. Restart Rider when prompted.
