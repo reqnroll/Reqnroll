@@ -1,6 +1,0 @@
-/* Let Markdown tables use the full width of the article instead of shrinking to
-   their content (Furo's default), so they line up with the surrounding text. */
-article table.docutils,
-.table-wrapper table.docutils {
-  width: 100%;
-}

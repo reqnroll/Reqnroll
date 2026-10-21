@@ -32,7 +32,6 @@ author = 'Reqnroll'
 extensions = [
   'myst_parser',  # see https://myst-parser.readthedocs.io/en/v0.16.0/sphinx/intro.html, https://jdsalaro.com/cheatsheet/sphinx-myst-markdown/
   'sphinx_copybutton',
-#   'sphinx_design',  # per-IDE tabs in ide-integrations/ide-support
   'sphinxcontrib.googleanalytics'  # see https://github.com/sphinx-contrib/googleanalytics
 ]
 
@@ -114,13 +113,10 @@ html_theme_options = {
 
 html_css_files = [
     'css/custom.css',
-    'css/lightbox.css',
-    'css/tables.css',
 ] 
 
 html_js_files = [
     'tag-filtered-table.js',  # Enable tag-filtered-table functionality
-    'lightbox.js',  # click-to-zoom for content images
 ]
 
 # see https://pygments.org/styles/

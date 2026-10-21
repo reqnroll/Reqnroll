@@ -2,7 +2,6 @@ sphinx
 myst_parser
 furo
 sphinx-copybutton
-# sphinx-design
 sphinx-autobuild
 sphinxcontrib.googleanalytics
 
