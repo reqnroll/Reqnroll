@@ -4,6 +4,8 @@ furo
 sphinx-copybutton
 sphinx-autobuild
 sphinxcontrib.googleanalytics
+# sphinxcontrib namespace stub needs pkg_resources, removed in setuptools 81
+setuptools<81
 
 # sphinx-markdown-tables
 # readthedocs-sphinx-search
