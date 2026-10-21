@@ -5,9 +5,6 @@
 
 The extensions now have consolidated package identities, so Visual Studio, VS Code and Rider
 treat them as new packages rather than upgrades. **Uninstall any earlier preview build first.**
-The identities are `Reqnroll.IdeSupport.VisualStudio` (Visual Studio),
-`Reqnroll.reqnroll-ide-support` (VS Code, publisher `Reqnroll`) and `net.reqnroll.idesupport`
-(Rider).
 ```
 
 :::{tab-set}
