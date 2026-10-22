@@ -5,6 +5,7 @@
 
 ## Bug fixes:
 * Fix: GenerateFeatureFileCodeBehindTask fails with misleading DirectoryNotFoundException when ndjson output path exceeds Windows MAX_PATH (260)
+* Fix: Scenario Outline codegen emits unqualified System.Linq references resulting in CS0234 when the user's namespace includes 'System' (#1112)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi
 
