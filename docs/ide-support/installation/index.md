@@ -28,6 +28,8 @@ The Marketplace search will also surface the existing, non-preview
 **"Reqnroll.VisualStudio"** extension. They are separate listings — install
 the one explicitly labeled **(Preview)** to get the LSP-based extension
 described in these docs.
+
+[Direct link to the preview extension](https://marketplace.visualstudio.com/items?itemName=Reqnroll.reqnroll-ide-support-vs)
 ```
 
 **Only enable one at a time.** The Preview extension and the existing
