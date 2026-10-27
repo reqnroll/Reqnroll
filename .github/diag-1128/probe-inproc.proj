@@ -1,0 +1,7 @@
+<Project>
+  <UsingTask TaskName="PathProbeTask" AssemblyFile="$(MSBuildThisFileDirectory)ProbeTask\bin\Release\net462\ProbeTask.dll" />
+
+  <Target Name="Build">
+    <PathProbeTask Label="inproc" />
+  </Target>
+</Project>

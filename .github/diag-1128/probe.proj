@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <ProbeAssembly>$(MSBuildThisFileDirectory)ProbeTask\bin\Release\net462\ProbeTask.dll</ProbeAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="PathProbeTask" AssemblyFile="$(ProbeAssembly)" TaskFactory="TaskHostFactory" />
+
+  <Target Name="Build">
+    <Message Importance="High" Text="MSBuild $(MSBuildVersion), MSBuildRuntimeType $(MSBuildRuntimeType), bin: $(MSBuildBinPath)" />
+    <PathProbeTask Label="taskhost" />
+    <MSBuild Projects="$(MSBuildThisFileDirectory)probe-inproc.proj" />
+  </Target>
+</Project>

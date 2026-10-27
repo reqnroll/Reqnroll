@@ -1,0 +1,66 @@
+# TEMPORARY diagnostic workflow for https://github.com/reqnroll/Reqnroll/issues/1128 - remove before merging PR #1129
+name: Diag 1128
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  msbuild-path-probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-2025-vs2026, windows-2025 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Runner image
+      shell: pwsh
+      run: |
+        Write-Output "ImageOS=$env:ImageOS ImageVersion=$env:ImageVersion"
+        [System.Environment]::OSVersion.Version
+        (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full').Release
+        (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem').LongPathsEnabled
+    - name: Locate MSBuild
+      id: msbuild
+      shell: pwsh
+      run: |
+        $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -prerelease -products * -property installationPath
+        $bin = Join-Path $vs 'MSBuild\Current\Bin'
+        "bin=$bin" >> $env:GITHUB_OUTPUT
+        & "$bin\MSBuild.exe" -version -nologo
+        Get-ChildItem $bin, "$bin\amd64" -Filter 'MSBuild*.config*' | Select-Object FullName, Length, LastWriteTime | Format-Table -AutoSize | Out-String -Width 300
+    - name: Dump MSBuild.exe.config (x86)
+      shell: pwsh
+      run: Get-Content "${{ steps.msbuild.outputs.bin }}\MSBuild.exe.config" | Select-Object -First 40
+    - name: Dump MSBuild.exe.config (amd64)
+      shell: pwsh
+      run: Get-Content "${{ steps.msbuild.outputs.bin }}\amd64\MSBuild.exe.config" | Select-Object -First 40
+    - name: AppContext switches in configs
+      shell: pwsh
+      run: |
+        foreach ($f in "${{ steps.msbuild.outputs.bin }}\MSBuild.exe.config", "${{ steps.msbuild.outputs.bin }}\amd64\MSBuild.exe.config") {
+          Write-Output "== $f"
+          Select-String -Path $f -Pattern 'supportedRuntime|AppContextSwitchOverrides' | ForEach-Object { $_.Line.Trim() }
+        }
+    - name: Build probe task
+      shell: pwsh
+      run: |
+        # copy outside the repo so that the repo's Directory.Build.props is not applied
+        Copy-Item -Recurse .github\diag-1128 "$env:RUNNER_TEMP\probe"
+        dotnet build "$env:RUNNER_TEMP\probe\ProbeTask\ProbeTask.csproj" -c Release -nologo -v:m
+    - name: Run probe with MSBuild (x86)
+      shell: pwsh
+      run: |
+        & "${{ steps.msbuild.outputs.bin }}\MSBuild.exe" "$env:RUNNER_TEMP\probe\probe.proj" -nologo -nodeReuse:false -v:m "-bl:$env:RUNNER_TEMP\binlogs\probe-x86.binlog"
+    - name: Run probe with MSBuild (amd64)
+      shell: pwsh
+      run: |
+        & "${{ steps.msbuild.outputs.bin }}\amd64\MSBuild.exe" "$env:RUNNER_TEMP\probe\probe.proj" -nologo -nodeReuse:false -v:m "-bl:$env:RUNNER_TEMP\binlogs\probe-amd64.binlog"
+    - name: Upload binlogs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: diag-1128-binlogs-${{ matrix.os }}
+        path: ${{ runner.temp }}/binlogs/
