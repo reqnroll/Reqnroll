@@ -32,6 +32,8 @@ public class XRetryPluginTest : ExternalPluginsTestBase
 
     [TestMethod]
     [TestCategory("MsBuild")]
+    // Temporarily ignored until https://github.com/reqnroll/Reqnroll/issues/1128 is fixed
+    [Ignore("Temporarily ignored until #1128 is fixed")]
     public void XRetry_should_work_with_Reqnroll_on_DotNetFramework_generation()
     {
         // compiling with MsBuild forces the generation to run with .NET Framework
