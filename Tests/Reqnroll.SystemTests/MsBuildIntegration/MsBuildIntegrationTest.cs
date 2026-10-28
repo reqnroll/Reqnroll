@@ -240,6 +240,52 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_support_long_paths_for_generated_files(CodeBehindLocation codeBehindLocation)
+    {
+        // See https://github.com/reqnroll/Reqnroll/issues/1078 and https://github.com/reqnroll/Reqnroll/issues/1128
+        _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = codeBehindLocation == CodeBehindLocation.IntermediateOutputPath;
+
+        // The nested folders make the generated file paths longer than MAX_PATH (260) regardless of the test folder location.
+        var longFolder = Path.Combine(Enumerable.Range(1, 5).Select(i => $"LongFolder{i}".PadRight(50, 'x')).ToArray());
+        var featureFileName = "LongPathFeature.feature";
+        var featureFile = Path.Combine(longFolder, featureFileName);
+        _solutionDriver.DefaultProject.AddFile(new ProjectFile(featureFile, "None",
+            """
+            Feature: Long Path Feature
+
+            Scenario: Test Scenario
+                When embedded messages resources are reported
+            """));
+
+        AddStepBindings();
+
+        _compilationDriver.CompileSolution(logLevel: "n");
+
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{featureFileName}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{featureFileName}\.ndjson");
+
+        string projectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _solutionDriver.DefaultProject.ProjectName);
+        if (codeBehindLocation == CodeBehindLocation.ProjectFolder)
+        {
+            string codeBehindFilePath = Path.Combine(projectFolder, featureFile + ".cs");
+            codeBehindFilePath.Length.Should().BeGreaterThan(260, "the test should verify a long path");
+            File.Exists(codeBehindFilePath).Should().BeTrue($"the code-behind file should be generated to '{codeBehindFilePath}'");
+        }
+
+        ExecuteTests();
+
+        ShouldAllScenariosPass(1);
+
+        // make sure the ndjson resource has been embedded
+        _bindingDriver.GetActualLogLines("resource")
+                      .Distinct()
+                      .Should()
+                      .BeEquivalentTo($"-> resource: {featureFile.Replace('\\', '/')}.ndjson:StepBinding");
+    }
+
+    [TestMethod]
     public void Should_copy_config_file_to_output_folder()
     {
         AddSimpleScenario();
