@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-2025-vs2026, windows-2025 ]
+        os: [ windows-2025-vs2026 ]
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
@@ -58,9 +58,31 @@ jobs:
       shell: pwsh
       run: |
         & "${{ steps.msbuild.outputs.bin }}\amd64\MSBuild.exe" "$env:RUNNER_TEMP\probe\probe.proj" -nologo -nodeReuse:false -v:m "-bl:$env:RUNNER_TEMP\binlogs\probe-amd64.binlog"
-    - name: Upload binlogs
+    - name: Diff merged MSBuild.exe.config against template
+      shell: pwsh
+      run: |
+        $bin = "${{ steps.msbuild.outputs.bin }}"
+        $out = "$env:RUNNER_TEMP\configs"
+        New-Item -ItemType Directory -Force "$out\x86", "$out\amd64" | Out-Null
+        Copy-Item "$bin\MSBuild.exe.config*" "$out\x86\"
+        Copy-Item "$bin\amd64\MSBuild.exe.config*" "$out\amd64\"
+        Copy-Item "$bin\..\..\..\Common7\IDE\devenv.exe.config*" $out -ErrorAction SilentlyContinue
+        foreach ($a in 'x86', 'amd64') {
+          Write-Output "########## $a : template -> installed config"
+          git diff --no-index --no-color "$out\$a\MSBuild.exe.config.template" "$out\$a\MSBuild.exe.config"
+        }
+        exit 0
+    - name: Build IDE probe solution with devenv
+      shell: pwsh
+      run: |
+        $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -prerelease -products * -property installationPath
+        dotnet restore "$env:RUNNER_TEMP\probe\ide\ProbeIde.sln" -nologo -v:m
+        & "$vs\Common7\IDE\devenv.com" "$env:RUNNER_TEMP\probe\ide\ProbeIde.sln" /Build Debug
+    - name: Upload binlogs and configs
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: diag-1128-binlogs-${{ matrix.os }}
-        path: ${{ runner.temp }}/binlogs/
+        name: diag-1128-${{ matrix.os }}
+        path: |
+          ${{ runner.temp }}/binlogs/
+          ${{ runner.temp }}/configs/
