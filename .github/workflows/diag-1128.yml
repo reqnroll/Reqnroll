@@ -58,6 +58,50 @@ jobs:
       shell: pwsh
       run: |
         & "${{ steps.msbuild.outputs.bin }}\amd64\MSBuild.exe" "$env:RUNNER_TEMP\probe\probe.proj" -nologo -nodeReuse:false -v:m "-bl:$env:RUNNER_TEMP\binlogs\probe-amd64.binlog"
+    - name: Machine info (.NET Framework, hotfixes, AppContext registry, env)
+      shell: pwsh
+      run: |
+        Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' | ForEach-Object { "OS: $($_.ProductName) $($_.DisplayVersion) build $($_.CurrentBuild).$($_.UBR)" }
+        "NDP release: " + (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full').Release
+        "mscorlib x86: " + (Get-Item C:\Windows\Microsoft.NET\Framework\v4.0.30319\mscorlib.dll).VersionInfo.FileVersion
+        "mscorlib x64: " + (Get-Item C:\Windows\Microsoft.NET\Framework64\v4.0.30319\mscorlib.dll).VersionInfo.FileVersion
+        "LongPathsEnabled: " + (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem').LongPathsEnabled
+        foreach ($k in 'HKLM:\SOFTWARE\Microsoft\.NETFramework\AppContext', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\.NETFramework\AppContext', 'HKCU:\SOFTWARE\Microsoft\.NETFramework\AppContext') {
+          "== $k exists=$(Test-Path $k)"
+          Get-ItemProperty $k -ErrorAction SilentlyContinue | Select-Object * -ExcludeProperty PS* | Format-List | Out-String -Width 300
+        }
+        "== .NETFramework keys (64/32 bit)"
+        Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\.NETFramework', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\.NETFramework' -ErrorAction SilentlyContinue | Select-Object * -ExcludeProperty PS* | Format-List | Out-String -Width 300
+        "== env"
+        Get-ChildItem env: | Where-Object Name -match '^(COMPlus_|DOTNET_|MSBUILD)' | Format-Table -AutoSize | Out-String -Width 300
+        "== hotfixes"
+        Get-HotFix | Sort-Object InstalledOn | Format-Table HotFixID, Description, InstalledOn -AutoSize | Out-String -Width 200
+    - name: Standalone x86 probe app (own / MSBuild merged / MSBuild template config)
+      shell: pwsh
+      run: |
+        $bin = "${{ steps.msbuild.outputs.bin }}"
+        dotnet build "$env:RUNNER_TEMP\probe\ProbeApp\ProbeApp.csproj" -c Release -nologo -v:q
+        $app = "$env:RUNNER_TEMP\probe\ProbeApp\bin\Release\net472"
+        & "$app\ProbeApp.exe" app-own-config
+        foreach ($v in @(@('app-merged-config', "$bin\MSBuild.exe.config"), @('app-template-config', "$bin\MSBuild.exe.config.template"))) {
+          $dir = "$env:RUNNER_TEMP\probe\$($v[0])"
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          Copy-Item "$app\ProbeApp.exe" $dir
+          Copy-Item $v[1] "$dir\ProbeApp.exe.config"
+          & "$dir\ProbeApp.exe" $v[0]
+        }
+    - name: Config swap - x86 MSBuild with the template config
+      shell: pwsh
+      run: |
+        $bin = "${{ steps.msbuild.outputs.bin }}"
+        Copy-Item "$bin\MSBuild.exe.config" "$env:RUNNER_TEMP\MSBuild.exe.config.merged"
+        try {
+          Copy-Item "$bin\MSBuild.exe.config.template" "$bin\MSBuild.exe.config" -Force
+          & "$bin\MSBuild.exe" "$env:RUNNER_TEMP\probe\probe.proj" -nologo -nodeReuse:false -v:m
+        }
+        finally {
+          Copy-Item "$env:RUNNER_TEMP\MSBuild.exe.config.merged" "$bin\MSBuild.exe.config" -Force
+        }
     - name: Diff merged MSBuild.exe.config against template
       shell: pwsh
       run: |
