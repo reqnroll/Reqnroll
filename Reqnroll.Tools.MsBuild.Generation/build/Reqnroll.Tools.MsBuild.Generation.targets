@@ -95,7 +95,7 @@
 
   <Target Name="ProcessReqnrollFeatureFilesInProject"
           BeforeTargets="BeforeCompile;CoreCompile;AssignTargetPaths"
-          DependsOnTargets="PrepareForBuild;CoreProcessReqnrollFeatureFilesInProject;IncludeProcessedReqnrollItemsToBuildInputs" />
+          DependsOnTargets="PrepareForBuild;CoreProcessReqnrollFeatureFilesInProject;IncludeProcessedReqnrollItemsToBuildInputs;WarnForReqnrollCodeBehindFilesNotCompiled" />
 
   <!--
     To regenerate code-behind files when core project settings or Reqnroll dependencies change, we create a cache file with a hash of relevant inputs.
@@ -229,6 +229,29 @@
       </EmbeddedResource>
     </ItemGroup>
 
+  </Target>
+
+  <!--
+    The code-behind files are not added to the compilation automatically when they are generated to the project folder
+    and the project does not include the C# files implicitly, e.g. in legacy (non-SDK-style) projects or when 'EnableDefaultCompileItems' is disabled.
+    In these cases the code-behind files have to be listed in the project file, otherwise the tests of the feature file are silently missing.
+  -->
+  <Target Name="WarnForReqnrollCodeBehindFilesNotCompiled" DependsOnTargets="IncludeProcessedReqnrollItemsToBuildInputs"
+          Condition="'$(ReqnrollWarnForCodeBehindFilesNotCompiled)' == 'true'">
+    <ItemGroup>
+      <_ReqnrollCodeBehindFile Include="@(ReqnrollFeatureFile->'%(CodeBehindFile)')" />
+      <!-- compare full paths, because the project file might refer to the code-behind files in a different form -->
+      <_ReqnrollCodeBehindFileNotCompiled Include="@(_ReqnrollCodeBehindFile->'%(FullPath)')" Exclude="@(Compile->'%(FullPath)')" />
+    </ItemGroup>
+
+    <Warning Text="The generated code-behind file '%(_ReqnrollCodeBehindFileNotCompiled.Identity)' is not included in the compilation, so the tests of the related feature file will not be available. Set the 'ReqnrollUseIntermediateOutputPathForCodeBehind' project property to 'true' to include the code-behind files automatically, or add the code-behind file to the project file as a 'Compile' item. This warning can be disabled by setting the 'ReqnrollWarnForCodeBehindFilesNotCompiled' project property to 'false'."
+             File="%(_ReqnrollCodeBehindFileNotCompiled.Identity)"
+             Condition="Exists('%(_ReqnrollCodeBehindFileNotCompiled.Identity)')" />
+
+    <ItemGroup>
+      <_ReqnrollCodeBehindFile Remove="@(_ReqnrollCodeBehindFile)" />
+      <_ReqnrollCodeBehindFileNotCompiled Remove="@(_ReqnrollCodeBehindFileNotCompiled)" />
+    </ItemGroup>
   </Target>
 
   <Target Name="CleanFeatureFilesInProject">
