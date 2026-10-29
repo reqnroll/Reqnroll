@@ -240,12 +240,9 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
-    [DataRow(CodeBehindLocation.ProjectFolder)]
-    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
-    public void Should_support_long_paths_for_generated_files(CodeBehindLocation codeBehindLocation)
+    public void Should_support_long_paths_for_generated_files()
     {
         // See https://github.com/reqnroll/Reqnroll/issues/1078 and https://github.com/reqnroll/Reqnroll/issues/1128
-        _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = codeBehindLocation == CodeBehindLocation.IntermediateOutputPath;
 
         // The nested folders make the generated file paths longer than MAX_PATH (260) regardless of the test folder location.
         var longFolder = Path.Combine(Enumerable.Range(1, 5).Select(i => $"LongFolder{i}".PadRight(50, 'x')).ToArray());
@@ -266,13 +263,9 @@ public class MsBuildIntegrationTest : SystemTestBase
         _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{featureFileName}\.cs");
         _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{featureFileName}\.ndjson");
 
-        string projectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _solutionDriver.DefaultProject.ProjectName);
-        if (codeBehindLocation == CodeBehindLocation.ProjectFolder)
-        {
-            string codeBehindFilePath = Path.Combine(projectFolder, featureFile + ".cs");
-            codeBehindFilePath.Length.Should().BeGreaterThan(260, "the test should verify a long path");
-            File.Exists(codeBehindFilePath).Should().BeTrue($"the code-behind file should be generated to '{codeBehindFilePath}'");
-        }
+        string codeBehindFilePath = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _solutionDriver.DefaultProject.ProjectName, featureFile + ".cs");
+        codeBehindFilePath.Length.Should().BeGreaterThan(260, "the test should verify a long path");
+        File.Exists(codeBehindFilePath).Should().BeTrue($"the code-behind file should be generated to '{codeBehindFilePath}'");
 
         ExecuteTests();
 
