@@ -13,6 +13,10 @@ namespace Reqnroll.TestProjectGenerator
             [TargetFramework.Net452] = "v4.5.2",
             [TargetFramework.Net461] = "v4.6.1",
             [TargetFramework.Net462] = "v4.6.2",
+            [TargetFramework.Net471] = "v4.7.1",
+            [TargetFramework.Net472] = "v4.7.2",
+            [TargetFramework.Net48] = "v4.8",
+            [TargetFramework.Net481] = "v4.8.1",
         };
 
         public string BuildTargetFrameworkVersion(TargetFramework targetFramework)
