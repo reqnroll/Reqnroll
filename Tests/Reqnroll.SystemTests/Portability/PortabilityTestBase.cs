@@ -67,8 +67,6 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     [TestMethod]
     [TestCategory("MsBuild")]
-    // Temporarily ignored until https://github.com/reqnroll/Reqnroll/issues/1128 is fixed
-    [Ignore("Temporarily ignored until #1128 is fixed")]
     [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
     public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild(UnitTestProvider unitTestProvider)
     {
