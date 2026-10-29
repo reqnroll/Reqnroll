@@ -17,7 +17,8 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             switch (project.ProjectFormat)
             {
                 case ProjectFormat.New: return new SdkStyleProjectFormatNuGetRestorer();
-                case ProjectFormat.Old: return new OldProjectFormatNuGetRestorer(_nuget);
+                // the old (non-SDK-style) projects also use PackageReference, so they are restored as part of the build
+                case ProjectFormat.Old: return new SdkStyleProjectFormatNuGetRestorer();
                 default: throw new ArgumentException($"The format of the specified project is not supported.", nameof(project));
             }
         }
