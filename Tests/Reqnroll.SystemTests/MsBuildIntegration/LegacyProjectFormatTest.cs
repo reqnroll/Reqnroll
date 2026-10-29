@@ -41,7 +41,7 @@ public class LegacyProjectFormatTest : SystemTestBase
     public void Should_discover_and_execute_tests_when_code_behind_files_are_generated_to_intermediate_output_path()
     {
         _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = true;
-        AddSimpleScenarioAndOutline();
+        AddSimpleScenario();
         _projectsDriver.AddPassingStepBinding();
 
         _compilationDriver.SetBuildTool(BuildTool.MSBuild);

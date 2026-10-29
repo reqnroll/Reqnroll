@@ -293,22 +293,16 @@ public class MsBuildIntegrationTest : SystemTestBase
         File.Exists(expectedConfigFilePath).Should().BeTrue($"the config file should be copied to the output folder '{expectedConfigFilePath}'");
     }
 
-    public enum ExplicitCompileItems
-    {
-        WithoutCodeBehindFiles,
-        WithCodeBehindFiles
-    }
-
     /// <summary>
     /// Simulates projects that list the compile items explicitly, like legacy (non-SDK-style) projects do (see #1126).
     /// Has to be invoked after the feature files have been added.
     /// </summary>
-    private void DisableDefaultCompileItems(ExplicitCompileItems explicitCompileItems, bool? warnForCodeBehindFilesNotCompiled = null)
+    private void DisableDefaultCompileItems(bool includeCodeBehindFiles, bool? warnForCodeBehindFilesNotCompiled = null)
     {
         var warningSetting = warnForCodeBehindFilesNotCompiled is bool warn ? $"<ReqnrollWarnForCodeBehindFilesNotCompiled>{warn.ToString().ToLowerInvariant()}</ReqnrollWarnForCodeBehindFilesNotCompiled>" : "";
         // The code-behind files are listed one by one (as Visual Studio does it in legacy projects), because a wildcard
         // would not include them in the first build, as they are generated after the project has been evaluated.
-        var codeBehindFileItem = explicitCompileItems == ExplicitCompileItems.WithCodeBehindFiles ? $"""<Compile Include="{_projectsDriver.LastFeatureFile.Path}.cs" />""" : "";
+        var codeBehindFileItem = includeCodeBehindFiles ? $"""<Compile Include="{_projectsDriver.LastFeatureFile.Path}.cs" />""" : "";
         _solutionDriver.AddFile("Directory.Build.props",
                                 $"""
                                  <Project>
@@ -329,7 +323,7 @@ public class MsBuildIntegrationTest : SystemTestBase
     {
         AddSimpleScenario();
         _projectsDriver.AddPassingStepBinding();
-        DisableDefaultCompileItems(ExplicitCompileItems.WithoutCodeBehindFiles);
+        DisableDefaultCompileItems(includeCodeBehindFiles: false);
 
         _compilationDriver.CompileSolution();
 
@@ -341,7 +335,7 @@ public class MsBuildIntegrationTest : SystemTestBase
     {
         AddSimpleScenario();
         _projectsDriver.AddPassingStepBinding();
-        DisableDefaultCompileItems(ExplicitCompileItems.WithoutCodeBehindFiles, warnForCodeBehindFilesNotCompiled: false);
+        DisableDefaultCompileItems(includeCodeBehindFiles: false, warnForCodeBehindFilesNotCompiled: false);
 
         _compilationDriver.CompileSolution();
 
@@ -349,14 +343,14 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
-    [DataRow(ExplicitCompileItems.WithCodeBehindFiles, CodeBehindLocation.ProjectFolder)]
-    [DataRow(ExplicitCompileItems.WithoutCodeBehindFiles, CodeBehindLocation.IntermediateOutputPath)]
-    public void Should_not_warn_when_code_behind_files_are_compiled(ExplicitCompileItems explicitCompileItems, CodeBehindLocation codeBehindLocation)
+    [DataRow(true, CodeBehindLocation.ProjectFolder)]
+    [DataRow(false, CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_not_warn_when_code_behind_files_are_compiled(bool includeCodeBehindFiles, CodeBehindLocation codeBehindLocation)
     {
         _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = codeBehindLocation == CodeBehindLocation.IntermediateOutputPath;
         AddSimpleScenarioAndOutline();
         _projectsDriver.AddPassingStepBinding();
-        DisableDefaultCompileItems(explicitCompileItems);
+        DisableDefaultCompileItems(includeCodeBehindFiles);
 
         ExecuteTests();
 

@@ -17,7 +17,7 @@
 ## Bug fixes:
 * Fix: Formatters incorrectly handle Unicode text file content of attachments (#1041)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.3 - 2026-01-27
 
@@ -29,7 +29,7 @@
 * Fix: xUnit VB.NET generates code with async warning (#1009)
 * Fix: disableFriendlyTestNames doesn't work in Reqnroll 3.3.2 (#1013)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.2 - 2026-01-14
 
