@@ -1,12 +1,28 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using Reqnroll.Utils;
 
 namespace Reqnroll.Tools.MsBuild.Generation;
 
-public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
+/// <summary>
+/// Writes and deletes the generated files (code-behind, messages).
+/// </summary>
+/// <param name="log">The task logger.</param>
+/// <param name="isExtendedLengthPathSupported">Checks whether the current process accepts extended-length (<c>\\?\</c>) paths. Defaults to <see cref="ExtendedLengthPathSupport.IsSupported"/>; can be overridden for testing.</param>
+/// <param name="isWindows">Whether the current platform is Windows. Defaults to the current platform; can be overridden for testing.</param>
+public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log, Func<bool> isExtendedLengthPathSupported = null, bool? isWindows = null)
 {
+    /// <summary>
+    /// Full paths with at least this length are treated as long paths. The Windows limit is 260 (MAX_PATH) for files,
+    /// but only 248 for directories (MAX_PATH minus room for an 8.3 file name), so we use the lower one for both.
+    /// </summary>
+    internal const int LongPathThreshold = 248;
+
+    private readonly Func<bool> _isExtendedLengthPathSupported = isExtendedLengthPathSupported ?? (() => ExtendedLengthPathSupport.IsSupported);
+    private readonly bool _isWindows = isWindows ?? RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
     public void WriteGeneratedFile(string outputPath, string generatedFileContent)
     {
         log.LogTaskDiagnosticMessage($"Writing data to {outputPath}");
@@ -15,7 +31,7 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
 
     public void DeleteGeneratedFile(string outputPath)
     {
-        var path = ChangePathToSupportLongPaths(outputPath);
+        var path = GetFileSystemPath(outputPath);
 
         if (!File.Exists(path))
             return;
@@ -34,16 +50,25 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
     private void WriteFile(string filePath, string content)
     {
         string directoryPath = Path.GetDirectoryName(filePath);
-        var longDirPath = ChangePathToSupportLongPaths(directoryPath);
-        if (!string.IsNullOrEmpty(longDirPath) && !Directory.Exists(longDirPath))
+        var fileSystemDirectoryPath = GetFileSystemPath(directoryPath);
+        if (!string.IsNullOrEmpty(fileSystemDirectoryPath) && !Directory.Exists(fileSystemDirectoryPath))
         {
-            Directory.CreateDirectory(longDirPath);
+            Directory.CreateDirectory(fileSystemDirectoryPath);
         }
-        var longPath = ChangePathToSupportLongPaths(filePath);
-        WriteAllTextWithRetry(longPath, content, Encoding.UTF8);
+        var fileSystemFilePath = GetFileSystemPath(filePath);
+        WriteAllTextWithRetry(fileSystemFilePath, content, Encoding.UTF8);
     }
 
-    private static string ChangePathToSupportLongPaths(string path)
+    /// <summary>
+    /// Returns the path to be used for file system operations. For long paths on Windows the extended-length path syntax
+    /// (<c>\\?\</c>) is used if the current process supports it, otherwise the full path is returned unchanged.
+    /// </summary>
+    /// <remarks>
+    /// The extended-length path syntax is only used for long paths, because it is not supported in every process:
+    /// with .NET Framework legacy path handling (e.g. x86 MSBuild.exe 18.11 on some machines) such paths are rejected
+    /// with "Illegal characters in path". See https://github.com/reqnroll/Reqnroll/issues/1128 for details.
+    /// </remarks>
+    internal string GetFileSystemPath(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return path;
@@ -51,22 +76,29 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
         string fullPath = Path.GetFullPath(path);
 
         // Cross-platform: only apply extended syntax on Windows.
-        if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
-                System.Runtime.InteropServices.OSPlatform.Windows))
-        {
+        if (!_isWindows)
             return fullPath;
-        }
 
         // Already device/extended syntax.
         if (fullPath.StartsWith(@"\\?\", StringComparison.Ordinal) ||
             fullPath.StartsWith(@"\\.\", StringComparison.Ordinal))
             return fullPath;
 
-        // UNC longDirPath.
+        // Short paths work without the extended syntax in every process.
+        if (fullPath.Length < LongPathThreshold)
+            return fullPath;
+
+        if (!_isExtendedLengthPathSupported())
+        {
+            log.LogTaskDiagnosticMessage($"Long path '{fullPath}' cannot be converted to extended-length path syntax, because the current process does not support it.");
+            return fullPath;
+        }
+
+        // UNC path.
         if (fullPath.StartsWith(@"\\", StringComparison.Ordinal))
             return @"\\?\UNC\" + fullPath.Substring(2);
 
-        // Drive-qualified longDirPath.
+        // Drive-qualified path.
         return @"\\?\" + fullPath;
     }
 
@@ -87,7 +119,7 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
                 File.WriteAllText(path, contents, encoding);
                 return;
             }
-            catch (IOException)
+            catch (IOException ex) when (ex is not PathTooLongException)
             {
                 if (i == maxAttempts)
                     throw;
