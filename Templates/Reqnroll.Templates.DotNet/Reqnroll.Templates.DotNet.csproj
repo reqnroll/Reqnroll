@@ -29,6 +29,7 @@
     <Compile Remove="**\*" />
     <None Include="$(SolutionDir)reqnroll-icon.png" Pack="true" PackagePath="images" />
     <None Include="templates\reqnroll-project\Template.csproj" />
+    <None Include="templates\reqnroll-project\StepDefinitions\CalculatorStepDefinitions.cs" />
     <None Include="templates\reqnroll-project\.template.config\**" />
     <None Include="templates\reqnroll-config\.template.config\**" />
     <None Include="templates\reqnroll-feature\.template.config\**" />
