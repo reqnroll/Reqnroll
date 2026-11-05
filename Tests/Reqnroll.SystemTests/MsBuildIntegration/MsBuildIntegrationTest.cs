@@ -18,6 +18,8 @@ public class MsBuildIntegrationTest : SystemTestBase
         IntermediateOutputPath
     }
 
+    private const string CodeBehindFileNotCompiledWarning = "is not included in the compilation";
+
     private void AddStepBindings()
     {
         _projectsDriver.AddStepBinding("When", regex: "embedded messages resources are reported",
@@ -66,6 +68,7 @@ public class MsBuildIntegrationTest : SystemTestBase
             _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{featureFile}\.cs");
             _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{featureFile}\.ndjson");
         }
+        _compilationResultDriver.CompileResult.Output.Should().NotContain(CodeBehindFileNotCompiledWarning);
 
         return featureFiles;
     }
@@ -288,5 +291,70 @@ public class MsBuildIntegrationTest : SystemTestBase
 
         string expectedConfigFilePath = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _solutionDriver.DefaultProject.ProjectName, "bin", "Debug", _solutionDriver.DefaultProject.TargetFrameworkMoniker, "reqnroll.json");
         File.Exists(expectedConfigFilePath).Should().BeTrue($"the config file should be copied to the output folder '{expectedConfigFilePath}'");
+    }
+
+    /// <summary>
+    /// Simulates projects that list the compile items explicitly, like legacy (non-SDK-style) projects do (see #1126).
+    /// Has to be invoked after the feature files have been added.
+    /// </summary>
+    private void DisableDefaultCompileItems(bool includeCodeBehindFiles, bool? warnForCodeBehindFilesNotCompiled = null)
+    {
+        var warningSetting = warnForCodeBehindFilesNotCompiled is bool warn ? $"<ReqnrollWarnForCodeBehindFilesNotCompiled>{warn.ToString().ToLowerInvariant()}</ReqnrollWarnForCodeBehindFilesNotCompiled>" : "";
+        // The code-behind files are listed one by one (as Visual Studio does it in legacy projects), because a wildcard
+        // would not include them in the first build, as they are generated after the project has been evaluated.
+        var codeBehindFileItem = includeCodeBehindFiles ? $"""<Compile Include="{_projectsDriver.LastFeatureFile.Path}.cs" />""" : "";
+        _solutionDriver.AddFile("Directory.Build.props",
+                                $"""
+                                 <Project>
+                                   <PropertyGroup>
+                                     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+                                     {warningSetting}
+                                   </PropertyGroup>
+                                   <ItemGroup>
+                                     <Compile Include="**\*.cs" Exclude="bin\**;obj\**;**\*.feature.cs" />
+                                     {codeBehindFileItem}
+                                   </ItemGroup>
+                                 </Project>
+                                 """);
+    }
+
+    [TestMethod]
+    public void Should_warn_when_code_behind_files_are_not_compiled()
+    {
+        AddSimpleScenario();
+        _projectsDriver.AddPassingStepBinding();
+        DisableDefaultCompileItems(includeCodeBehindFiles: false);
+
+        _compilationDriver.CompileSolution();
+
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"warning : The generated code-behind file '.*{_projectsDriver.LastFeatureFile.Path}\.cs' {CodeBehindFileNotCompiledWarning}");
+    }
+
+    [TestMethod]
+    public void Should_not_warn_when_code_behind_files_are_not_compiled_if_warning_is_disabled()
+    {
+        AddSimpleScenario();
+        _projectsDriver.AddPassingStepBinding();
+        DisableDefaultCompileItems(includeCodeBehindFiles: false, warnForCodeBehindFilesNotCompiled: false);
+
+        _compilationDriver.CompileSolution();
+
+        _compilationResultDriver.CompileResult.Output.Should().NotContain(CodeBehindFileNotCompiledWarning);
+    }
+
+    [TestMethod]
+    [DataRow(true, CodeBehindLocation.ProjectFolder)]
+    [DataRow(false, CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_not_warn_when_code_behind_files_are_compiled(bool includeCodeBehindFiles, CodeBehindLocation codeBehindLocation)
+    {
+        _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = codeBehindLocation == CodeBehindLocation.IntermediateOutputPath;
+        AddSimpleScenarioAndOutline();
+        _projectsDriver.AddPassingStepBinding();
+        DisableDefaultCompileItems(includeCodeBehindFiles);
+
+        ExecuteTests();
+
+        _compilationResultDriver.CompileResult.Output.Should().NotContain(CodeBehindFileNotCompiledWarning);
+        ShouldAllScenariosPass();
     }
 }

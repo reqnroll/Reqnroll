@@ -56,6 +56,12 @@
       feature flag to enable deletion of obsolete feature code-behind files on 'Clean' and 'Rebuild' operation
     -->
     <ReqnrollDeleteObsoleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteObsoleteCodeBehindFilesOnClean>
+
+    <!--
+      feature flag to enable warning for generated code-behind files that are not included in the compilation
+      (e.g. in legacy, non-SDK-style projects, where the code-behind files have to be listed in the project file)
+    -->
+    <ReqnrollWarnForCodeBehindFilesNotCompiled Condition="'$(ReqnrollWarnForCodeBehindFilesNotCompiled)'==''">true</ReqnrollWarnForCodeBehindFilesNotCompiled>
   </PropertyGroup>
 
   <ItemGroup>

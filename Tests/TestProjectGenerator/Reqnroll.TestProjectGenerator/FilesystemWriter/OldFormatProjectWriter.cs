@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml;
 using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Extensions;
+using Reqnroll.TestProjectGenerator.Helpers;
 
 namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 {
@@ -42,7 +43,9 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 xw.WriteAttributeString("ToolsVersion", "15.0");
                 xw.WriteAttributeString("DefaultTargets", "Build");
 
-                WriteNuGetPackagePropsImports(xw, project);
+                // NuGet packages are referenced with 'PackageReference', so the package props/targets
+                // are imported by the 'Microsoft.Common.props' and 'Microsoft.Common.targets' files.
+                WriteMSBuildImport(xw, "$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props");
 
                 WriteProjectProperties(xw, project);
                 WriteReferences(xw, project);
@@ -51,8 +54,6 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 WriteProjectFiles(xw, project, path);
 
                 WriteLanguageTargets(xw, project);
-
-                WriteNuGetPackageTargetImports(xw, project);
 
                 WriteMSBuildImports(xw, project);
                 WriteMSBuildTargets(xw, project);
@@ -181,6 +182,10 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 xw.WriteElementString("DefineConstants", "DEBUG;TRACE");
             }
 
+            foreach (var additionalPropertyGroupEntry in project.AdditionalPropertyGroupEntries)
+            {
+                xw.WriteElementString(additionalPropertyGroupEntry.Key, additionalPropertyGroupEntry.Value);
+            }
 
             xw.WriteEndElement();
         }
@@ -233,51 +238,16 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 
             foreach (var package in project.NuGetPackages)
             {
-                WriteNuGetPackage(xw, package);
+                xw.WriteStartElement("PackageReference");
+                xw.WriteAttributeString("Include", package.Name);
+                if (package.Version.IsNotNullOrWhiteSpace())
+                {
+                    xw.WriteAttributeString("Version", package.Version);
+                }
+                xw.WriteEndElement();
             }
 
             xw.WriteEndElement();
-
-            var pkgConf = new PackagesConfigGenerator(_targetFrameworkMonikerStringBuilder).Generate(project.NuGetPackages, project.TargetFrameworks);
-            project.AddFile(pkgConf);
-        }
-
-        private void WriteNuGetPackage(XmlWriter xw, NuGetPackage package)
-        {
-            if (package.Assemblies != null)
-            {
-                foreach (var assembly in package.Assemblies)
-                {
-                    xw.WriteStartElement("Reference");
-                    xw.WriteAttributeString("Include", assembly.PublicAssemblyName);
-
-                    xw.WriteElementString("HintPath", Path.Combine("..", "packages", $"{package.Name}.{package.Version}", "lib", assembly.RelativeHintPath));
-
-                    xw.WriteEndElement();
-                }
-            }
-        }
-
-        private void WriteNuGetPackageTargetImports(XmlWriter xw, Project project)
-        {
-            WriteNuGetPackageMsBuildImports(xw, project, "targets");
-        }
-
-        private void WriteNuGetPackagePropsImports(XmlWriter xw, Project project)
-        {
-            WriteNuGetPackageMsBuildImports(xw, project, "props");
-        }
-
-        private void WriteNuGetPackageMsBuildImports(XmlWriter xw, Project project, string extension)
-        {
-            if (project.NuGetPackages.Count <= 0) return;
-
-            foreach (var package in project.NuGetPackages)
-            {
-                string packagePath = Path.Combine("..", "packages", $"{package.Name}.{package.Version}");
-                string targetsFile = Path.Combine(packagePath, "build", $"{package.Name}.{extension}");
-                WriteMSBuildImport(xw, targetsFile);
-            }
         }
 
         private void WriteMSBuildImport(XmlWriter xw, string file)

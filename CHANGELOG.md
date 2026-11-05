@@ -2,11 +2,12 @@
 
 ## Improvements:
 * Updated Cucumber dependencies to: Gherkin v39.1.0, Cucumber.Messages v32.0.1 and Cucumber.HtmlFormatter v23.1.0. Formatters.Tests modified by adopting use of Cucumber/CCK (v29.2.2). (#984)
+* A build warning is shown when a generated code-behind file is not included in the compilation (e.g. in legacy, non-SDK-style projects that do not list the code-behind files in the project file). The warning can be disabled by setting the `ReqnrollWarnForCodeBehindFilesNotCompiled` MSBuild property to `false`. (#1126)
 
 ## Bug fixes:
 * Fix: GenerateFeatureFileCodeBehindTask fails with misleading DirectoryNotFoundException when ndjson output path exceeds Windows MAX_PATH (260)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+*Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy
 
 # v3.3.4 - 2026-03-23
 
