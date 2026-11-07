@@ -381,3 +381,4 @@ nCrunchTemp*.csproj
 
 *.received.*
 
+/.claude

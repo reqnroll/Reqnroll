@@ -84,7 +84,7 @@ public class HookStepExecutionTrackerTests
     }
 
     private TestCaseExecutionTracker CreateTestCaseExecutionRecord(int attemptId = 0) =>
-        new(_testCaseTrackerMock.Object, attemptId, "testCaseStartedId", "testCaseId", _testCaseTracker, _messageFactoryMock.Object, _publisherMock.Object, _stepTrackerFactoryMock.Object);
+        new(_testCaseTrackerMock.Object, attemptId, "testCaseStartedId", "testCaseId", _messageFactoryMock.Object, _publisherMock.Object, _stepTrackerFactoryMock.Object);
 
     [Fact]
     public async Task HookStepTracker_ProcessEvent_HookBindingStartedEvent_PublishesOneEnvelope()
@@ -234,7 +234,8 @@ public class HookStepExecutionTrackerTests
     {
         return new HookStepTracker(
             "dummyTestStepId",
-            hookId
+            hookId,
+            1
         );
     }
 }

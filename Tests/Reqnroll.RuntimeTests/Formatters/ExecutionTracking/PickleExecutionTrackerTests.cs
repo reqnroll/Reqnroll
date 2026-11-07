@@ -345,6 +345,58 @@ public class PickleExecutionTrackerTests
         _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()), Times.Once);
     }
 
+    [Fact]
+    public async Task ProcessEvent_TruncatedRetry_SecondAttemptReachesNewStep_NoExceptionAndCompleteLedger()
+    {
+        // Regression test: attempt 0 fails at step ps1 (StopAtFirstError); step ps2 is never reached.
+        // Attempt 1 (retry): ps1 passes, then ps2 runs for the first time.
+        // Before the fix, the lookup for ps2 on attempt 1 threw NullReferenceException because
+        // the ledger entry had never been created (it was gated behind AttemptCount == 0).
+        var tracker = CreatePickleExecTracker();
+
+        var publishedEnvelopes = new List<Envelope>();
+        _mockPublisher
+            .Setup(p => p.PublishAsync(It.IsAny<Envelope>()))
+            .Callback<Envelope>(env => publishedEnvelopes.Add(env))
+            .Returns(Task.CompletedTask);
+
+        var step1Context = new Mock<IScenarioStepContext>();
+        step1Context.Setup(x => x.StepInfo).Returns(new StepInfo(StepDefinitionType.Given, "step 1", null, null, "ps1"));
+
+        var step2Context = new Mock<IScenarioStepContext>();
+        step2Context.Setup(x => x.StepInfo).Returns(new StepInfo(StepDefinitionType.Given, "step 2", null, null, "ps2"));
+
+        // Attempt 0: only ps1 fires (scenario is then aborted by StopAtFirstError)
+        await tracker.ProcessEvent(new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub));
+        await tracker.ProcessEvent(new StepStartedEvent(_featureContextStub, _scenarioContextSub, step1Context.Object));
+        await tracker.ProcessEvent(new StepFinishedEvent(_featureContextStub, _scenarioContextSub, step1Context.Object));
+        _scenarioContextSub.ScenarioExecutionStatus = ScenarioExecutionStatus.TestError;
+        await tracker.ProcessEvent(new ScenarioFinishedEvent(_featureContextStub, _scenarioContextSub));
+
+        // Attempt 1 (retry): ps1 passes, then ps2 fires for the first time
+        var act = async () =>
+        {
+            await tracker.ProcessEvent(new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub));
+            await tracker.ProcessEvent(new StepStartedEvent(_featureContextStub, _scenarioContextSub, step1Context.Object));
+            await tracker.ProcessEvent(new StepFinishedEvent(_featureContextStub, _scenarioContextSub, step1Context.Object));
+            await tracker.ProcessEvent(new StepStartedEvent(_featureContextStub, _scenarioContextSub, step2Context.Object));
+            await tracker.ProcessEvent(new StepFinishedEvent(_featureContextStub, _scenarioContextSub, step2Context.Object));
+            _scenarioContextSub.ScenarioExecutionStatus = ScenarioExecutionStatus.OK;
+            await tracker.ProcessEvent(new ScenarioFinishedEvent(_featureContextStub, _scenarioContextSub));
+            await tracker.FinalizeTracking();
+        };
+
+        await act.Should().NotThrowAsync();
+
+        // Ledger must contain both steps: ps1 from attempt 0, ps2 discovered on attempt 1
+        tracker.TestCaseTracker.Steps.OfType<TestStepTracker>().Should().HaveCount(2);
+
+        // TestCase (definition) message must be published exactly once, regardless of retry
+        publishedEnvelopes.Count(e => e.Content() is TestCase).Should().Be(1);
+
+        _scenarioContextSub.ScenarioExecutionStatus = ScenarioExecutionStatus.OK; // reset shared context
+    }
+
     private PickleExecutionTracker CreatePickleExecTracker()
     {
         return new PickleExecutionTracker(

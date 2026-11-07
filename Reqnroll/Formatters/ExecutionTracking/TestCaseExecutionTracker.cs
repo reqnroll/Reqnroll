@@ -15,8 +15,12 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 public class TestCaseExecutionTracker
 {
     private readonly ICucumberMessageFactory _messageFactory;
-    private readonly TestCaseTracker _testCaseTracker;
     private readonly Stack<StepExecutionTrackerBase> _stepExecutionTrackers;
+
+    // Per-attempt occurrence counters keyed on step/hook identity. Because a fresh
+    // TestCaseExecutionTracker is created for each attempt, these counters are naturally
+    // scoped to a single attempt and reset on every retry.
+    private readonly Dictionary<(StepKind Kind, string Id), int> _occurrenceCounters = new();
 
     public IPickleExecutionTracker ParentTracker { get; }
 
@@ -40,17 +44,28 @@ public class TestCaseExecutionTracker
 
     public bool IsFirstAttempt => AttemptId == 0;
 
-    public TestCaseExecutionTracker(IPickleExecutionTracker parentTracker, int attemptId, string testCaseStartedId, string testCaseId, TestCaseTracker testCaseTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IStepTrackerFactory stepTrackerFactory)
+    public TestCaseExecutionTracker(IPickleExecutionTracker parentTracker, int attemptId, string testCaseStartedId, string testCaseId, ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IStepTrackerFactory stepTrackerFactory)
     {
         _messageFactory = messageFactory;
         _stepExecutionTrackers = new();
-        _testCaseTracker = testCaseTracker;
         ParentTracker = parentTracker;
         AttemptId = attemptId;
         TestCaseStartedId = testCaseStartedId;
         TestCaseId = testCaseId;
         _publisher = publisher;
         _stepTrackerFactory = stepTrackerFactory;
+    }
+
+    /// <summary>
+    /// Returns the next 1-based occurrence index for the given step/hook identity within this attempt.
+    /// Called exactly once per StepStarted / HookBindingStarted event.
+    /// </summary>
+    internal int NextOccurrence(StepKind kind, string id)
+    {
+        var key = (kind, id);
+        var next = _occurrenceCounters.TryGetValue(key, out var current) ? current + 1 : 1;
+        _occurrenceCounters[key] = next;
+        return next;
     }
 
     public async Task ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
@@ -62,14 +77,10 @@ public class TestCaseExecutionTracker
 
     public async Task ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
     {
-        // If this is the first attempt, at ScenarioFinished, we have enough information about which Hook and Step Bindings were used;
-        // we can now generate the TestCase message and publish it.
-        if (AttemptId == 0)
-        {
-            var testCase = _messageFactory.ToTestCase(_testCaseTracker);
-            await _publisher.PublishAsync(Envelope.Create(testCase)); // using the OrderFixingMessagePublisher will ensure that this is published before any other messages related to this TestCase (such as TestCaseStarted, etc)
-        }
-
+        // Note: publication of the TestCase (definition) message is owned by the PickleExecutionTracker,
+        // which emits it once the ledger is known to be complete (a passing/skipped attempt, or at finalize).
+        // It cannot be published here at attempt 0, because an aborted attempt 0 may not yet have reached
+        // every step/hook; later attempts can still append newly-discovered entries to the ledger.
         TestCaseFinishedTimestamp = scenarioFinishedEvent.Timestamp;
         ScenarioExecutionStatus = scenarioFinishedEvent.ScenarioContext.ScenarioExecutionStatus;
 

@@ -18,12 +18,11 @@ public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
 
         var hookId = PickleExecutionTracker.StepDefinitionsByBinding[hookBindingStartedEvent.HookBinding];
 
-        if (ParentTracker.IsFirstAttempt)
-        {
-            TestCaseTracker.ProcessEvent(hookBindingStartedEvent);
-        }
-
-        StepTracker = PickleExecutionTracker.TestCaseTracker.GetHookStepTrackerByHookId(hookId);
+        // Resolve (or create on first sight) the ledger entry for this hook firing. The occurrence index
+        // distinguishes repeated firings of the same hook (e.g. BeforeStep/AfterStep) and stays stable
+        // across retries, even if an earlier attempt aborted before this firing occurred.
+        var occurrence = ParentTracker.NextOccurrence(StepKind.Hook, hookId);
+        StepTracker = TestCaseTracker.GetOrCreateHookStepTracker(hookId, occurrence);
 
         await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepStarted(this)));
     }

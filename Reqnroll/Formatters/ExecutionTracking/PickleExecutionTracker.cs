@@ -114,6 +114,9 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     public int AttemptCount { get; private set; }
     public bool Finished { get; private set; }
 
+    // Guards once-only publication of the TestCase (definition) message for this pickle.
+    private bool _testCaseMessagePublished;
+
     private bool HasCurrentTestCaseExecution => Enabled && CurrentTestCaseExecutionTracker != null;
 
     public ScenarioExecutionStatus ScenarioExecutionStatus => _executionHistory.Last().ScenarioExecutionStatus;
@@ -166,7 +169,23 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
+        // If every attempt failed (so we never hit a passing/skipped terminal state above), publish the
+        // TestCase now from the accumulated ledger, which holds the union of all attempts.
+        await PublishTestCaseMessageOnce();
+
         await CurrentTestCaseExecutionTracker.FinalizeTracking();
+    }
+
+    // Publishes the TestCase (definition) message exactly once per pickle. The per-pickle
+    // OrderFixingMessagePublisher guarantees this message is ordered ahead of the TestCaseStarted /
+    // TestStep* messages that reference its ids, regardless of when this is called.
+    private async Task PublishTestCaseMessageOnce()
+    {
+        if (_testCaseMessagePublished || !Enabled)
+            return;
+
+        _testCaseMessagePublished = true;
+        await _publisher.PublishAsync(Envelope.Create(_messageFactory.ToTestCase(TestCaseTracker)));
     }
 
     public async Task ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
@@ -189,7 +208,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
             CurrentTestCaseExecutionTracker = null; // will be set again in SetExecutionRecordAsCurrentlyExecuting a few lines below
         }
 
-        var testCaseExecutionTracker = _testCaseExecutionTrackerFactory.CreateTestCaseExecutionTracker(this, AttemptCount, TestCaseId, TestCaseTracker, _publisher);
+        var testCaseExecutionTracker = _testCaseExecutionTrackerFactory.CreateTestCaseExecutionTracker(this, AttemptCount, TestCaseId, _publisher);
         SetExecutionRecordAsCurrentlyExecuting(testCaseExecutionTracker);
         await testCaseExecutionTracker.ProcessEvent(scenarioStartedEvent);
     }
@@ -201,6 +220,14 @@ public class PickleExecutionTracker : IPickleExecutionTracker
 
         Finished = true;
         await CurrentTestCaseExecutionTracker.ProcessEvent(scenarioFinishedEvent);
+
+        // A passing or cleanly-skipped attempt executed every step and hook, so the ledger is complete and
+        // correctly ordered, and no retry will follow: it is safe to publish the TestCase now. Anything that
+        // might still be retried (TestError, pending, undefined, ambiguous) is deferred to FinalizeTracking,
+        // by which point the ledger holds the union of all attempts.
+        var status = scenarioFinishedEvent.ScenarioContext.ScenarioExecutionStatus;
+        if (status is ScenarioExecutionStatus.OK or ScenarioExecutionStatus.Skipped)
+            await PublishTestCaseMessageOnce();
     }
 
     public async Task ProcessEvent(StepStartedEvent stepStartedEvent)
